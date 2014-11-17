@@ -1,0 +1,1 @@
+SETX OGRE %CD%
