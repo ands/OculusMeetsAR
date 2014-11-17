@@ -7,15 +7,15 @@
 *.sln.docstates
 
 # Build results
-[Dd]ebug/
-[Dd]ebugPublic/
-[Rr]elease/
-[Rr]eleases/
-x64/
-x86/
-build/
-bld/
-[Bb]in/
+#[Dd]ebug/
+#[Dd]ebugPublic/
+#[Rr]elease/
+#[Rr]eleases/
+#x64/
+#x86/
+#build/
+#bld/
+#[Bb]in/
 [Oo]bj/
 
 # Roslyn cache directories
@@ -41,7 +41,7 @@ dlldata.c
 *.meta
 *.obj
 *.pch
-*.pdb
+#*.pdb
 *.pgc
 *.pgd
 *.rsp
@@ -58,6 +58,9 @@ dlldata.c
 *.pidb
 *.svclog
 *.scc
+*.tlog
+*.idb
+vc120.pdb
 
 # Chutzpah Test files
 _Chutzpah*
@@ -181,3 +184,4 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+ogre.cfg
