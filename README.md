@@ -1,12 +1,16 @@
 OculusMeetsAR
 =============
 
-Including::::	
-Name			Version
-NatNetSDK 		2.7
-OGRE 			2.0
-LibOvr  		0.4.3
+THIS IS A WORK IN PROGRESS, NOT AN USABLE APPLICATION (yet)!
 
-all in 64bit
 
-For Visual Studio 2013 ONLY!!!
+Including:
+
+- NatNetSDK v2.7
+
+- OGRE v2.0
+
+- LibOVR v0.4.3
+
+
+For Windows x64 and Visual Studio 2013 ONLY!!!

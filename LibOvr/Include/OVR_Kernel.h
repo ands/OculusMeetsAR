@@ -26,17 +26,17 @@ limitations under the License.
 #ifndef OVR_h
 #define OVR_h
 
-#include "../Src/Kernel/OVR_Types.h"
-#include "../Src/Kernel/OVR_Allocator.h"
-#include "../Src/Kernel/OVR_RefCount.h"
-#include "../Src/Kernel/OVR_Log.h"
-#include "../Src/Kernel/OVR_Math.h"
-#include "../Src/Kernel/OVR_System.h"
-#include "../Src/Kernel/OVR_Nullptr.h"
-#include "../Src/Kernel/OVR_String.h"
-#include "../Src/Kernel/OVR_Array.h"
-#include "../Src/Kernel/OVR_Timer.h"
-#include "../Src/Kernel/OVR_SysFile.h"
+#include "Kernel/OVR_Types.h"
+#include "Kernel/OVR_Allocator.h"
+#include "Kernel/OVR_RefCount.h"
+#include "Kernel/OVR_Log.h"
+#include "Kernel/OVR_Math.h"
+#include "Kernel/OVR_System.h"
+#include "Kernel/OVR_Nullptr.h"
+#include "Kernel/OVR_String.h"
+#include "Kernel/OVR_Array.h"
+#include "Kernel/OVR_Timer.h"
+#include "Kernel/OVR_SysFile.h"
 
 #endif
 
