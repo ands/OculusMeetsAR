@@ -19,6 +19,7 @@ http://www.ogre3d.org/wiki/
 #include <OgreMaterialManager.h>
 #include "BaseApplication.h"
 
+
 #if OGRE_PLATFORM == OGRE_PLATFORM_APPLE
 #include <macUtils.h>
 #endif

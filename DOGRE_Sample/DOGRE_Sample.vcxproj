@@ -61,7 +61,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(OGRE)/include/OGRE;$(OGRE)/include/OGRE/Overlay</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(OGRE)/include/OGRE;$(NAT_NET)/include;$(OGRE)/include/OGRE/Overlay</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
