@@ -38,5 +38,8 @@
     <ClInclude Include="vec.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="..\ARLib\include\TrackingManager.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
