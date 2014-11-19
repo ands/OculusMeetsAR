@@ -3,7 +3,6 @@ OculusMeetsAR
 
 THIS IS A WORK IN PROGRESS, NOT AN USABLE APPLICATION (yet)!
 
-
 Including:
 
 - NatNetSDK v2.7
