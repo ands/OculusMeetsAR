@@ -1,4 +1,4 @@
-cd ogre
+cd OgreBulletPack
 call SET_ENV.bat
 
 cd ..\NatNetSDK

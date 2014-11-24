@@ -7,9 +7,9 @@ Including:
 
 - NatNetSDK v2.7
 
-- OGRE v2.0
+- OGRE v1.9
 
 - LibOVR v0.4.3
 
 
-For Windows x64 and Visual Studio 2013 ONLY!!!
+For Visual Studio 2010 ONLY!!!
