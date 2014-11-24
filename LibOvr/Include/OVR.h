@@ -28,9 +28,9 @@ limitations under the License.
 
 #include "OVR_Version.h"
 
-#include "../Src/Kernel/OVR_Math.h"
+#include "Kernel/OVR_Math.h"
 
-#include "../Src/OVR_CAPI.h"
+#include "OVR_CAPI.h"
 
 #endif
 
