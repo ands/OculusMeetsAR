@@ -5,13 +5,11 @@
 #ifndef APP_H
 #define APP_H
 
-class Rift;
-
-#include "Rift.h"
 #include <sstream>
 #include <string.h>
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
+#include "Oculus/Rift.h"
 #include "Scene.h"
 #include "Globals.h"
 
