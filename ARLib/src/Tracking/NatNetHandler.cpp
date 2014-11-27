@@ -1,19 +1,29 @@
 #include "NatNetHandler.h"
 #include <WS2tcpip.h>
 
-NatNetHandler::NatNetHandler(int iCType, const std::string& logFile)
+
+
+void StandardMessageCallback(int id, char* msg){
+
+}
+
+void StandardDataCallback(sFrameOfMocapData *frame, void *clientHandle){
+
+}
+
+
+NatNetHandler::NatNetHandler(int iCType, std::string logFile, void (*MessageCallback)(int id, char* msg), void (*DataCallback)(sFrameOfMocapData *frame, void* clientHandle))
 	: eConnectionState(NATNET_PENDING){
 	pClientHandle = new NatNetClient(iCType);
 
-	pClientHandle->SetMessageCallback(this->MessageHandler);
+	pClientHandle->SetMessageCallback(MessageCallback);
 	pClientHandle->SetVerbosityLevel(Verbosity_Info);
-	pClientHandle->SetDataCallback(this->DataHandler, pClientHandle);
+	pClientHandle->SetDataCallback(DataCallback, pClientHandle);
 
-	pNatNetInfoLog = new InfoLog(logFile);
 }
 
 NatNetHandler::~NatNetHandler(){
-	delete pNatNetInfoLog;
+
 }
 
 int NatNetHandler::connect(char* rClientIP, char* rServerIP){
@@ -25,7 +35,7 @@ int NatNetHandler::connect(char* rClientIP, char* rServerIP){
 	int ret = pClientHandle->Initialize(rClientIP, rServerIP);
 
 	if (ret != ErrorCode_OK){
-		pNatNetInfoLog->log("Unable to connect to server. Error Code " + std::to_string(ret) + "\n");
+		//pNatNetInfoLog->log("Unable to connect to server. Error Code " + std::to_string((long long)ret) + "\n");
 		return ErrorCode_Internal;
 	}else{
 		eConnectionState = NATNET_CONNECTED;
@@ -53,27 +63,19 @@ int NatNetHandler::connect(char* rClientIP, char* rServerIP){
 	pClientHandle->GetServerDescription(&ServerDescription);
 
 	if (!ServerDescription.HostPresent){
-		pNatNetInfoLog->log("Unable to connect to server. Host not present. Disconnecting.\n");
+		//pNatNetInfoLog->log("Unable to connect to server. Host not present. Disconnecting.\n");
 		eConnectionState = NATNET_DISCONNECTED;
 		return 1;
 	}
 
-	pNatNetInfoLog->log("Successfully connected to Server.\n");
-	pNatNetInfoLog->log("Application: " + std::string(ServerDescription.szHostApp) + " (version" +
-		std::to_string(ServerDescription.HostAppVersion[0]) + "." + std::to_string(ServerDescription.HostAppVersion[1]) + "." + 
-		std::to_string(ServerDescription.HostAppVersion[2]) + "." + std::to_string(ServerDescription.HostAppVersion[3]) + ")" );
-	pNatNetInfoLog->log("NatNet Version : ");
+	//pNatNetInfoLog->log("Successfully connected to Server.\n");
+	//pNatNetInfoLog->log("Application: " + std::string(ServerDescription.szHostApp) + " (version" +
+	//	std::to_string((long long)ServerDescription.HostAppVersion[0]) + "." + std::to_string((long long)ServerDescription.HostAppVersion[1]) + "." + 
+	//	std::to_string((long long)ServerDescription.HostAppVersion[2]) + "." + std::to_string((long long)ServerDescription.HostAppVersion[3]) + ")" );
+	//pNatNetInfoLog->log("NatNet Version : ");
 	return ret;
 }
 
 int NatNetHandler::disconnect(){
-
-}
-
-void NatNetHandler::MessageHandler(int iId, char* pMsg){
-	pNatNetInfoLog->log(std::to_string(iId) + ":\t" + pMsg + "\n");
-}
-
-void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pUserData){
-
+	return pClientHandle->Uninitialize();
 }

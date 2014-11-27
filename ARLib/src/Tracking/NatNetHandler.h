@@ -18,17 +18,20 @@ typedef enum{
 	NATNET_DISCONNECTED		//after first loss of connection
 }Connection_State;
 
+void StandardMessageCallback(int id, char* msg);
+
+void StandardDataCallback(sFrameOfMocapData *frame, void *clientHandle);
+
 class TRACKINGDLL_API NatNetHandler{
 public:
-	NatNetHandler(int iCType, const std::string& logFile = "NatNetHandler.info");
+	NatNetHandler(int iCType, std::string logFile = "NatNetHandler.info", void (*MessageCallback)(int id, char* msg) = MessageHandler, void (*DataCallback)(sFrameOfMocapData *frame, void *clientHandle) = DataHandler);
 	~NatNetHandler();
 
 	int connect(char* rClientIP, char* rServerIP);
 	int disconnect();
 private:
-	void MessageHandler(int iId, char* pMsg);
-	void DataHandler(sFrameOfMocapData *pFrame, void *pUserData);
-
+	static void MessageHandler(int iId, char* pMsg);
+	static void DataHandler(sFrameOfMocapData *pFrame, void *pUserData);
 
 	char cServerIP[4];
 	char cClientIP[4];
@@ -37,8 +40,6 @@ private:
 	sDataDescriptions *pDataDesc;
 	NatNetClient *pClientHandle;
 	Connection_State eConnectionState;
-
-	InfoLog *pNatNetInfoLog;
 };
 
 #endif

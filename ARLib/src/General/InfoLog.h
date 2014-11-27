@@ -4,6 +4,7 @@
 #include "..\Tracking\TrackingDll.h"
 #include <fstream>
 
+
 class TRACKINGDLL_API InfoLog{
 public:
 	InfoLog(const std::string& filename);
@@ -11,7 +12,7 @@ public:
 
 	void log(const std::string& infoString);
 private:
-	std::ofstream file;
+	std::ofstream *file;
 };
 
 #endif
