@@ -14,13 +14,11 @@
     <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\Globals.cpp" />
     <ClCompile Include="..\src\main.cpp" />
-    <ClCompile Include="..\src\Rift.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\App.h" />
     <ClInclude Include="..\include\Globals.h" />
-    <ClInclude Include="..\include\Rift.h" />
     <ClInclude Include="..\include\Scene.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -69,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBOVR)\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -82,8 +80,8 @@ OgreBulletDynamics_d.lib;
 BulletCollision_d.lib;
 BulletDynamics_d.lib;
 LinearMath_d.lib;
-ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(LIBOVR)\Lib</AdditionalLibraryDirectories>
+ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -95,7 +93,7 @@ ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBOVR)\Include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -110,8 +108,8 @@ OgreBulletDynamics.lib;
 BulletCollision.lib;
 BulletDynamics.lib;
 LinearMath.lib;
-ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovr.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(LIBOVR)\Lib</AdditionalLibraryDirectories>
+ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovr.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
