@@ -1,14 +1,18 @@
-#include "InfoLog.h"
+#include "General/InfoLog.h"
+
+namespace ARLib{
 
 InfoLog::InfoLog(const std::string& filename){
-	file = new std::ofstream(filename, std::ios::out);
+	mFile = new std::ofstream(filename, std::ios::out);
 }
 
 InfoLog::~InfoLog(){
-	file->close();
-	delete file;
+	mFile->close();
+	delete mFile;
 }
 
 void InfoLog::log(const std::string& infoString){
-	(*file) << infoString.c_str();
+	(*mFile) << infoString.c_str();
 }
+
+};

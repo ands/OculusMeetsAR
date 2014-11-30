@@ -1,45 +1,66 @@
-#ifndef NAT_NET_CLIENT_H
-#define NAT_NET_CLIENT_H
+#ifndef ARLIB_NAT_NET_HANDLER_H
+#define ARLIB_NAT_NET_HANDLER_H
 
 /**************************************************
 This Class Manages the handle of the NatNetClient and provides access to the 
 Motive stream data more easily.
 **************************************************/
 
-#include "../General/InfoLog.h"
-#include "TrackingDll.h"
+#include "Tracking/RigidBodyFrame.h"
+#include "Tracking/FrameEvaluator.h"
+#include "General/InfoLog.h"
 #include "NatNetTypes.h"
 #include "NatNetClient.h"
 #include <string>
 
-typedef enum{
-	NATNET_CONNECTED = 0,	//all ok!
-	NATNET_PENDING,			//before first connection
-	NATNET_DISCONNECTED		//after first loss of connection
-}Connection_State;
+namespace ARLib{
 
-void StandardMessageCallback(int id, char* msg);
+	typedef enum{
+		NATNET_CONNECTED = 0,	//all ok!
+		NATNET_PENDING,			//before first connection
+		NATNET_DISCONNECTED		//after first loss of connection
+	}CONNECTION_STATE;
 
-void StandardDataCallback(sFrameOfMocapData *frame, void *clientHandle);
+	typedef struct{
+		union{	
+			struct{
+				char one;
+				char two;
+				char three;
+				char four;
+			};
+			char byte[4];
+		};
+	}ipAddress;
 
-class TRACKINGDLL_API NatNetHandler{
-public:
-	NatNetHandler(int iCType, std::string logFile = "NatNetHandler.info", void (*MessageCallback)(int id, char* msg) = MessageHandler, void (*DataCallback)(sFrameOfMocapData *frame, void *clientHandle) = DataHandler);
-	~NatNetHandler();
+	class NatNetHandler{
+	public:
+		NatNetHandler(ConnectionType iCType, std::string logFile = "NatNetHandler.info");
+		~NatNetHandler();
 
-	int connect(char* rClientIP, char* rServerIP);
-	int disconnect();
-private:
-	static void MessageHandler(int iId, char* pMsg);
-	static void DataHandler(sFrameOfMocapData *pFrame, void *pUserData);
+		int connect(const char* rClientIP, const char* rServerIP);
+		int disconnect();
 
-	char cServerIP[4];
-	char cClientIP[4];
-	int iConnectionType; //Multicast or Unicast
+		CONNECTION_STATE connected()const;
 
-	sDataDescriptions *pDataDesc;
-	NatNetClient *pClientHandle;
-	Connection_State eConnectionState;
+		ipAddress getServerIP() const;
+		ipAddress getClientIP() const;
+
+		void registerFrameEvaluator(FrameEvaluator* evaluator);
+	private:
+		static void MessageHandler(int iId, char* pMsg);
+		static void DataHandler(sFrameOfMocapData *pFrame, void *pClient);
+
+		ipAddress mServerIP;
+		ipAddress mClientIP;
+		int mConnectionType; //Multicast or Unicast
+
+		sDataDescriptions *mDataDesc;
+		NatNetClient *mClientHandle;
+		FrameEvaluator *mEvaluator;
+
+		CONNECTION_STATE mConnectionState;
+	};
+
 };
-
 #endif
