@@ -5,13 +5,14 @@
 
 namespace ARLib{
 
-typedef struct{
+typedef struct Marker{
 	int mMarkerID;
 	float mMarkerSize;
 	Ogre::Vector3 mMarkerPosition;
 }Marker;
 
-typedef struct{
+typedef struct RigidBody{
+	~RigidBody();
 	bool mVisible;
 	int mID;
 	float mError;

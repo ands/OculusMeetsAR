@@ -6,18 +6,21 @@ This class manages the client application, which communicates with the Motive st
 and the Oculus Rift Handle
 ***************************************************/
 
-#include "Tracking\RigidBodyFrame.h"
+#include "Tracking/RigidBodyEventListener.h"
 
 namespace ARLib{
 
 	class FrameEvaluator{
 	public:
+		FrameEvaluator();
 		~FrameEvaluator();
 		void evaluate();
 		void updateFrame(RBFrame *frame);
+		void registerRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
 		RBFrame *mLastFrame;
 		RBFrame *mCurrentFrame;
+		std::vector<RigidBodyEventListener*> mRigidBodies;
 	};
 };
 

@@ -9,7 +9,7 @@ NatNetHandler::NatNetHandler(ConnectionType iCType, std::string logFile)
 
 	mClientHandle->SetMessageCallback(MessageHandler);
 	mClientHandle->SetVerbosityLevel(Verbosity_Info);
-	mClientHandle->SetDataCallback(DataHandler, this);
+	mClientHandle->SetDataCallback(NatNetHandler::DataHandler, this);
 }
 
 NatNetHandler::~NatNetHandler(){
@@ -57,7 +57,6 @@ int NatNetHandler::connect(const char* rClientIP, const char* rServerIP){
 		mConnectionState = NATNET_DISCONNECTED;
 		return 1;
 	}
-
 	//pNatNetInfoLog->log("Successfully connected to Server.\n");
 	//pNatNetInfoLog->log("Application: " + std::string(ServerDescription.szHostApp) + " (version" +
 	//	std::to_string((long long)ServerDescription.HostAppVersion[0]) + "." + std::to_string((long long)ServerDescription.HostAppVersion[1]) + "." + 
@@ -110,11 +109,10 @@ void NatNetHandler::MessageHandler(int iId, char* pMsg){
 void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 	NatNetHandler *pHandler = (NatNetHandler*) pClient;
 
-	bool change = (bool)(pFrame->params & 0x02);
+	bool change = true;//(bool)(pFrame->params & 0x02);
 	if(!change){
 		return;
 	}
-
 	RBFrame *frame = new RBFrame(pFrame->nRigidBodies, pFrame->iFrame, pFrame->fTimestamp, pFrame->fLatency);
 	frame->mChange = change;
 

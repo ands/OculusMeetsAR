@@ -5,12 +5,14 @@ namespace ARLib{
 	
 TrackingManager::TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD)
 	: mTracking(tracking)
-	, mRiftHandle(oculusHMD){
+	, mRiftHandle(oculusHMD)
+	, mEvaluator(nullptr)
+	, mNatNetHandler(nullptr){
 	mEvaluator = new FrameEvaluator();
 }
 
 TrackingManager::~TrackingManager(){
-	if(mNatNetHandler)
+	if(mNatNetHandler != nullptr)
 		delete mNatNetHandler;
 	delete mEvaluator;
 }
@@ -36,24 +38,24 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 	return ARLIB_TRACKING_OK;	
 }
 		
-void TrackingManager::setRiftRigidBodyID(unsigned int id){
-
+void TrackingManager::update(){
+	mEvaluator->evaluate();
 }
 
-void setNatNetConnectionType(ConnectionType cType){
-
+void TrackingManager::setNatNetConnectionType(ConnectionType cType){
+	mNatNetConnectionType = cType;
 }
 		
 void TrackingManager::setNatNetServerIP(const std::string& sIP){
-
+	mNatNetServerIP = sIP;
 }
 
 void TrackingManager::setNatNetClientIP(const std::string& cIP){
-
+	mNatNetClientIP = cIP;
 }
 
 void TrackingManager::registerRigidBodyEventListener(RigidBodyEventListener* listener){
-	mRigidBodies.push_back(listener);
+	mEvaluator->registerRigidBodyEventListener(listener);
 }
 
 };

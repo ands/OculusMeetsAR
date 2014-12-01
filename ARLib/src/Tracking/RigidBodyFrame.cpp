@@ -2,6 +2,10 @@
 
 namespace ARLib{
 
+	RigidBody::~RigidBody(){
+		delete [] mMarkers;
+	}
+
 	void RigidBody::addMarker(unsigned int index, int markerID, float markerSize, Ogre::Vector3& markerPosition){
 		mMarkers[index].mMarkerID = markerID;
 		mMarkers[index].mMarkerSize = markerSize;

@@ -12,11 +12,11 @@ namespace ARLib{
 
 	class RigidBodyEventListener{
 	public:
-		virtual void onChange() = 0;
+		RigidBodyEventListener(unsigned int rigidBodyID);
+		virtual void onChange(RigidBody *rb) = 0;
+		unsigned int getRigidBodyID()const;
 	protected:
-		bool mVisible;
-		Ogre::Vector3 mPosition;
-		Ogre::Quaternion mOrientation;
+		unsigned int mRigidBodyID;
 	};
 };
 #endif

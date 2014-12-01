@@ -33,10 +33,11 @@ namespace ARLib{
 		~TrackingManager();
 
 		TRACKING_ERROR_CODE initialize(); 
-		void setRiftRigidBodyID(unsigned int id);
+		void update();
+
 		void setNatNetConnectionType(ConnectionType cType);
-		void setNatNetServerIP(const std::string& sIP);
-		void setNatNetClientIP(const std::string& cIP);
+		void setNatNetServerIP(const std::string& sIP = "");
+		void setNatNetClientIP(const std::string& cIP = "");
 
 		void registerRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
@@ -44,12 +45,10 @@ namespace ARLib{
 		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;
 
-		unsigned int mRiftRigidBodyID;
 		std::string mNatNetServerIP;
 		std::string mNatNetClientIP;
 		ConnectionType mNatNetConnectionType;
 
-		std::vector<RigidBodyEventListener*> mRigidBodies;
 		NatNetHandler *mNatNetHandler;
 	};
 
