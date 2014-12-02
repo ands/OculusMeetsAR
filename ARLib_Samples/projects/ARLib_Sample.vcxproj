@@ -12,13 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\App.cpp" />
-    <ClCompile Include="..\src\Globals.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\App.h" />
-    <ClInclude Include="..\include\Globals.h" />
     <ClInclude Include="..\include\Scene.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

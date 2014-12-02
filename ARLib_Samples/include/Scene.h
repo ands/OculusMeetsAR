@@ -3,26 +3,18 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
+#include "Oculus/RiftNode.h"
 
 class Scene
 {
 	public:
-		Scene( Ogre::Root* root, OIS::Mouse* mouse, OIS::Keyboard* keyboard );
+		Scene(Ogre::Root* root, OIS::Mouse* mouse, OIS::Keyboard* keyboard);
 		~Scene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
+		ARLib::RiftNode* getRiftNode() { return mRiftNode; }
 
-		// Initialising/Loading the scene
-		void createRoom();
-		void createCameras();
-
-		void update( float dt );
-
-		Ogre::Camera* getLeftCamera() { return mCamLeft; }
-		Ogre::Camera* getRightCamera() { return mCamRight; }
-		void setIPD( float IPD );
-
-		void setRiftPose( Ogre::Quaternion orientation, Ogre::Vector3 pos );
+		void update(float dt);
 
 		// Keyboard and mouse events:
 		bool keyPressed(const OIS::KeyEvent&);
@@ -32,19 +24,14 @@ class Scene
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 
 	private:
+		void createRoom();
+
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
-
-		Ogre::Camera* mCamLeft;
-		Ogre::Camera* mCamRight;
-
-		Ogre::SceneNode* mHeadNode;
-		Ogre::SceneNode* mBodyNode;
-		Ogre::SceneNode* mBodyTiltNode;
-
 		Ogre::SceneNode* mRoomNode;
+		ARLib::RiftNode* mRiftNode;
 };
 
 #endif
