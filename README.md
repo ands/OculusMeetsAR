@@ -27,5 +27,10 @@ Contents
 
 - OgreBulletPack: The Object-Oriented Graphics Rendering Engine with Bullet Physics bindings (and the viargo input aggregation library).
 
+Building
+========
 
-Use SET_ENV.bat to set environment variables for all the libraries.
+Execute SET_ENV.bat to set environment variables for all the libraries prior to building.
+
+Set the working directory for the example projects to "$(TargetDir)" (those are not saved in the Visual Studio project files - don't ask...).
+
