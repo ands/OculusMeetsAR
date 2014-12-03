@@ -30,7 +30,8 @@ Contents
 Building
 ========
 
-Execute SET_ENV.bat to set environment variables for all the libraries prior to building.
+- Execute SET_ENV.bat to set environment variables for all the libraries prior to building.
 
-Set the working directory for the example projects to "$(TargetDir)" (those are not saved in the Visual Studio project files - don't ask...).
+- Set the working directory for the example projects to "$(TargetDir)"
+  (those are not saved in the Visual Studio project files - don't ask...).
 
