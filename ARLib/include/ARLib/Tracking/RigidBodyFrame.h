@@ -12,7 +12,7 @@ typedef struct Marker{
 }Marker;
 
 typedef struct RigidBody{
-	RigidBody(unsigned int nMarker);
+	RigidBody(unsigned int nMarker = 0);
 	~RigidBody();
 	bool mVisible;
 	int mID;
