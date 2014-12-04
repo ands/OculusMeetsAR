@@ -1,6 +1,11 @@
+#include <iostream> // TODO: replace this with the log file!
+#include "OVR.h"
 #include "Oculus/Rift.h"
 
 namespace ARLib {
+
+/////////////////////////////////////////////////////////////////////////
+// statics
 
 bool Rift::isInitialized = false;
 
@@ -29,19 +34,17 @@ bool Rift::available(int id)
 	return result;
 }
 
+/////////////////////////////////////////////////////////////////////////
+// members
+#define hmd ((ovrHmd)hmdHandle) // TODO: BAD UGLY HACK. EVEN RANDOMLY BREAKS INTELLISENSE. FIND A SANE SOLUTION!!!
 
-Rift::Rift(int id, Ogre::Root* root, Ogre::RenderWindow* renderWindow)
+Rift::Rift(int id)
 {
 	if(!isInitialized) throw("Need to initialize first. Call Rift::init()!");
 	std::cout << "Creating Rift (ID: " << id << ")" << std::endl;
 
-	mSceneMgr = root->createSceneManager(Ogre::ST_GENERIC);
-	mSceneMgr->setAmbientLight( Ogre::ColourValue( 0.5, 0.5, 0.5 ) );
-
-	mRenderWindow = renderWindow;
-
-	hmd = ovrHmd_Create(id);
-    if(!hmd) throw( "Could not connect to Rift." );
+	hmdHandle = ovrHmd_Create(id);
+    if(!hmd) throw("Could not connect to Rift.");
 
 	std::cout << "Oculus Rift found." << std::endl;
 	std::cout << "\tProduct Name: " << hmd->ProductName << std::endl;
@@ -55,198 +58,142 @@ Rift::Rift(int id, Ogre::Root* root, Ogre::RenderWindow* renderWindow)
 		throw ("\t\tThis Rift does not support the features needed by the application.");
 	}
 
-	// Configure Render Textures:
-	OVR::Sizei recommendedTex0Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Left, hmd->DefaultEyeFov[0], 1.0f);
-	OVR::Sizei recommendedTex1Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Right, hmd->DefaultEyeFov[1], 1.0f);
+	ipd = ovrHmd_GetFloat(hmd, OVR_KEY_IPD, 0.064f);
 
-	mLeftEyeRenderTexture = Ogre::TextureManager::getSingleton().createManual(
-		"RiftRenderTextureLeft", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		Ogre::TEX_TYPE_2D, recommendedTex0Size.w, recommendedTex0Size.h, 0, Ogre::PF_R8G8B8,
-		Ogre::TU_RENDERTARGET);
-	mRightEyeRenderTexture = Ogre::TextureManager::getSingleton().createManual(
-		"RiftRenderTextureRight", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-		Ogre::TEX_TYPE_2D, recommendedTex1Size.w, recommendedTex1Size.h, 0, Ogre::PF_R8G8B8,
-		Ogre::TU_RENDERTARGET);
-
-	// Assign the textures to the eyes used later:
-	mMatLeft = Ogre::MaterialManager::getSingleton().getByName("Oculus/LeftEye");
-	mMatLeft->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(mLeftEyeRenderTexture);
-	mMatRight = Ogre::MaterialManager::getSingleton().getByName("Oculus/RightEye");
-	mMatRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->setTexture(mRightEyeRenderTexture);
-
-	ovrEyeRenderDesc eyeRenderDesc[2];
-	
-	eyeRenderDesc[0] = ovrHmd_GetRenderDesc(hmd, ovrEye_Left, hmd->DefaultEyeFov[0]);
-	eyeRenderDesc[1] = ovrHmd_GetRenderDesc(hmd, ovrEye_Right, hmd->DefaultEyeFov[1]);
-	
-	std::cout << eyeRenderDesc[0].Fov.DownTan << std::endl;
-	std::cout << eyeRenderDesc[0].Eye << std::endl;
-
-	ovrVector2f UVScaleOffset[2];
-	ovrRecti viewports[2];
-	viewports[0].Pos.x = 0;
-	viewports[0].Pos.y = 0;
-	viewports[0].Size.w = recommendedTex0Size.w;
-	viewports[0].Size.h = recommendedTex0Size.h;
-	viewports[1].Pos.x = recommendedTex0Size.w;
-	viewports[1].Pos.y = 0;
-	viewports[1].Size.w = recommendedTex1Size.w;
-	viewports[1].Size.h = recommendedTex1Size.h;
-
-	Ogre::SceneNode* meshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-
-	// Create the Distortion Meshes:
-	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
-	{
-		ovrDistortionMesh meshData;
-		ovrHmd_CreateDistortionMesh(hmd, eyeRenderDesc[eyeNum].Eye, eyeRenderDesc[eyeNum].Fov, 0, &meshData);
-
-		Ogre::GpuProgramParametersSharedPtr params;
-		
-		if(eyeNum == 0)
-		{
-			ovrHmd_GetRenderScaleAndOffset( eyeRenderDesc[eyeNum].Fov, recommendedTex0Size, viewports[eyeNum], UVScaleOffset);
-			params = mMatLeft->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-		} else {
-			ovrHmd_GetRenderScaleAndOffset( eyeRenderDesc[eyeNum].Fov, recommendedTex1Size, viewports[eyeNum], UVScaleOffset);
-			params = mMatRight->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-		}
-
-		params->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(UVScaleOffset[0].x, UVScaleOffset[0].y));
-		params->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(UVScaleOffset[1].x, UVScaleOffset[1].y));
-		
-		std::cout << "UVScaleOffset[0]: " << UVScaleOffset[0].x << ", " << UVScaleOffset[0].y << std::endl;
-		std::cout << "UVScaleOffset[1]: " << UVScaleOffset[1].x << ", " << UVScaleOffset[1].y << std::endl;
-
-		// create ManualObject
-		// TODO: Destroy the manual objects!!
-		Ogre::ManualObject* manual;
-		if(eyeNum == 0)
-		{
-			manual = mSceneMgr->createManualObject("RiftRenderObjectLeft");
-			manual->begin("Oculus/LeftEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-			//manual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-		}
-		else
-		{
-			manual = mSceneMgr->createManualObject("RiftRenderObjectRight");
-			manual->begin("Oculus/RightEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-			//manual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
-		}
- 
-		for(unsigned int i = 0; i < meshData.VertexCount; i++)
-		{
-			ovrDistortionVertex v = meshData.pVertexData[i];
-			manual->position(v.ScreenPosNDC.x, v.ScreenPosNDC.y, 0);
-			manual->textureCoord(v.TanEyeAnglesR.x, v.TanEyeAnglesR.y);
-			manual->textureCoord(v.TanEyeAnglesG.x, v.TanEyeAnglesG.y);
-			manual->textureCoord(v.TanEyeAnglesB.x, v.TanEyeAnglesB.y);
-			float vig = std::max(v.VignetteFactor, 0.0f);
-			manual->colour(vig, vig, vig, vig);
-		}
-		for(unsigned int i = 0; i < meshData.IndexCount; i++)
-		{
-			manual->index(meshData.pIndexData[i]);
-		}
- 
-		// tell Ogre, your definition has finished
-		manual->end();
-
-		ovrHmd_DestroyDistortionMesh(&meshData);
-
-		meshNode->attachObject(manual);
-	}
-
-	// Create a camera in the (new, external) scene so the mesh can be rendered onto it:
-	mCamera = mSceneMgr->createCamera("OculusRiftExternalCamera");
-	mCamera->setFarClipDistance(50);
-	mCamera->setNearClipDistance(0.001f);
-	mCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-	mCamera->setOrthoWindow(2, 2);
-
-	mSceneMgr->getRootSceneNode()->attachObject(mCamera);
-
-	meshNode->setPosition(0, 0, -1);
-	meshNode->setScale(1, 1, -1);
-
-	mViewport = mRenderWindow->addViewport(mCamera);
-	mViewport->setBackgroundColour(Ogre::ColourValue::Black);
-	mViewport->setOverlaysEnabled(true);
-
-	// Set up IPD in meters:
-	mIPD = ovrHmd_GetFloat(hmd, OVR_KEY_IPD, 0.064f);
-	mPosition = Ogre::Vector3::ZERO;
+	initDistortionGeometries();
 }
 
 Rift::~Rift()
 {
-	if(hmd) ovrHmd_Destroy(hmd);
+	ovrHmd_Destroy(hmd);
 }
 
-// Takes the two cameras created in the scene and creates Viewports in the correct render textures:
-void Rift::setCameras(Ogre::Camera* left, Ogre::Camera* right)
+void Rift::getTextureSizes(int *size2dL,
+						   int *size2dR)
 {
-	Ogre::RenderTexture* renderTexture = mLeftEyeRenderTexture->getBuffer()->getRenderTarget();
-	renderTexture->addViewport(left);
-	renderTexture->getViewport(0)->setClearEveryFrame(true);
-	renderTexture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-	renderTexture->getViewport(0)->setOverlaysEnabled(true);
+	OVR::Sizei recommendedTex0Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Left, hmd->DefaultEyeFov[0], 1.0f);
+	size2dL[0] = recommendedTex0Size.w;
+	size2dL[1] = recommendedTex0Size.h;
 
-	renderTexture = mRightEyeRenderTexture->getBuffer()->getRenderTarget();
-	renderTexture->addViewport(right);
-	renderTexture->getViewport(0)->setClearEveryFrame(true);
-	renderTexture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-	renderTexture->getViewport(0)->setOverlaysEnabled(true);
-	
+	OVR::Sizei recommendedTex1Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Right, hmd->DefaultEyeFov[1], 1.0f);
+	size2dR[0] = recommendedTex1Size.w;
+	size2dR[1] = recommendedTex1Size.h;
+}
+
+void Rift::getUVScalesAndOffsets(float *scale2dL, float *offset2dL,
+								 float *scale2dR, float *offset2dR)
+{
+	ovrEyeRenderDesc eyeRenderDesc[2];
+	eyeRenderDesc[0] = ovrHmd_GetRenderDesc(hmd, ovrEye_Left, hmd->DefaultEyeFov[0]);
+	eyeRenderDesc[1] = ovrHmd_GetRenderDesc(hmd, ovrEye_Right, hmd->DefaultEyeFov[1]);
+
+	ovrRecti viewports[2];
+	viewports[0].Pos.x = 0;
+	viewports[0].Pos.y = 0;
+	viewports[0].Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Left, hmd->DefaultEyeFov[0], 1.0f);
+	viewports[1].Pos.x = viewports[0].Size.w;
+	viewports[1].Pos.y = 0;
+	viewports[1].Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Right, hmd->DefaultEyeFov[1], 1.0f);
+
+	ovrVector2f UVScaleOffset[2][2];
+	ovrHmd_GetRenderScaleAndOffset(eyeRenderDesc[0].Fov, viewports[0].Size, viewports[0], UVScaleOffset[0]);
+	ovrHmd_GetRenderScaleAndOffset(eyeRenderDesc[1].Fov, viewports[1].Size, viewports[1], UVScaleOffset[1]);
+
+	scale2dL[0] = UVScaleOffset[0][0].x;
+	scale2dL[1] = UVScaleOffset[0][0].y;
+	scale2dR[0] = UVScaleOffset[1][0].x;
+	scale2dR[1] = UVScaleOffset[1][0].y;
+
+	offset2dL[0] = UVScaleOffset[0][1].x;
+	offset2dL[1] = UVScaleOffset[0][1].y;
+	offset2dR[0] = UVScaleOffset[1][1].x;
+	offset2dR[1] = UVScaleOffset[1][1].y;
+}
+
+void Rift::initDistortionGeometries()
+{
+	assert(sizeof(ovrDistortionVertex) == sizeof(DistortionVertex));
+
+	ovrEyeRenderDesc eyeRenderDesc[2];
+	eyeRenderDesc[0] = ovrHmd_GetRenderDesc(hmd, ovrEye_Left, hmd->DefaultEyeFov[0]);
+	eyeRenderDesc[1] = ovrHmd_GetRenderDesc(hmd, ovrEye_Right, hmd->DefaultEyeFov[1]);
+
+	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
+	{
+		ovrDistortionMesh meshData;
+		ovrHmd_CreateDistortionMesh(hmd, eyeRenderDesc[eyeNum].Eye, eyeRenderDesc[eyeNum].Fov, 0, &meshData);
+ 
+		vertices[eyeNum].resize(meshData.VertexCount);
+		indices[eyeNum].resize(meshData.IndexCount);
+
+		memcpy(&vertices[eyeNum][0], &meshData.pVertexData[0], meshData.VertexCount * sizeof(ovrDistortionVertex));
+		memcpy(&indices[eyeNum][0], &meshData.pIndexData[0], meshData.IndexCount * sizeof(unsigned short));
+
+		ovrHmd_DestroyDistortionMesh(&meshData);
+	}
+}
+
+void Rift::getDistortionGeometries(DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
+								   DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR)
+{
+	*verticesL = &this->vertices[0][0];
+	*vertexNumL = this->vertices[0].size();
+	*indicesL = &this->indices[0][0];
+	*indexNumL = this->indices[0].size();
+
+	*verticesR = &this->vertices[1][0];
+	*vertexNumR = this->vertices[1].size();
+	*indicesR = &this->indices[1][0];
+	*indexNumR = this->indices[1].size();
+}
+
+void Rift::getProjections(float znear, float zfar, bool rightHanded,
+						  float *aspectRatioL, float *projection4x4L,
+						  float *aspectRatioR, float *projection4x4R)
+{
 	ovrFovPort fovLeft = hmd->DefaultEyeFov[ovrEye_Left];
 	ovrFovPort fovRight = hmd->DefaultEyeFov[ovrEye_Right];
 
-	float combinedTanHalfFovHorizontal = std::max(fovLeft.LeftTan, fovLeft.RightTan);
-	float combinedTanHalfFovVertical = std::max(fovLeft.UpTan, fovLeft.DownTan);
-	float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
-	
-	left->setAspectRatio(aspectRatio);
-	right->setAspectRatio(aspectRatio);
-	
-	ovrMatrix4f projL = ovrMatrix4f_Projection(fovLeft, 0.001f, 50.0f, true);
-	ovrMatrix4f projR = ovrMatrix4f_Projection(fovRight, 0.001f, 50.0f, true);
+	float combinedTanHalfFovHorizontalL = std::max(fovLeft.LeftTan, fovLeft.RightTan);
+	float combinedTanHalfFovHorizontalR = std::max(fovRight.LeftTan, fovRight.RightTan);
 
-	left->setCustomProjectionMatrix(true,
-		Ogre::Matrix4(projL.M[0][0], projL.M[0][1], projL.M[0][2], projL.M[0][3],
-				projL.M[1][0], projL.M[1][1], projL.M[1][2], projL.M[1][3],
-				projL.M[2][0], projL.M[2][1], projL.M[2][2], projL.M[2][3],
-				projL.M[3][0], projL.M[3][1], projL.M[3][2], projL.M[3][3]));
-	right->setCustomProjectionMatrix(true,
-		Ogre::Matrix4(projR.M[0][0], projR.M[0][1], projR.M[0][2], projR.M[0][3],
-				projR.M[1][0], projR.M[1][1], projR.M[1][2], projR.M[1][3],
-				projR.M[2][0], projR.M[2][1], projR.M[2][2], projR.M[2][3],
-				projR.M[3][0], projR.M[3][1], projR.M[3][2], projR.M[3][3]));
+	float combinedTanHalfFovVerticalL = std::max(fovLeft.UpTan, fovLeft.DownTan);
+	float combinedTanHalfFovVerticalR = std::max(fovRight.UpTan, fovRight.DownTan);
+
+	*aspectRatioL = combinedTanHalfFovHorizontalL / combinedTanHalfFovVerticalL;
+	*aspectRatioR = combinedTanHalfFovHorizontalR / combinedTanHalfFovVerticalR;
+	
+	ovrMatrix4f projectionL = ovrMatrix4f_Projection(fovLeft, znear, zfar, rightHanded);
+	ovrMatrix4f projectionR = ovrMatrix4f_Projection(fovRight, znear, zfar, rightHanded);
+
+	memcpy(projection4x4L, projectionL.M, 16 * sizeof(float));
+	memcpy(projection4x4R, projectionR.M, 16 * sizeof(float));
 }
 
-bool Rift::update(float dt)
+void Rift::getPose(float *position3d, float *orientationQuaternionXYZW)
 {
-	if(!hmd) return true;
-
 	ovrFrameTiming frameTiming = ovrHmd_BeginFrameTiming(hmd, 0);
+
 	ovrTrackingState ts = ovrHmd_GetTrackingState(hmd, frameTiming.ScanoutMidpointSeconds);
+	positionCurrentlyTracked = (ts.StatusFlags & ovrStatus_PositionTracked) != 0;
+	orientationCurrentlyTracked = (ts.StatusFlags & ovrStatus_OrientationTracked) != 0;
+	cameraPoseCurrentlyTracked = (ts.StatusFlags & ovrStatus_CameraPoseTracked) != 0;
+	positionTrackingConnected = (ts.StatusFlags & ovrStatus_PositionConnected) != 0;
 
-	//ovrPosef headPose;
-
-	if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
-	{
-		// The cpp compatibility layer is used to convert ovrPosef to Posef (see OVR_Math.h)
-		OVR::Posef pose = ts.HeadPose.ThePose;
-		mOrientation = Ogre::Quaternion(pose.Rotation.w, pose.Rotation.x, pose.Rotation.y, pose.Rotation.z);
-		mPosition = Ogre::Vector3(pose.Translation.x, pose.Translation.y, pose.Translation.z);
-	}
+	ovrPosef pose = ts.HeadPose.ThePose;
+	position3d[0] = pose.Position.x;
+	position3d[1] = pose.Position.y;
+	position3d[2] = pose.Position.z;
+	orientationQuaternionXYZW[0] = pose.Orientation.x;
+	orientationQuaternionXYZW[1] = pose.Orientation.y;
+	orientationQuaternionXYZW[2] = pose.Orientation.z;
+	orientationQuaternionXYZW[3] = pose.Orientation.w;
 
 	/*ovr_WaitTillTime(frameTiming.TimewarpPointSeconds);
-
 	for(int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
 		ovrMatrix4f tWM[2];
 		ovrHmd_GetEyeTimewarpMatrices(hmd, (ovrEyeType) eyeNum, headPose, tWM);
-
 		Ogre::GpuProgramParametersSharedPtr params = mMatRight->getTechnique(0)->getPass(0)->getVertexProgramParameters();
 			params->setNamedConstant("eyeRotationStart",
 					Ogre::Matrix4(tWM[0].M[0][0], tWM[0].M[0][1], tWM[0].M[0][2], tWM[0].M[0][3],
@@ -261,14 +208,13 @@ bool Rift::update(float dt)
 	}*/
 
 	ovrHmd_EndFrameTiming(hmd);
-
-	return true;
 }
 
 void Rift::recenterPose()
 {
-	if (hmd)
-		ovrHmd_RecenterPose(hmd);
+	ovrHmd_RecenterPose(hmd);
 }
+
+#undef hmd
 
 }; // ARLib namespace

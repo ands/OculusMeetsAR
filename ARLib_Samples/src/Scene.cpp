@@ -1,22 +1,12 @@
 #include "Scene.h"
 
-Scene::Scene( Ogre::Root* root, OIS::Mouse* mouse, OIS::Keyboard* keyboard )
+Scene::Scene(ARLib::Rift *rift, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
 	mRoot = root;
 	mMouse = mouse;
 	mKeyboard = keyboard;
 	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
 
-	createRoom();
-}
-
-Scene::~Scene()
-{
-	if (mSceneMgr) delete mSceneMgr;
-}
-
-void Scene::createRoom()
-{
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f,0.1f,0.1f));
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 	mSceneMgr->setShadowFarDistance(30);
@@ -60,7 +50,7 @@ void Scene::createRoom()
 	mRoomNode->attachObject( roomLight );
 
 	// rift node:
-	mRiftNode = new ARLib::RiftNode(mSceneMgr);
+	mRiftNode = new ARLib::RiftNode(rift, root, renderWindow, mSceneMgr, 0.001f, 50.0f, 0);
 	mRiftNode->getNode()->setPosition(4.0f, 1.5f, 4.0f);
 	//mRiftNode->getNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 
@@ -73,9 +63,25 @@ void Scene::createRoom()
 	mRiftNode->getNode()->attachObject(light);
 }
 
-void Scene::update( float dt )
+Scene::~Scene()
 {
-	// TODO: will be handled by the tracking system
+	mRoot->destroySceneManager(mSceneMgr);
+	delete mRiftNode;
+}
+
+void Scene::update(float dt)
+{
+	ARLib::Rift *rift = mRiftNode->getRift();
+	if (rift)
+	{
+		// TODO: this needs to be done by the tracking system!
+		static ARLib::RigidBody rb; float q[4];
+		rift->getPose(&rb.mPosition.x, q);
+		rb.mOrientation = Ogre::Quaternion(q[3], q[0], q[1], q[2]);
+		mRiftNode->onChange(&rb);
+	}
+
+	// TODO: will also be handled by the tracking system?
 	/*float forward = (mKeyboard->isKeyDown( OIS::KC_W ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_S ) ? 0 : -1);
 	float leftRight = (mKeyboard->isKeyDown( OIS::KC_A ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_D ) ? 0 : -1);
 

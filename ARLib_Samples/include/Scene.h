@@ -3,12 +3,12 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
-#include "Oculus/RiftNode.h"
+#include "Ogre/RiftNode.h"
 
 class Scene
 {
 	public:
-		Scene(Ogre::Root* root, OIS::Mouse* mouse, OIS::Keyboard* keyboard);
+		Scene(ARLib::Rift *rift, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
 		~Scene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
@@ -24,8 +24,6 @@ class Scene
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 
 	private:
-		void createRoom();
-
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;

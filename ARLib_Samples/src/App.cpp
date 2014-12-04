@@ -21,9 +21,9 @@ App::App(bool showDebugWindow)
 
 	initOgre(showDebugWindow);
 	initOIS();
-	mScene = new Scene(mRoot, mMouse, mKeyboard);
-	createViewports();
 	initRift();
+	mScene = new Scene(mRift, mWindow, mRoot, mMouse, mKeyboard);
+	createViewports();
 	mRoot->startRendering();
 }
 
@@ -99,7 +99,7 @@ void App::initOgre(bool showDebugWindow)
 }
 void App::quitOgre()
 {
-	//if(mRoot) delete mRoot;
+	if(mRoot) delete mRoot;
 }
 
 void App::initOIS()
@@ -142,10 +142,7 @@ void App::initRift()
 	if (mRiftAvailable)
 	{
 		try {
-			mRift = new ARLib::Rift(0, mRoot, mWindow);
-			ARLib::RiftNode* riftNode = mScene->getRiftNode();
-			mRift->setCameras(riftNode->getLeftCamera(), riftNode->getRightCamera());
-			riftNode->setIPD(mRift->getIPD());
+			mRift = new ARLib::Rift(0);
 		} catch(const char* e) {
 			std::cout << ">> " << e << std::endl;
 			mRiftAvailable = false;
@@ -177,17 +174,6 @@ void App::createViewports()
 bool App::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
-
-	if (mRift)
-	{
-		if (mRift->update(evt.timeSinceLastFrame))
-		{
-			mScene->getRiftNode()->setPose(mRift->getOrientation(), mRift->getPosition());
-		} else {
-			delete mRift;
-			mRift = NULL;
-		}
-	}
 
 	// update the standard input devices
 	mKeyboard->capture();

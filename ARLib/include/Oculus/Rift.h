@@ -1,63 +1,76 @@
 #ifndef RIFT_H
 #define RIFT_H
 
-#include <iostream>
-
-#include "OVR.h"
-#include "OGRE/Ogre.h"
+#include <vector>
 
 namespace ARLib {
+
+struct DistortionVertex
+{
+	float ScreenPosNDC[2]; // [-1,+1],[-1,+1] over the entire framebuffer.
+    float TimeWarpFactor;  // Lerp factor between time-warp matrices. Can be encoded in Pos.z.
+    float VignetteFactor;  // Vignette fade factor. Can be encoded in Pos.w.
+    float TanEyeAnglesR[2];
+    float TanEyeAnglesG[2];
+    float TanEyeAnglesB[2];
+};
 
 class Rift
 {
 	public:
-		Rift(int id, Ogre::Root* root, Ogre::RenderWindow* renderWindow);
+		Rift(int id);
 		~Rift();
 		
 		static void init();
 		static void shutdown();
 		static bool available(int id);
-		
-		// Must be called to set up viewports correctly.
-		// Create the cameras in your scene, then call this function
-		void setCameras(Ogre::Camera* left, Ogre::Camera* right);
 
-		// Update Rift data every frame. This should return true as long as data is read from rift.
-		bool update(float dt);
+		void getTextureSizes(
+			int *size2dL,
+			int *size2dR);
 
-		Ogre::Quaternion getOrientation() { return mOrientation; }
-		Ogre::Vector3 getPosition() { return mPosition; }
+		void getUVScalesAndOffsets(
+			float *scale2dL, float *offset2dL,
+			float *scale2dR, float *offset2dR);
 
-		// returns interpupillary distance in meters: (Default: 0.064m)
-		float getIPD() { return mIPD; }
-		
-		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
+		void getDistortionGeometries(
+			DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
+			DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR);
 
-		// Used to reset head position and orientation to "forward".
-		// Call this when user presses 'R', for example.
+		void getProjections(
+			float znear, float zfar, bool rightHanded,
+			float *aspectRatioL, float *projection4x4L,
+			float *aspectRatioR, float *projection4x4R);
+
+		void getPose(
+			float *position3d,
+			float *orientationQuaternionXYZW);
+
 		void recenterPose();
+
+		float getInterpupillaryDistance() { return ipd; }
+
+		bool isPositionCurrentlyTracked() { return positionCurrentlyTracked; }
+		bool isOrientationCurrentlyTracked() { return orientationCurrentlyTracked; }
+		bool isCameraPoseCurrentlyTracked() { return cameraPoseCurrentlyTracked; }
+		bool isPositionTrackingConnected() { return positionTrackingConnected; }
 
 	private:
 		static bool isInitialized;
 
-		ovrHmd hmd;
+		void initDistortionGeometries();
 
-		Ogre::Quaternion mOrientation;
-		Ogre::Vector3 mPosition;
-		
-		Ogre::TexturePtr mLeftEyeRenderTexture;
-		Ogre::TexturePtr mRightEyeRenderTexture;
+		const void *hmdHandle;
 
-		Ogre::SceneManager* mSceneMgr;
-		Ogre::RenderWindow* mRenderWindow;
+		float ipd;
 
-		Ogre::Camera* mCamera;
-		Ogre::Viewport* mViewport;
+		bool positionCurrentlyTracked;
+		bool orientationCurrentlyTracked;
+		bool cameraPoseCurrentlyTracked;
+		bool positionTrackingConnected;
 
-		Ogre::MaterialPtr mMatLeft;
-		Ogre::MaterialPtr mMatRight;
-
-		float mIPD;
+		std::vector<DistortionVertex> vertices[2];
+		std::vector<unsigned short> indices[2];
 };
 
 }; // ARLib namespace
