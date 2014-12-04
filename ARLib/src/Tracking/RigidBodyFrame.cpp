@@ -2,6 +2,11 @@
 
 namespace ARLib{
 
+	RigidBody::RigidBody(unsigned int nMarker)
+		: mNMarker(nMarker){
+		mMarkers = new Marker[mNMarker];
+	}
+
 	RigidBody::~RigidBody(){
 		delete [] mMarkers;
 	}

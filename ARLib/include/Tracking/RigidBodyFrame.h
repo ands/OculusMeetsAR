@@ -12,13 +12,14 @@ typedef struct Marker{
 }Marker;
 
 typedef struct RigidBody{
+	RigidBody(unsigned int nMarker);
 	~RigidBody();
 	bool mVisible;
 	int mID;
 	float mError;
 	Ogre::Vector3 mPosition;
 	Ogre::Quaternion mOrientation;
-	int mNMarker;
+	unsigned int mNMarker;
 	Marker *mMarkers;
 	void addMarker(unsigned int index, int markerID, float markerSize, Ogre::Vector3& markerPosition);
 }RigidBody;

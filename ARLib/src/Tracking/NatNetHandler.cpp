@@ -117,15 +117,13 @@ void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 	frame->mChange = change;
 
 	for(int i = 0; i < pFrame->nRigidBodies; i++){
-		RigidBody *rb = new RigidBody();
 		sRigidBodyData& pRB = pFrame->RigidBodies[i];
+		RigidBody *rb = new RigidBody(pRB.nMarkers);
 		rb->mVisible = pRB.params & 0x01;
 		rb->mID = pRB.ID;
 		rb->mError = pRB.MeanError;
 		rb->mPosition = Ogre::Vector3(pRB.x, pRB.y, pRB.z);
 		rb->mOrientation = Ogre::Quaternion(pRB.qx, pRB.qy, pRB.qz, pRB.qw);
-		rb->mNMarker = pRB.nMarkers;
-		rb->mMarkers = new Marker[rb->mNMarker];
 
 		for(int j = 0; j < rb->mNMarker; j++){
 			int markerID = pRB.MarkerIDs ? pRB.MarkerIDs[j] : -1;
