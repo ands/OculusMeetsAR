@@ -3,7 +3,7 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
-#include "Oculus/Rift.h"
+#include "ARLib/Oculus/Rift.h"
 #include "Scene.h"
 
 class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener

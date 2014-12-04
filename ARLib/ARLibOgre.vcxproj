@@ -11,24 +11,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ARLib\General\InfoLog.h" />
-    <ClInclude Include="include\ARLib\Tracking\FrameEvaluator.h" />
-    <ClInclude Include="include\ARLib\Tracking\NatNetHandler.h" />
-    <ClInclude Include="include\ARLib\Tracking\RigidBodyEventListener.h" />
-    <ClInclude Include="include\ARLib\Tracking\RigidBodyFrame.h" />
-    <ClInclude Include="include\ARLib\Tracking\TrackingManager.h" />
+    <ClCompile Include="src\Ogre\RiftNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\General\InfoLog.cpp" />
-    <ClCompile Include="src\Tracking\FrameEvaluator.cpp" />
-    <ClCompile Include="src\Tracking\NatNetHandler.cpp" />
-    <ClCompile Include="src\Tracking\RigidBodyEventListener.cpp" />
-    <ClCompile Include="src\Tracking\RigidBodyFrame.cpp" />
-    <ClCompile Include="src\Tracking\TrackingManager.cpp" />
+    <ClInclude Include="include\ARLib\Ogre\RiftNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{963869C4-75C7-499E-BD3F-3383F063E5E6}</ProjectGuid>
-    <RootNamespace>ARLibTracking</RootNamespace>
+    <ProjectGuid>{F2CE07FF-A392-47A2-9F84-BD290656AAFE}</ProjectGuid>
+    <RootNamespace>ARLibOgre</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -63,19 +53,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_MBCS;TRACKINGDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)/include;$(NAT_NET)/include;$(LIBOVR)/include;$(ProjectDir)/include</AdditionalIncludeDirectories>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <AdditionalIncludeDirectories>include;$(OGRE_BULLET_PACK)/include;$(LIBOVR)/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_MBCS;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(LIBOVR)/Lib;$(NAT_NET)/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>NatNetLib.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <Lib>
-      <AdditionalDependencies>NatNetLibStatic.lib;ARLibOculus_d.lib;ws2_32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ARLIB)/lib;$(NAT_NET)/lib%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -83,18 +66,15 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>_MBCS;TRACKINGDLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)/include;$(NAT_NET)/include;$(LIBOVR)/include;$(ProjectDir)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>include;$(OGRE_BULLET_PACK)/include;$(LIBOVR)/Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_MBCS;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(OGRE_BULLET_PACK)\lib\$(Configuration)</AdditionalLibraryDirectories>
     </Link>
-    <Lib>
-      <AdditionalDependencies>NatNetLib.lib;ARLibOculus.lib;ws2_32.lib%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(ARLIB)/lib;$(NAT_NET)/lib%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-    </Lib>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

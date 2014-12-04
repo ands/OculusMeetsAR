@@ -12,11 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Oculus\Rift.cpp" />
-    <ClCompile Include="src\Oculus\RiftNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Oculus\Rift.h" />
-    <ClInclude Include="include\Oculus\RiftNode.h" />
+    <ClInclude Include="include\ARLib\Oculus\Rift.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{3868D32F-7B02-478D-BAAA-0DCEB2574B6F}</ProjectGuid>
