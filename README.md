@@ -3,6 +3,8 @@ OculusMeetsAR
 
 THIS IS A WORK IN PROGRESS, NOT AN USABLE LIBRARY/APPLICATION (yet)!
 
+
+
 Including:
 
 - NatNetSDK v2.7
@@ -17,9 +19,9 @@ For Visual Studio 2010 ONLY
 Contents
 ========
 
-- ARLib: The main library. Can be used to create augmented reality applications with an Oculus Rift DK2 and attached cameras using Ogre.
+- ARLib: The main library. Can be used to create augmented reality applications with an Oculus Rift DK2 and attached cameras. Also features direct Ogre integration.
 
-- ARLib_Samples: Various sample applications that use ARLib.
+- ARLib_Samples: Various sample applications that use ARLib with Ogre.
 
 - LibOVR: Static libraries from the original Oculus SDK.
 
