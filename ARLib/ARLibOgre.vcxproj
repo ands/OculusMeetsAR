@@ -14,7 +14,7 @@
     <ClCompile Include="src\Ogre\RiftNode.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Ogre\RiftNode.h" />
+    <ClInclude Include="include\ARLib\Ogre\RiftNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2CE07FF-A392-47A2-9F84-BD290656AAFE}</ProjectGuid>

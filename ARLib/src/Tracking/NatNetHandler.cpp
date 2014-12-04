@@ -1,4 +1,4 @@
-#include "Tracking\NatNetHandler.h"
+#include "ARLib/Tracking/NatNetHandler.h"
 #include <WS2tcpip.h>
 
 namespace ARLib{

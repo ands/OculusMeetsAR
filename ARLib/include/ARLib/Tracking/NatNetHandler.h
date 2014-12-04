@@ -6,9 +6,9 @@ This Class Manages the handle of the NatNetClient and provides access to the
 Motive stream data more easily.
 **************************************************/
 
-#include "Tracking/RigidBodyFrame.h"
-#include "Tracking/FrameEvaluator.h"
-#include "General/InfoLog.h"
+#include "ARLib/Tracking/RigidBodyFrame.h"
+#include "ARLib/Tracking/FrameEvaluator.h"
+#include "ARLib/General/InfoLog.h"
 #include "NatNetTypes.h"
 #include "NatNetClient.h"
 #include <string>

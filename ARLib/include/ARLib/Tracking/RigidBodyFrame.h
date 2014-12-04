@@ -1,7 +1,7 @@
 #ifndef ARLIB_RIGID_BODY_FRAME_H
 #define ARLIB_RIGID_BODY_FRAME_H
 
-#include "OGRE\Ogre.h"
+#include "OGRE/Ogre.h"
 
 namespace ARLib{
 

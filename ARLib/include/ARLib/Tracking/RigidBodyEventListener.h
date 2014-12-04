@@ -6,7 +6,7 @@ This class manages the client application, which communicates with the Motive st
 and the Oculus Rift Handle
 ***************************************************/
 
-#include "Tracking\RigidBodyFrame.h"
+#include "ARLib/Tracking/RigidBodyFrame.h"
 
 namespace ARLib{
 

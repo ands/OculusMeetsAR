@@ -1,6 +1,6 @@
 #include <iostream> // TODO: replace this with the log file!
 #include "OVR.h"
-#include "Oculus/Rift.h"
+#include "ARLib/Oculus/Rift.h"
 
 namespace ARLib {
 

@@ -1,6 +1,6 @@
 #include <iostream>
 #include "OGRE/Ogre.h"
-#include "Tracking/TrackingManager.h"
+#include "ARLib/Tracking/TrackingManager.h"
 using namespace std;
 
 class SomeRigidBody : public ARLib::RigidBodyEventListener{

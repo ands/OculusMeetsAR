@@ -3,7 +3,7 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
-#include "Ogre/RiftNode.h"
+#include "ARLib/Ogre/RiftNode.h"
 
 class Scene
 {

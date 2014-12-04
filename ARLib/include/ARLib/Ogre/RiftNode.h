@@ -2,8 +2,8 @@
 #define RIFTNODE_H
 
 #include "OGRE/Ogre.h"
-#include "Oculus/Rift.h"
-#include "Tracking/RigidBodyEventListener.h"
+#include "ARLib/Oculus/Rift.h"
+#include "ARLib/Tracking/RigidBodyEventListener.h"
 
 namespace ARLib {
 

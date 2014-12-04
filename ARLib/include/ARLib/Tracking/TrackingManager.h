@@ -6,9 +6,9 @@ This class manages the client application, which communicates with the Motive st
 and the Oculus Rift Handle
 ***************************************************/
 
-#include "Tracking/NatNetHandler.h"
-#include "Tracking/FrameEvaluator.h"
-#include "Oculus/Rift.h"
+#include "ARLib/Tracking/NatNetHandler.h"
+#include "ARLib/Tracking/FrameEvaluator.h"
+#include "ARLib/Oculus/Rift.h"
 
 namespace ARLib{
 

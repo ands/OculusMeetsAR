@@ -1,4 +1,4 @@
-#include "Tracking\RigidBodyFrame.h"
+#include "ARLib/Tracking/RigidBodyFrame.h"
 
 namespace ARLib{
 

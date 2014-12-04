@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\General\InfoLog.h" />
-    <ClInclude Include="include\Tracking\FrameEvaluator.h" />
-    <ClInclude Include="include\Tracking\NatNetHandler.h" />
-    <ClInclude Include="include\Tracking\RigidBodyEventListener.h" />
-    <ClInclude Include="include\Tracking\RigidBodyFrame.h" />
-    <ClInclude Include="include\Tracking\TrackingManager.h" />
+    <ClInclude Include="include\ARLib\General\InfoLog.h" />
+    <ClInclude Include="include\ARLib\Tracking\FrameEvaluator.h" />
+    <ClInclude Include="include\ARLib\Tracking\NatNetHandler.h" />
+    <ClInclude Include="include\ARLib\Tracking\RigidBodyEventListener.h" />
+    <ClInclude Include="include\ARLib\Tracking\RigidBodyFrame.h" />
+    <ClInclude Include="include\ARLib\Tracking\TrackingManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\General\InfoLog.cpp" />
