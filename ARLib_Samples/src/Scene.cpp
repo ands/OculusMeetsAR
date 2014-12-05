@@ -1,6 +1,7 @@
 #include "Scene.h"
+#include "RigidListenerNode.h"
 
-Scene::Scene(ARLib::Rift *rift, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard)
+Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -13,17 +14,14 @@ Scene::Scene(ARLib::Rift *rift, Ogre::RenderWindow *renderWindow, Ogre::Root *ro
 
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
 
-	Ogre::SceneNode* cubeNode = mRoomNode->createChildSceneNode();
-	Ogre::Entity* cubeEnt = mSceneMgr->createEntity( "Cube.mesh" );
-	cubeEnt->getSubEntity(0)->setMaterialName( "CubeMaterialRed" );
-	cubeNode->attachObject( cubeEnt );
-	cubeNode->setPosition( 1.0, 0.0, 0.0 );
+	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
+	tracker->registerRigidBodyEventListener(cubeNodeT);
+
 	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
 	cubeNode2->setPosition( 3.0, 0.0, 0.0 );
-	cubeNode->setScale( 0.5, 0.5, 0.5 );
 	cubeNode2->setScale( 0.5, 0.5, 0.5 );
 	
 	Ogre::SceneNode* cubeNode3 = mRoomNode->createChildSceneNode();

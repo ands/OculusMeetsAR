@@ -1,15 +1,16 @@
 #include "App.h"
 
 App::App(bool showDebugWindow)
-	: mRoot(NULL)
-	, mKeyboard(NULL)
-	, mMouse(NULL)
-	, mScene(NULL)
+	: mRoot(nullptr)
+	, mKeyboard(nullptr)
+	, mMouse(nullptr)
+	, mScene(nullptr)
 	, mShutdown(false)
-	, mWindow(NULL)
-	, mSmallWindow(NULL)
+	, mWindow(nullptr)
+	, mSmallWindow(nullptr)
 	, mRiftAvailable(false)
-	, mRift(NULL)
+	, mRift(nullptr)
+	, mTracker(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 
@@ -22,7 +23,8 @@ App::App(bool showDebugWindow)
 	initOgre(showDebugWindow);
 	initOIS();
 	initRift();
-	mScene = new Scene(mRift, mWindow, mRoot, mMouse, mKeyboard);
+	initTracking();
+	mScene = new Scene(mRift, mTracker, mWindow, mRoot, mMouse, mKeyboard);
 	createViewports();
 	mRoot->startRendering();
 }
@@ -30,6 +32,7 @@ App::App(bool showDebugWindow)
 App::~App()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
+	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
 	if(mScene) delete mScene;
@@ -146,7 +149,7 @@ void App::initRift()
 		} catch(const char* e) {
 			std::cout << ">> " << e << std::endl;
 			mRiftAvailable = false;
-			mRift = NULL;
+			mRift = nullptr;
 		}
 	}
 }
@@ -155,6 +158,35 @@ void App::quitRift()
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
 	if(mRift) delete mRift;
 	ARLib::Rift::shutdown();
+}
+		
+void App::initTracking()
+{
+	if(mRiftAvailable)
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, mRift);
+	else
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET);
+
+	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
+	mTracker->setNatNetClientIP(); //local machine
+	mTracker->setNatNetServerIP(); //local machine
+
+	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
+	if(error != ARLib::ARLIB_TRACKING_OK){
+		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
+		mTrackingAvailable = false;
+		//mTracker->uninitialize(); ::todo
+		delete mTracker;
+	}else{
+		mTrackingAvailable = true;	
+	}
+}
+		
+void App::quitTracking()
+{
+	std::cout << "Shutting down Tracking System" << std::endl;
+	//mTracker->uninitialize(); ::todo
+	if(mTracker) delete mTracker;
 }
 
 void App::createViewports()
@@ -179,6 +211,7 @@ bool App::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
+	mTracker->update(); //right place?
 	mScene->update(evt.timeSinceLastFrame);
 
 	return true; 

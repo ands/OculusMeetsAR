@@ -4,11 +4,12 @@
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
 #include "ARLib/Ogre/RiftNode.h"
+#include "ARLib/Tracking/TrackingManager.h"
 
 class Scene
 {
 	public:
-		Scene(ARLib::Rift *rift, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
+		Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
 		~Scene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }

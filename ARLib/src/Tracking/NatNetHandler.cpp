@@ -1,7 +1,9 @@
 #include "ARLib/Tracking/NatNetHandler.h"
-#include <WS2tcpip.h>
+#include "NatNetClient.h"
 
 namespace ARLib{
+
+const std::string NatNetHandler::invalidIP = "-1.-1.-1.-1";
 
 NatNetHandler::NatNetHandler(ConnectionType iCType, std::string logFile)
 	: mConnectionState(NATNET_PENDING){
@@ -31,21 +33,8 @@ int NatNetHandler::connect(const char* rClientIP, const char* rServerIP){
 		mConnectionState = NATNET_CONNECTED;
 	}
 
-	//gather ip addresses
-	struct sockaddr_in sa;
-	inet_pton(AF_INET, rClientIP, &(sa.sin_addr));
-	ULONG ulIp = sa.sin_addr.S_un.S_addr;
-	mClientIP.byte[0] = ulIp & 0xFF;
-	mClientIP.byte[1] = (ulIp >> 8) & 0xFF;
-	mClientIP.byte[2] = (ulIp >> 16) & 0xFF;
-	mClientIP.byte[3] = (ulIp >> 24) & 0xFF;
-
-	inet_pton(AF_INET, rServerIP, &(sa.sin_addr));
-	ulIp = sa.sin_addr.S_un.S_addr;
-	mServerIP.byte[0] = ulIp & 0xFF;
-	mServerIP.byte[1] = (ulIp >> 8) & 0xFF;
-	mServerIP.byte[2] = (ulIp >> 16) & 0xFF;
-	mServerIP.byte[3] = (ulIp >> 24) & 0xFF;
+	mServerIP = rServerIP;
+	mClientIP = rClientIP;
 
 	//gather Server info
 	sServerDescription ServerDescription;
@@ -74,27 +63,15 @@ CONNECTION_STATE NatNetHandler::connected()const{
 	return mConnectionState;
 }
 
-ipAddress NatNetHandler::getServerIP() const{
-	if(mConnectionState != NATNET_CONNECTED){
-		ipAddress dummy;
-		dummy.byte[0] = 0;
-		dummy.byte[1] = 0;
-		dummy.byte[2] = 0;
-		dummy.byte[3] = 0;
-		return dummy;
-	}
+const std::string& NatNetHandler::getServerIP() const{
+	if(mConnectionState != NATNET_CONNECTED)
+		return invalidIP;
 	return mServerIP;
 }
 
-ipAddress NatNetHandler::getClientIP() const{
-	if(mConnectionState != NATNET_CONNECTED){
-		ipAddress dummy;
-		dummy.byte[0] = 0;
-		dummy.byte[1] = 0;
-		dummy.byte[2] = 0;
-		dummy.byte[3] = 0;
-		return dummy;
-	}
+const std::string& NatNetHandler::getClientIP() const{
+	if(mConnectionState != NATNET_CONNECTED)
+		return invalidIP;
 	return mClientIP;
 }
 
