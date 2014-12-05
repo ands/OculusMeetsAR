@@ -10,28 +10,18 @@ Motive stream data more easily.
 #include "ARLib/Tracking/FrameEvaluator.h"
 #include "ARLib/General/InfoLog.h"
 #include "NatNetTypes.h"
-#include "NatNetClient.h"
 #include <string>
+
+class NatNetClient;
 
 namespace ARLib{
 
-	typedef enum{
+	typedef enum CONNECTION_STATE{
 		NATNET_CONNECTED = 0,	//all ok!
 		NATNET_PENDING,			//before first connection
 		NATNET_DISCONNECTED		//after first loss of connection
 	}CONNECTION_STATE;
 
-	typedef struct{
-		union{	
-			struct{
-				char one;
-				char two;
-				char three;
-				char four;
-			};
-			char byte[4];
-		};
-	}ipAddress;
 
 	class NatNetHandler{
 	public:
@@ -43,16 +33,18 @@ namespace ARLib{
 
 		CONNECTION_STATE connected()const;
 
-		ipAddress getServerIP() const;
-		ipAddress getClientIP() const;
+		const std::string& getServerIP() const;
+		const std::string& getClientIP() const;
 
 		void registerFrameEvaluator(FrameEvaluator* evaluator);
 	private:
+		static const std::string invalidIP;
+
 		static void MessageHandler(int iId, char* pMsg);
 		static void DataHandler(sFrameOfMocapData *pFrame, void *pClient);
 
-		ipAddress mServerIP;
-		ipAddress mClientIP;
+		std::string mServerIP;
+		std::string mClientIP;
 		int mConnectionType; //Multicast or Unicast
 
 		sDataDescriptions *mDataDesc;

@@ -13,10 +13,12 @@
   <ItemGroup>
     <ClCompile Include="..\src\App.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\RigidListenerNode.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\App.h" />
+    <ClInclude Include="..\include\RigidListenerNode.h" />
     <ClInclude Include="..\include\Scene.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -83,7 +85,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include;$(NAT_NET)/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

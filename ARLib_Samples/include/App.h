@@ -4,6 +4,7 @@
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
 #include "ARLib/Oculus/Rift.h"
+#include "ARLib/Tracking/TrackingManager.h"
 #include "Scene.h"
 
 class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
@@ -31,6 +32,8 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		void quitOIS();
 		void initRift();
 		void quitRift();
+		void initTracking();
+		void quitTracking();
 		void createViewports();
 
 		OIS::Keyboard* mKeyboard;
@@ -48,7 +51,9 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		Scene* mScene;
 
 		bool mRiftAvailable;
+		bool mTrackingAvailable;
 		ARLib::Rift* mRift;
+		ARLib::TrackingManager* mTracker;
 };
 
 #endif
