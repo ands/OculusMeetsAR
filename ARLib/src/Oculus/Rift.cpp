@@ -36,16 +36,15 @@ bool Rift::available(int id)
 
 /////////////////////////////////////////////////////////////////////////
 // members
-#define hmd ((ovrHmd)hmdHandle) // TODO: BAD UGLY HACK. EVEN RANDOMLY BREAKS INTELLISENSE. FIND A SANE SOLUTION!!!
-
 Rift::Rift(int id)
 {
 	if(!isInitialized) throw("Need to initialize first. Call Rift::init()!");
 	std::cout << "Creating Rift (ID: " << id << ")" << std::endl;
 
 	hmdHandle = ovrHmd_Create(id);
-    if(!hmd) throw("Could not connect to Rift.");
+    if(!hmdHandle) throw("Could not connect to Rift.");
 
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	std::cout << "Oculus Rift found." << std::endl;
 	std::cout << "\tProduct Name: " << hmd->ProductName << std::endl;
 	std::cout << "\tProduct ID: " << hmd->ProductId << std::endl;
@@ -65,12 +64,15 @@ Rift::Rift(int id)
 
 Rift::~Rift()
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	ovrHmd_Destroy(hmd);
 }
 
 void Rift::getTextureSizes(int *size2dL,
 						   int *size2dR)
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
+
 	OVR::Sizei recommendedTex0Size = ovrHmd_GetFovTextureSize(hmd, ovrEye_Left, hmd->DefaultEyeFov[0], 1.0f);
 	size2dL[0] = recommendedTex0Size.w;
 	size2dL[1] = recommendedTex0Size.h;
@@ -83,6 +85,8 @@ void Rift::getTextureSizes(int *size2dL,
 void Rift::getUVScalesAndOffsets(float *scale2dL, float *offset2dL,
 								 float *scale2dR, float *offset2dR)
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
+
 	ovrEyeRenderDesc eyeRenderDesc[2];
 	eyeRenderDesc[0] = ovrHmd_GetRenderDesc(hmd, ovrEye_Left, hmd->DefaultEyeFov[0]);
 	eyeRenderDesc[1] = ovrHmd_GetRenderDesc(hmd, ovrEye_Right, hmd->DefaultEyeFov[1]);
@@ -114,6 +118,7 @@ void Rift::initDistortionGeometries()
 {
 	assert(sizeof(ovrDistortionVertex) == sizeof(DistortionVertex));
 
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	ovrEyeRenderDesc eyeRenderDesc[2];
 	eyeRenderDesc[0] = ovrHmd_GetRenderDesc(hmd, ovrEye_Left, hmd->DefaultEyeFov[0]);
 	eyeRenderDesc[1] = ovrHmd_GetRenderDesc(hmd, ovrEye_Right, hmd->DefaultEyeFov[1]);
@@ -151,6 +156,8 @@ void Rift::getProjections(float znear, float zfar, bool rightHanded,
 						  float *aspectRatioL, float *projection4x4L,
 						  float *aspectRatioR, float *projection4x4R)
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
+
 	ovrFovPort fovLeft = hmd->DefaultEyeFov[ovrEye_Left];
 	ovrFovPort fovRight = hmd->DefaultEyeFov[ovrEye_Right];
 
@@ -172,6 +179,7 @@ void Rift::getProjections(float znear, float zfar, bool rightHanded,
 
 void Rift::getPose(float *position3d, float *orientationQuaternionXYZW)
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	ovrFrameTiming frameTiming = ovrHmd_BeginFrameTiming(hmd, 0);
 
 	ovrTrackingState ts = ovrHmd_GetTrackingState(hmd, frameTiming.ScanoutMidpointSeconds);
@@ -212,6 +220,7 @@ void Rift::getPose(float *position3d, float *orientationQuaternionXYZW)
 
 void Rift::recenterPose()
 {
+	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	ovrHmd_RecenterPose(hmd);
 }
 

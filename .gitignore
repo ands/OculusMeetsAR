@@ -185,3 +185,9 @@ UpgradeLog*.htm
 # Microsoft Fakes
 FakesAssemblies/
 ogre.cfg
+/ARLib/lib/ARLibOculus_d.lib
+/ARLib/lib/ARLibOgre.lib
+/ARLib/lib/ARLibOgre_d.lib
+/ARLib/lib/ARLibTracking.lib
+/ARLib/lib/ARLibTracking_d.lib
+/ARLib/lib/ARLibOculus.lib

@@ -27,6 +27,8 @@ class RiftNode : public RigidBodyEventListener
 		virtual void onChange(RigidBody *rb);
 
 	private:
+		void createRiftRenderTarget(Ogre::RenderWindow *renderWindow, float zNear, float zFar);
+
 		Rift *rift;
 		Ogre::Camera *cameras[2];
 		Ogre::SceneNode *headNode;
