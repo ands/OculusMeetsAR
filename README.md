@@ -3,6 +3,10 @@ OculusMeetsAR
 
 THIS IS A WORK IN PROGRESS, NOT AN USABLE LIBRARY/APPLICATION (yet)!
 
+Resources:
+
+- Wiki: https://github.com/ands/OculusMeetsAR/wiki
+
 
 
 Including:
