@@ -52,6 +52,8 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *roo
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
 	mRiftNode->getNode()->setPosition(4.0f, 1.5f, 4.0f);
 	//mRiftNode->getNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
+	if (tracker)
+		tracker->registerRigidBodyEventListener(mRiftNode);
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
