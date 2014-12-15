@@ -184,6 +184,7 @@ UpgradeLog*.htm
 
 # Microsoft Fakes
 FakesAssemblies/
+
 ogre.cfg
 /ARLib/lib/ARLibOculus_d.lib
 /ARLib/lib/ARLibOgre.lib
@@ -191,3 +192,22 @@ ogre.cfg
 /ARLib/lib/ARLibTracking.lib
 /ARLib/lib/ARLibTracking_d.lib
 /ARLib/lib/ARLibOculus.lib
+/ARLib/Debug
+/ARLib/Release
+OgreMain_d.pdb
+/ARLib_Samples/bin/Debug/ARLib_Sample.exe
+/ARLib_Samples/bin/Debug/ARLib_Sample.pdb
+/ARLib_Samples/bin/Debug/ARLib_Tracking_Sample.exe
+/ARLib_Samples/bin/Debug/ARLib_Tracking_Sample.pdb
+/ARLib_Samples/bin/Release/ARLib_Tracking_Sample.exe
+/ARLib_Samples/bin/Release/ARLib_Tracking_Sample.pdb
+/ARLib_Samples/bin/Release/ARLib_Sample.exe
+/ARLib_Samples/bin/Release/ARLib_Sample.pdb
+/ARLib_Samples/projects/Release
+/ARLib_Samples/projects/Debug
+/TrackingTestServer/Release
+/TrackingTestServer/Debug
+/TrackingTestServer/bin/Debug/TrackingTestServer.pdb
+/TrackingTestServer/bin/Debug/TrackingTestServer.exe
+/TrackingTestServer/bin/Release/TrackingTestServer.pdb
+/TrackingTestServer/bin/Release/TrackingTestServer.exe
