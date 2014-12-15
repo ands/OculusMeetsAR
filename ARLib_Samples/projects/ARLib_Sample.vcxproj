@@ -67,7 +67,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,7 +85,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(LIBOVR)\Include;$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
