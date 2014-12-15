@@ -33,6 +33,7 @@ namespace ARLib{
 		~TrackingManager();
 
 		TRACKING_ERROR_CODE initialize(); 
+		void uninitialize();
 		void update();
 
 		void setNatNetConnectionType(ConnectionType cType);
@@ -41,6 +42,8 @@ namespace ARLib{
 
 		void registerRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
+		bool mInitialized;
+
 		TRACKING_METHOD mTracking;
 		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;

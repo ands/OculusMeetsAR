@@ -7,6 +7,7 @@ and the Oculus Rift Handle
 ***************************************************/
 
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+#include <vector>
 
 namespace ARLib{
 

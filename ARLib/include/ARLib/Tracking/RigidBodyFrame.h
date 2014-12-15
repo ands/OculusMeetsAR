@@ -1,14 +1,13 @@
 #ifndef ARLIB_RIGID_BODY_FRAME_H
 #define ARLIB_RIGID_BODY_FRAME_H
 
-#include "OGRE/Ogre.h"
 
 namespace ARLib{
 
 typedef struct Marker{
 	int mMarkerID;
 	float mMarkerSize;
-	Ogre::Vector3 mMarkerPosition;
+	float mX, mY, mZ;
 }Marker;
 
 typedef struct RigidBody{
@@ -17,11 +16,11 @@ typedef struct RigidBody{
 	bool mVisible;
 	int mID;
 	float mError;
-	Ogre::Vector3 mPosition;
-	Ogre::Quaternion mOrientation;
+	float mX, mY, mZ;
+	float mqX, mqY, mqZ, mqW;
 	unsigned int mNMarker;
 	Marker *mMarkers;
-	void addMarker(unsigned int index, int markerID, float markerSize, Ogre::Vector3& markerPosition);
+	void addMarker(unsigned int index, int markerID, float markerSize, float x, float y, float z);
 }RigidBody;
 
 

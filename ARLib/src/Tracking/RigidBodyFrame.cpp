@@ -11,10 +11,12 @@ namespace ARLib{
 		delete [] mMarkers;
 	}
 
-	void RigidBody::addMarker(unsigned int index, int markerID, float markerSize, Ogre::Vector3& markerPosition){
+	void RigidBody::addMarker(unsigned int index, int markerID, float markerSize, float x, float y, float z){
 		mMarkers[index].mMarkerID = markerID;
 		mMarkers[index].mMarkerSize = markerSize;
-		mMarkers[index].mMarkerPosition = markerPosition;
+		mMarkers[index].mX = x;
+		mMarkers[index].mY = y;
+		mMarkers[index].mZ = z;
 	};
 
 	RBFrame::RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency)

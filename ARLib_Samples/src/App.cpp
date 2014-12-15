@@ -175,8 +175,7 @@ void App::initTracking()
 	if(error != ARLib::ARLIB_TRACKING_OK){
 		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
 		mTrackingAvailable = false;
-		//mTracker->uninitialize(); ::todo
-		delete mTracker;
+		mTracker->uninitialize();
 	}else{
 		mTrackingAvailable = true;	
 	}

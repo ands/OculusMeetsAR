@@ -99,17 +99,20 @@ void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 		rb->mVisible = pRB.params & 0x01;
 		rb->mID = pRB.ID;
 		rb->mError = pRB.MeanError;
-		rb->mPosition = Ogre::Vector3(pRB.x, pRB.y, pRB.z);
-		rb->mOrientation = Ogre::Quaternion(pRB.qx, pRB.qy, pRB.qz, pRB.qw);
-
+		rb->mX = pRB.x;
+		rb->mY = pRB.y;
+		rb->mZ = pRB.z;
+		rb->mqX = pRB.qx;
+		rb->mqY = pRB.qy;
+		rb->mqZ = pRB.qz;
+		rb->mqW = pRB.qw;
 		for(int j = 0; j < rb->mNMarker; j++){
 			int markerID = pRB.MarkerIDs ? pRB.MarkerIDs[j] : -1;
 			float markerSize = pRB.MarkerSizes ? pRB.MarkerSizes[j] : 0.0f;
-			Ogre::Vector3 markerPosition = pRB.Markers ? 
-										Ogre::Vector3(pRB.Markers[j][0],
-													  pRB.Markers[j][1],
-													  pRB.Markers[j][2]) : Ogre::Vector3();
-			rb->addMarker(j, markerID, markerSize, markerPosition);
+			float x = pRB.Markers ? pRB.Markers[j][0] : 0.0f;
+			float y = pRB.Markers ? pRB.Markers[j][1] : 0.0f;
+			float z = pRB.Markers ? pRB.Markers[j][2] : 0.0f;
+			rb->addMarker(j, markerID, markerSize, x, y, z);
 		}
 		frame->addRigidBody(i, rb);
 	}

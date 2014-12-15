@@ -7,7 +7,8 @@ TrackingManager::TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD)
 	: mTracking(tracking)
 	, mRiftHandle(oculusHMD)
 	, mEvaluator(nullptr)
-	, mNatNetHandler(nullptr){
+	, mNatNetHandler(nullptr)
+	, mInitialized(false){
 	mEvaluator = new FrameEvaluator();
 }
 
@@ -35,11 +36,20 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 			return ARLIB_TRACKING_RIFT_ERROR;
 		}
 	}
+	mInitialized = true;
 	return ARLIB_TRACKING_OK;	
+}
+
+void TrackingManager::uninitialize(){
+	if(mNatNetHandler != nullptr)
+		delete mNatNetHandler;
+	mInitialized = false;
 }
 		
 void TrackingManager::update(){
-	mEvaluator->evaluate();
+	if(mInitialized){
+		mEvaluator->evaluate();
+	}
 }
 
 void TrackingManager::setNatNetConnectionType(ConnectionType cType){

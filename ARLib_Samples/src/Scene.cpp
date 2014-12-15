@@ -73,9 +73,12 @@ void Scene::update(float dt)
 	if (rift)
 	{
 		// TODO: this needs to be done by the tracking system!
-		static ARLib::RigidBody rb; float q[4];
-		rift->getPose(&rb.mPosition.x, q);
-		rb.mOrientation = Ogre::Quaternion(q[3], q[0], q[1], q[2]);
+		static ARLib::RigidBody rb; float q[4]; float p[3];
+		rift->getPose(p, q);
+		rb.mqX = q[0];
+		rb.mqY = q[1];
+		rb.mqZ = q[2];
+		rb.mqW = q[3];
 		mRiftNode->onChange(&rb);
 	}
 
