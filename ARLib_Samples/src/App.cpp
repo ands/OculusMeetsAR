@@ -194,7 +194,7 @@ void App::quitTracking()
 
 void App::createViewports()
 {
-	if (mWindow)
+	if (mWindow && mRift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
 		mRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
