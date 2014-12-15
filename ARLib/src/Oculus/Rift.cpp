@@ -37,7 +37,19 @@ bool Rift::available(int id)
 /////////////////////////////////////////////////////////////////////////
 // members
 Rift::Rift(int id)
+	: hmdHandle(nullptr)
+	, positionCurrentlyTracked(false)
+	, orientationCurrentlyTracked(false)
+	, cameraPoseCurrentlyTracked(false)
+	, positionTrackingConnected(false)
 {
+	// initialize arrays
+	verticesNum[0] = verticesNum[1] = 0;
+	vertices[0] = vertices[1] = nullptr;
+	indicesNum[0] = indicesNum[1] = 0;
+	indices[0] = indices[1] = nullptr;
+
+	// initialize hmd
 	if(!isInitialized) throw("Need to initialize first. Call Rift::init()!");
 	std::cout << "Creating Rift (ID: " << id << ")" << std::endl;
 
@@ -51,7 +63,7 @@ Rift::Rift(int id)
 	std::cout << "\tFirmware: " << hmd->FirmwareMajor << "." << hmd->FirmwareMinor << std::endl;
 	std::cout << "\tResolution: " << hmd->Resolution.w << "x" << hmd->Resolution.h << std::endl;
 
-	if (!ovrHmd_ConfigureTracking(hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0) )
+	if (!ovrHmd_ConfigureTracking(hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0))
 	{
 		ovrHmd_Destroy(hmd);
 		throw ("\t\tThis Rift does not support the features needed by the application.");
@@ -66,6 +78,15 @@ Rift::~Rift()
 {
 	ovrHmd hmd = ((ovrHmd)hmdHandle);
 	ovrHmd_Destroy(hmd);
+
+	if (vertices[0])
+		delete vertices[0];
+	if (vertices[1])
+		delete vertices[1];
+	if (indices[0])
+		delete indices[0];
+	if (indices[1])
+		delete indices[1];
 }
 
 void Rift::getTextureSizes(int *size2dL,
@@ -128,11 +149,14 @@ void Rift::initDistortionGeometries()
 		ovrDistortionMesh meshData;
 		ovrHmd_CreateDistortionMesh(hmd, eyeRenderDesc[eyeNum].Eye, eyeRenderDesc[eyeNum].Fov, 0, &meshData);
  
-		vertices[eyeNum].resize(meshData.VertexCount);
-		indices[eyeNum].resize(meshData.IndexCount);
+		verticesNum[eyeNum] = meshData.VertexCount;
+		indicesNum[eyeNum] = meshData.IndexCount;
 
-		memcpy(&vertices[eyeNum][0], &meshData.pVertexData[0], meshData.VertexCount * sizeof(ovrDistortionVertex));
-		memcpy(&indices[eyeNum][0], &meshData.pIndexData[0], meshData.IndexCount * sizeof(unsigned short));
+		vertices[eyeNum] = new DistortionVertex[verticesNum[eyeNum]];
+		indices[eyeNum] = new unsigned short[indicesNum[eyeNum]];
+
+		memcpy(vertices[eyeNum], meshData.pVertexData, verticesNum[eyeNum] * sizeof(ovrDistortionVertex));
+		memcpy(indices[eyeNum], meshData.pIndexData, indicesNum[eyeNum] * sizeof(unsigned short));
 
 		ovrHmd_DestroyDistortionMesh(&meshData);
 	}
@@ -141,15 +165,15 @@ void Rift::initDistortionGeometries()
 void Rift::getDistortionGeometries(DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
 								   DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR)
 {
-	*verticesL = &this->vertices[0][0];
-	*vertexNumL = this->vertices[0].size();
-	*indicesL = &this->indices[0][0];
-	*indexNumL = this->indices[0].size();
+	*verticesL = vertices[0];
+	*vertexNumL = verticesNum[0];
+	*indicesL = indices[0];
+	*indexNumL = indicesNum[0];
 
-	*verticesR = &this->vertices[1][0];
-	*vertexNumR = this->vertices[1].size();
-	*indicesR = &this->indices[1][0];
-	*indexNumR = this->indices[1].size();
+	*verticesR = vertices[1];
+	*vertexNumR = verticesNum[1];
+	*indicesR = indices[1];
+	*indexNumR = indicesNum[1];
 }
 
 void Rift::getProjections(float znear, float zfar, bool rightHanded,

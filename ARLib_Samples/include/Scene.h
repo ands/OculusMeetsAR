@@ -3,17 +3,17 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
-#include "ARLib/Ogre/RiftNode.h"
+#include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
 
 class Scene
 {
 	public:
-		Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
+		Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
 		~Scene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
-		ARLib::RiftNode* getRiftNode() { return mRiftNode; }
+		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
 
 		void update(float dt);
 
@@ -30,7 +30,7 @@ class Scene
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
 		Ogre::SceneNode* mRoomNode;
-		ARLib::RiftNode* mRiftNode;
+		ARLib::RiftSceneNode* mRiftNode;
 };
 
 #endif

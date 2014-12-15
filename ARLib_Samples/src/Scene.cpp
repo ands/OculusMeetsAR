@@ -1,7 +1,7 @@
 #include "Scene.h"
 #include "RigidListenerNode.h"
 
-Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWindow *renderWindow, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard)
+Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -15,7 +15,8 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWin
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
 
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
-	tracker->registerRigidBodyEventListener(cubeNodeT);
+	if (tracker)
+		tracker->registerRigidBodyEventListener(cubeNodeT);
 
 	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
@@ -48,7 +49,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::RenderWin
 	mRoomNode->attachObject( roomLight );
 
 	// rift node:
-	mRiftNode = new ARLib::RiftNode(rift, root, renderWindow, mSceneMgr, 0.001f, 50.0f, 0);
+	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
 	mRiftNode->getNode()->setPosition(4.0f, 1.5f, 4.0f);
 	//mRiftNode->getNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 
@@ -72,6 +73,10 @@ void Scene::update(float dt)
 	ARLib::Rift *rift = mRiftNode->getRift();
 	if (rift)
 	{
+		// reset rift view on R
+		if (mKeyboard->isKeyDown(OIS::KC_R))
+			rift->recenterPose();
+
 		// TODO: this needs to be done by the tracking system!
 		static ARLib::RigidBody rb; float q[4]; float p[3];
 		rift->getPose(p, q);

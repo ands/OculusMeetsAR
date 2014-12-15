@@ -1,5 +1,5 @@
-#ifndef RIFTNODE_H
-#define RIFTNODE_H
+#ifndef RIFTSCENENODE_H
+#define RIFTSCENENODE_H
 
 #include "OGRE/Ogre.h"
 #include "ARLib/Oculus/Rift.h"
@@ -7,14 +7,11 @@
 
 namespace ARLib {
 
-class RiftNode : public RigidBodyEventListener
+class RiftSceneNode : public RigidBodyEventListener
 {
 	public:
-		RiftNode(
-			Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow,
-			Ogre::SceneManager *sceneManager, float zNear, float zFar,
-			unsigned int rigidBodyID);
-		~RiftNode();
+		RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID);
+		~RiftSceneNode();
 
 		Rift *getRift() { return rift; }
 		Ogre::SceneNode *getNode() { return bodyNode; }
@@ -27,16 +24,11 @@ class RiftNode : public RigidBodyEventListener
 		virtual void onChange(RigidBody *rb);
 
 	private:
-		void createRiftRenderTarget(Ogre::RenderWindow *renderWindow, float zNear, float zFar);
-
 		Rift *rift;
 		Ogre::Camera *cameras[2];
 		Ogre::SceneNode *headNode;
 		Ogre::SceneNode *bodyNode;
 		Ogre::SceneNode *bodyTiltNode;
-
-		Ogre::Root *root;
-		Ogre::SceneManager *riftSceneManager;
 };
 
 }; // ARLib namespace

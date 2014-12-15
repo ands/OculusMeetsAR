@@ -10,6 +10,8 @@ App::App(bool showDebugWindow)
 	, mSmallWindow(nullptr)
 	, mRiftAvailable(false)
 	, mRift(nullptr)
+	, mRenderTarget(nullptr)
+	, mSmallRenderTarget(nullptr)
 	, mTracker(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
@@ -24,7 +26,7 @@ App::App(bool showDebugWindow)
 	initOIS();
 	initRift();
 	initTracking();
-	mScene = new Scene(mRift, mTracker, mWindow, mRoot, mMouse, mKeyboard);
+	mScene = new Scene(mRift, mTracker, mRoot, mMouse, mKeyboard);
 	createViewports();
 	mRoot->startRendering();
 }
@@ -32,6 +34,8 @@ App::App(bool showDebugWindow)
 App::~App()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
+	if (mRenderTarget) delete mRenderTarget;
+	if (mSmallRenderTarget) delete mSmallRenderTarget;
 	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
@@ -190,15 +194,16 @@ void App::quitTracking()
 
 void App::createViewports()
 {
-	if(mSmallWindow)
+	if (mWindow)
 	{
-		ARLib::RiftNode* riftNode = mScene->getRiftNode();
+		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
+		mRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
+	}
 
-		Ogre::Viewport* debugL = mSmallWindow->addViewport(riftNode->getLeftCamera(), 0, 0.0f, 0.0f, 0.5f, 1.0f);
-		debugL->setBackgroundColour(Ogre::ColourValue(0.15f, 0.15f, 0.15f));
-
-		Ogre::Viewport* debugR = mSmallWindow->addViewport(riftNode->getRightCamera(), 1, 0.5f, 0.0f, 0.5f, 1.0f);
-		debugR->setBackgroundColour(Ogre::ColourValue(0.15f, 0.15f, 0.15f));
+	if (mSmallWindow)
+	{
+		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
+		mSmallRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
 	}
 }
 
@@ -210,7 +215,8 @@ bool App::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-	mTracker->update(); //right place?
+	if (mTracker)
+		mTracker->update(); //right place?
 	mScene->update(evt.timeSinceLastFrame);
 
 	return true; 
