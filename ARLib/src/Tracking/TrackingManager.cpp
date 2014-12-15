@@ -19,8 +19,9 @@ TrackingManager::~TrackingManager(){
 }
 
 TRACKING_ERROR_CODE TrackingManager::initialize(){
+	TRACKING_ERROR_CODE errorCode = NONE;
 	if(!(mTracking & (ARLIB_NATNET | ARLIB_RIFT))){
-		return ARLIB_TRACKING_NO_DEVICE_ERROR;
+		errorCode = errorCode | ARLIB_TRACKING_NO_DEVICE_ERROR;
 	}
 	if(mTracking & ARLIB_NATNET){
 		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
@@ -28,21 +29,28 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str());
 		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
 			mNatNetHandler->connected() & NATNET_PENDING){
-				return ARLIB_TRACKING_NATNET_ERROR;
+				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
 		}
 	}
 	if(mTracking & ARLIB_RIFT){
 		if(!mRiftHandle){
-			return ARLIB_TRACKING_RIFT_ERROR;
+			errorCode = errorCode | ARLIB_TRACKING_RIFT_ERROR;
 		}
 	}
-	mInitialized = true;
-	return ARLIB_TRACKING_OK;	
+	if(errorCode == NONE){
+		mInitialized = true;
+		return ARLIB_TRACKING_OK;	
+	}else{
+		mInitialized = false;
+		return errorCode;
+	}
 }
 
 void TrackingManager::uninitialize(){
-	if(mNatNetHandler != nullptr)
+	if(mNatNetHandler != nullptr){
 		delete mNatNetHandler;
+		mNatNetHandler = nullptr;
+	}
 	mInitialized = false;
 }
 		

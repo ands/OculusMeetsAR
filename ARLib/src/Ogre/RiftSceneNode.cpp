@@ -50,8 +50,8 @@ void RiftSceneNode::setYaw(Ogre::Radian angle)
 
 void RiftSceneNode::onChange(RigidBody *rb)
 {
-	headNode->setOrientation(rb->mOrientation);
-	headNode->setPosition(rb->mPosition);
+	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
+	headNode->setPosition(rb->mX, rb->mY, rb->mZ);
 }
 
 }; // ARLib namespace
