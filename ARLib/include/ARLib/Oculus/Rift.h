@@ -1,8 +1,6 @@
 #ifndef RIFT_H
 #define RIFT_H
 
-#include <vector>
-
 namespace ARLib {
 
 struct DistortionVertex
@@ -69,8 +67,10 @@ class Rift
 		bool cameraPoseCurrentlyTracked;
 		bool positionTrackingConnected;
 
-		std::vector<DistortionVertex> vertices[2];
-		std::vector<unsigned short> indices[2];
+		unsigned int verticesNum[2];
+		DistortionVertex *vertices[2];
+		unsigned int indicesNum[2];
+		unsigned short *indices[2];
 };
 
 }; // ARLib namespace
