@@ -226,13 +226,13 @@ void BulletApp::createViewports()
 	if (mWindow && mRift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-		mRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
+        mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
 	}
 
 	if (mSmallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-		mSmallRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
+        mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
 	}
 }
 
