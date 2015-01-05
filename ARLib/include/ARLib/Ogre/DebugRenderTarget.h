@@ -13,11 +13,17 @@ class DebugRenderTarget : public RenderTarget
 	public:
 		DebugRenderTarget(Ogre::RenderWindow *renderWindow);
 
-		// use one of the following to set the cameras for the render target:
-		void SetCameras(Ogre::Camera *left, Ogre::Camera *right);
-		void SetRiftSceneNode(RiftSceneNode *riftSceneNode);
-
 	private:
+		// sets the cameras that should render to this render target
+		virtual void SetCameras(
+			Ogre::Camera *left,
+			Ogre::Camera *right);
+
+		// to use timewarp, this should be called on every update
+		/*virtual void SetTimewarpMatrices(
+			Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+			Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd);*/
+
 		Ogre::RenderWindow *renderWindow;
 };
 

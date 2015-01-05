@@ -15,17 +15,22 @@ class RiftRenderTarget : public RenderTarget
 		RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow);
 		~RiftRenderTarget();
 
-		Rift *getRift() { return rift; }
-
-		// use one of the following to set the cameras for the render target:
-		virtual void SetCameras(Ogre::Camera *left, Ogre::Camera *right);
-		virtual void SetRiftSceneNode(RiftSceneNode *riftSceneNode);
-
 	private:
+		// sets the cameras that should render to this render target
+		virtual void SetCameras(
+			Ogre::Camera *left,
+			Ogre::Camera *right);
+
+		// to use timewarp, this should be called on every update
+		/*virtual void SetTimewarpMatrices(
+			Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+			Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd);*/
+
 		Rift *rift;
 		Ogre::Root *root;
 		Ogre::SceneManager *riftSceneManager;
 		Ogre::TexturePtr renderTexture[2];
+		Ogre::MaterialPtr material[2];
 };
 
 }; // ARLib namespace

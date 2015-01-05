@@ -1,3 +1,4 @@
+#include "OGRE/OgreCompositorManager.h"
 #include "App.h"
 
 App::App(bool showDebugWindow)
@@ -197,14 +198,30 @@ void App::createViewports()
 	if (mWindow && mRift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-		mRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
+		mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
+
+		Ogre::Viewport *left = mScene->getRiftSceneNode()->getLeftCamera()->getViewport();
+		Ogre::Viewport *right = mScene->getRiftSceneNode()->getRightCamera()->getViewport();
+		addCompositors(left);
+		addCompositors(right);
 	}
 
 	if (mSmallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-		mSmallRenderTarget->SetRiftSceneNode(mScene->getRiftSceneNode());
+		mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
+
+		Ogre::Viewport *left = mScene->getRiftSceneNode()->getLeftCamera()->getViewport();
+		Ogre::Viewport *right = mScene->getRiftSceneNode()->getRightCamera()->getViewport();
+		addCompositors(left);
+		addCompositors(right);
 	}
+}
+
+void App::addCompositors(Ogre::Viewport *vp)
+{
+	Ogre::CompositorManager::getSingleton().addCompositor(vp, "Old Movie");
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Old Movie", true);
 }
 
 bool App::frameRenderingQueued(const Ogre::FrameEvent& evt) 

@@ -1,11 +1,13 @@
 #ifndef RIFTSCENENODE_H
 #define RIFTSCENENODE_H
 
+#include <vector>
 #include "OGRE/Ogre.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 
 namespace ARLib {
+class RenderTarget;
 
 class RiftSceneNode : public RigidBodyEventListener
 {
@@ -21,6 +23,9 @@ class RiftSceneNode : public RigidBodyEventListener
 		void setPitch(Ogre::Radian angle);
 		void setYaw(Ogre::Radian angle);
 
+		void addRenderTarget(RenderTarget *renderTarget);
+		void removeRenderTarget(RenderTarget *renderTarget);
+
 		virtual void onChange(RigidBody *rb);
 
 	private:
@@ -29,6 +34,7 @@ class RiftSceneNode : public RigidBodyEventListener
 		Ogre::SceneNode *headNode;
 		Ogre::SceneNode *bodyNode;
 		Ogre::SceneNode *bodyTiltNode;
+		std::vector<RenderTarget*> renderTargets;
 };
 
 }; // ARLib namespace
