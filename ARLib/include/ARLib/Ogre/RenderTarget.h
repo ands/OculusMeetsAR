@@ -11,10 +11,18 @@ class RiftSceneNode;
 
 class RenderTarget
 {
-	public:
-		// use one of the following to set the cameras for the render target:
-		virtual void SetCameras(Ogre::Camera *left, Ogre::Camera *right) = 0;
-		virtual void SetRiftSceneNode(RiftSceneNode *riftSceneNode) = 0;
+	private:
+		// sets the cameras that should render to this render target
+		virtual void SetCameras(
+			Ogre::Camera *left,
+			Ogre::Camera *right) = 0;
+
+		// to use timewarp, this should be called on every update
+		/*virtual void SetTimewarpMatrices(
+			Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+			Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd) = 0;*/
+
+	friend class RiftSceneNode;
 };
 
 }; // ARLib namespace

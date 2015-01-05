@@ -43,12 +43,14 @@ RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWin
 
 		// load materials and set shader parameters
 		const char *materialNames[] = { "Oculus/LeftEye", "Oculus/RightEye" };
-		Ogre::MaterialPtr material = materialManager->getByName(materialNames[eyeNum]);
-		Ogre::Pass *materialPass = material->getTechnique(0)->getPass(0);
+		material[eyeNum] = materialManager->getByName(materialNames[eyeNum]);
+		Ogre::Pass *materialPass = material[eyeNum]->getTechnique(0)->getPass(0);
 		materialPass->getTextureUnitState(0)->setTexture(renderTexture[eyeNum]);
 		Ogre::GpuProgramParametersSharedPtr params = materialPass->getVertexProgramParameters();
 		params->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(uvScale[eyeNum][0], uvScale[eyeNum][1]));
 		params->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(uvOffset[eyeNum][0], uvOffset[eyeNum][1]));
+		/*params->setNamedConstant("eyeRotationStart", Ogre::Matrix4::IDENTITY);
+		params->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
 		
 		// create the distortion meshes:
 		const char *objectNames[] = { "RiftRenderObjectLeft", "RiftRenderObjectRight" };
@@ -129,9 +131,16 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 	}
 }
 
-void RiftRenderTarget::SetRiftSceneNode(RiftSceneNode *riftSceneNode)
+/*void RiftRenderTarget::SetTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+										   Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd)
 {
-	SetCameras(riftSceneNode->getLeftCamera(), riftSceneNode->getRightCamera());
-}
+	Ogre::GpuProgramParametersSharedPtr params = material[0]->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+	params->setNamedConstant("eyeRotationStart", leftRotationStart);
+	params->setNamedConstant("eyeRotationEnd",   leftRotationEnd);
+
+	params = material[1]->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+	params->setNamedConstant("eyeRotationStart", rightRotationStart);
+	params->setNamedConstant("eyeRotationEnd",   rightRotationEnd);
+}*/
 
 }; // ARLib namespace

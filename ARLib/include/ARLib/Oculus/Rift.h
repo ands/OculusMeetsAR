@@ -41,8 +41,12 @@ class Rift
 			float *aspectRatioR, float *projection4x4R);
 
 		void getPose(
-			float *position3d,
-			float *orientationQuaternionXYZW);
+			float *position3d, float *orientationQuaternionXYZW);
+
+		// if used, must be executed after getPose during the frame!
+		/*void getTimewarpMatrices(
+			float *rotationStart4x4L, float *rotationEnd4x4L,
+			float *rotationStart4x4R, float *rotationEnd4x4R);*/
 
 		void recenterPose();
 
@@ -71,6 +75,9 @@ class Rift
 		DistortionVertex *vertices[2];
 		unsigned int indicesNum[2];
 		unsigned short *indices[2];
+
+		float eyeRotationStart[2][16];
+		float eyeRotationEnd[2][16];
 };
 
 }; // ARLib namespace

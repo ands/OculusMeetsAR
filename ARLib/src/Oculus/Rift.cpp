@@ -63,10 +63,25 @@ Rift::Rift(int id)
 	std::cout << "\tFirmware: " << hmd->FirmwareMajor << "." << hmd->FirmwareMinor << std::endl;
 	std::cout << "\tResolution: " << hmd->Resolution.w << "x" << hmd->Resolution.h << std::endl;
 
+    ovrHmd_SetEnabledCaps(hmd, ovrHmdCap_NoVSync | ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction);
+
+	/*ovrRenderAPIConfig config;
+    unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+    //distortionCaps |= ovrDistortionCap_SRGB; // ?
+	distortionCaps |= ovrDistortionCap_Overdrive;
+    distortionCaps |= ovrDistortionCap_TimeWarp;
+    //distortionCaps |= ovrDistortionCap_ProfileNoTimewarpSpinWaits; // TimewarpNoJitEnabled
+    //distortionCaps |= ovrDistortionCap_HqDistortion; // only if antialiasing is enabled
+	ovrEyeRenderDesc eyeRenderDesc[2];
+    if (!ovrHmd_ConfigureRendering(hmd, &config, distortionCaps, hmd->DefaultEyeFov, eyeRenderDesc))
+    {
+        throw ("This Rift does not support the rendering features needed by the application.");
+    }*/
+
 	if (!ovrHmd_ConfigureTracking(hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0))
 	{
 		ovrHmd_Destroy(hmd);
-		throw ("\t\tThis Rift does not support the features needed by the application.");
+		throw ("This Rift does not support the tracking features needed by the application.");
 	}
 
 	ipd = ovrHmd_GetFloat(hmd, OVR_KEY_IPD, 0.064f);
@@ -221,26 +236,26 @@ void Rift::getPose(float *position3d, float *orientationQuaternionXYZW)
 	orientationQuaternionXYZW[2] = pose.Orientation.z;
 	orientationQuaternionXYZW[3] = pose.Orientation.w;
 
-	/*ovr_WaitTillTime(frameTiming.TimewarpPointSeconds);
-	for(int eyeNum = 0; eyeNum < 2; eyeNum++)
-	{
-		ovrMatrix4f tWM[2];
-		ovrHmd_GetEyeTimewarpMatrices(hmd, (ovrEyeType) eyeNum, headPose, tWM);
-		Ogre::GpuProgramParametersSharedPtr params = mMatRight->getTechnique(0)->getPass(0)->getVertexProgramParameters();
-			params->setNamedConstant("eyeRotationStart",
-					Ogre::Matrix4(tWM[0].M[0][0], tWM[0].M[0][1], tWM[0].M[0][2], tWM[0].M[0][3],
-						tWM[0].M[1][0], tWM[0].M[1][1], tWM[0].M[1][2], tWM[0].M[1][3],
-						tWM[0].M[2][0], tWM[0].M[2][1], tWM[0].M[2][2], tWM[0].M[2][3],
-						tWM[0].M[3][0], tWM[0].M[3][1], tWM[0].M[3][2], tWM[0].M[3][3]));
-			params->setNamedConstant("eyeRotationEnd",
-					Ogre::Matrix4(tWM[1].M[0][0], tWM[1].M[0][1], tWM[1].M[0][2], tWM[1].M[0][3],
-						tWM[1].M[1][0], tWM[1].M[1][1], tWM[1].M[1][2], tWM[1].M[1][3],
-						tWM[1].M[2][0], tWM[1].M[2][1], tWM[1].M[2][2], tWM[1].M[2][3],
-						tWM[1].M[3][0], tWM[1].M[3][1], tWM[1].M[3][2], tWM[1].M[3][3]));
-	}*/
+	//ovr_WaitTillTime(frameTiming.TimewarpPointSeconds);
+	/*ovrMatrix4f m[2];
+	ovrHmd_GetEyeTimewarpMatrices(hmd, ovrEye_Left, pose, m);
+	memcpy(eyeRotationStart[0], &m[0].M[0][0], 16 * sizeof(float));
+	memcpy(eyeRotationEnd  [0], &m[1].M[0][0], 16 * sizeof(float));
+	ovrHmd_GetEyeTimewarpMatrices(hmd, ovrEye_Right, pose, m);
+	memcpy(eyeRotationStart[1], &m[0].M[0][0], 16 * sizeof(float));
+	memcpy(eyeRotationEnd  [1], &m[1].M[0][0], 16 * sizeof(float));
 
-	ovrHmd_EndFrameTiming(hmd);
+	ovrHmd_EndFrameTiming(hmd);*/
 }
+
+/*void Rift::getTimewarpMatrices(float *rotationStart4x4L, float *rotationEnd4x4L,
+							   float *rotationStart4x4R, float *rotationEnd4x4R)
+{
+	memcpy(rotationStart4x4L, eyeRotationStart[0], 16 * sizeof(float));
+	memcpy(rotationEnd4x4L  , eyeRotationEnd  [0], 16 * sizeof(float));
+	memcpy(rotationStart4x4R, eyeRotationStart[1], 16 * sizeof(float));
+	memcpy(rotationEnd4x4R  , eyeRotationEnd  [1], 16 * sizeof(float));
+}*/
 
 void Rift::recenterPose()
 {

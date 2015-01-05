@@ -36,6 +36,7 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		void initTracking();
 		void quitTracking();
 		void createViewports();
+		void addCompositors(Ogre::Viewport *vp);
 
 		OIS::Keyboard* mKeyboard;
 		OIS::Mouse* mMouse;
