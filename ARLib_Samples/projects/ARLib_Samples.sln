@@ -3,6 +3,8 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLib_Sample", "ARLib_Sample.vcxproj", "{D4448315-9DDE-4479-8873-71A82AD38002}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLib_Bullet_Test", "ARLib_Bullet_Test.vcxproj", "{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -13,6 +15,10 @@ Global
 		{D4448315-9DDE-4479-8873-71A82AD38002}.Debug|Win32.Build.0 = Debug|Win32
 		{D4448315-9DDE-4479-8873-71A82AD38002}.Release|Win32.ActiveCfg = Release|Win32
 		{D4448315-9DDE-4479-8873-71A82AD38002}.Release|Win32.Build.0 = Release|Win32
+		{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}.Debug|Win32.Build.0 = Debug|Win32
+		{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}.Release|Win32.ActiveCfg = Release|Win32
+		{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
