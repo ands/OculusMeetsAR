@@ -42,6 +42,12 @@
     <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+	<OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
+    <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+    <IncludePath>../include;$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include\OGRE\Overlay;$(OGRE_BULLET_PACK)\include;$(IncludePath)</IncludePath>
+	<LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -64,11 +70,14 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)\include;$(ARLIB)\include;$(NAT_NET)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OgreMain.lib;OIS.lib;OgreOverlay.lib;OgreBulletCollisions.lib;OgreBulletDynamics.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;libovr.lib;winmm.lib;ARLibOculus.lib;ARLibOgre.lib;ARLibTracking.lib;mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

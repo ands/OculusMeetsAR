@@ -11,7 +11,7 @@
 //
 //////////////////////////////////////////////////////////////////////////
 
-#include <capture.h>
+#include "capture.h"
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -21,8 +21,6 @@ template <class T> void SafeRelease(T **ppT)
         *ppT = NULL;
     }
 }
-
-#include "capture.h"
 
 HRESULT CopyAttribute(IMFAttributes *pSrc, IMFAttributes *pDest, const GUID& key);
 
