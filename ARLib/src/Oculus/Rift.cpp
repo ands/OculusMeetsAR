@@ -243,9 +243,9 @@ void Rift::getPose(float *position3d, float *orientationQuaternionXYZW)
 	memcpy(eyeRotationEnd  [0], &m[1].M[0][0], 16 * sizeof(float));
 	ovrHmd_GetEyeTimewarpMatrices(hmd, ovrEye_Right, pose, m);
 	memcpy(eyeRotationStart[1], &m[0].M[0][0], 16 * sizeof(float));
-	memcpy(eyeRotationEnd  [1], &m[1].M[0][0], 16 * sizeof(float));
+	memcpy(eyeRotationEnd  [1], &m[1].M[0][0], 16 * sizeof(float));*/
 
-	ovrHmd_EndFrameTiming(hmd);*/
+	ovrHmd_EndFrameTiming(hmd);
 }
 
 /*void Rift::getTimewarpMatrices(float *rotationStart4x4L, float *rotationEnd4x4L,

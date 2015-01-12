@@ -38,8 +38,9 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 		const int countY = 80;
 		const float randRadiusX = 0.5f / countX;
 		const float randRadiusY = 0.5f / countY;
-		const float coneRadius = (1.0f / std::min(countX, countY) + 2.0f * std::max(randRadiusX, randRadiusY)) * 1.42f;
-		assert(coneRadius > randRadiusX && coneRadius > randRadiusY);
+		const float coneRadiusX = (1.0f / countX + /*2.0f **/ randRadiusX) * 1.42f;
+		const float coneRadiusY = (1.0f / countY + /*2.0f **/ randRadiusY) * 1.42f;
+		assert(coneRadiusX > randRadiusX && coneRadiusY > randRadiusY);
 
 		for (int y = 0; y < countY; y++)
 		{
@@ -50,13 +51,13 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 				float centerX = texX * 2.0f - 1.0f;
 				float centerY = texY * 2.0f - 1.0f;
 				texY = 1.0f - texY;
-				float currX, currY, lastX = centerX + coneRadius, lastY = centerY;
+				float currX, currY, lastX = centerX + coneRadiusX, lastY = centerY;
 
 				for(int i = 1; i <= triangles; i++)
 				{
 					float angle = ((float)i / (float)triangles) * 2.0f * 3.14159f;
-					currX = centerX + std::cosf(angle) * coneRadius;
-					currY = centerY + std::sinf(angle) * coneRadius;
+					currX = centerX + std::cosf(angle) * coneRadiusX;
+					currY = centerY + std::sinf(angle) * coneRadiusY;
 
 					// center
 					manual->position(centerX, centerY, 0);
