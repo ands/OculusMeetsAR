@@ -1,3 +1,5 @@
+#version 130
+
 uniform sampler2D diffuseMap;
 
 void main(void)

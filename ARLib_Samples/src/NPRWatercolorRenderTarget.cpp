@@ -34,20 +34,22 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 
 		int index = 0;
 		const int triangles = 15;
-		const int countX = 32;
-		const int countY = 32;
-		const float randRadius = 0.5f / std::max(countX, countY);
-		const float coneRadius = (1.0f / std::min(countX, countY) + 2.0f * randRadius) * 1.42f;
-		assert(coneRadius > randRadius);
+		const int countX = 60;
+		const int countY = 80;
+		const float randRadiusX = 0.5f / countX;
+		const float randRadiusY = 0.5f / countY;
+		const float coneRadius = (1.0f / std::min(countX, countY) + 2.0f * std::max(randRadiusX, randRadiusY)) * 1.42f;
+		assert(coneRadius > randRadiusX && coneRadius > randRadiusY);
 
 		for (int y = 0; y < countY; y++)
 		{
 			for (int x = 0; x < countX; x++)
 			{
-				float texX = ((float)x / (float)(countX - 1)) + ((float)std::rand()/(float)RAND_MAX) * randRadius;
-				float texY = ((float)y / (float)(countY - 1)) + ((float)std::rand()/(float)RAND_MAX) * randRadius;
+				float texX = ((float)x / (float)(countX - 1)) + ((float)std::rand()/(float)RAND_MAX) * randRadiusX;
+				float texY = ((float)y / (float)(countY - 1)) + ((float)std::rand()/(float)RAND_MAX) * randRadiusY;
 				float centerX = texX * 2.0f - 1.0f;
 				float centerY = texY * 2.0f - 1.0f;
+				texY = 1.0f - texY;
 				float currX, currY, lastX = centerX + coneRadius, lastY = centerY;
 
 				for(int i = 1; i <= triangles; i++)
@@ -58,17 +60,17 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 
 					// center
 					manual->position(centerX, centerY, 0);
-					manual->textureCoord(texX, -texY);
+					manual->textureCoord(texX, texY);
 					manual->index(index++);
 
 					// first
 					manual->position(lastX, lastY, -0.1f);
-					manual->textureCoord(texX, -texY);
+					manual->textureCoord(texX, texY);
 					manual->index(index++);
 
 					// second
 					manual->position(currX, currY, -0.1f);
-					manual->textureCoord(texX, -texY);
+					manual->textureCoord(texX, texY);
 					manual->index(index++);
 
 					lastX = currX;
@@ -111,10 +113,13 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 	{
 		Ogre::RenderTexture* renderTextureTarget = renderTexture[eyeNum]->getBuffer()->getRenderTarget();
 		renderTextureTarget->removeAllViewports();
-		renderTextureTarget->addViewport(cameras[eyeNum]);
-		renderTextureTarget->getViewport(0)->setClearEveryFrame(true);
-		renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-		renderTextureTarget->getViewport(0)->setOverlaysEnabled(true);
-		// TODO: add blur compositor to camera!
+		Ogre::Viewport *vp = renderTextureTarget->addViewport(cameras[eyeNum]);
+		//vp->setClearEveryFrame(true);
+		//vp->setBackgroundColour(Ogre::ColourValue::Black);
+		//vp->setOverlaysEnabled(true);
+		
+		// add blur compositor
+		Ogre::CompositorManager::getSingleton().addCompositor(vp, "Blur");
+		Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Blur", true);
 	}
 }

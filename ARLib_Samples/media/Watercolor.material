@@ -3,10 +3,6 @@ vertex_program WatercolorVertex glsl
     source WatercolorVertex.glsl
 	default_params
 	{
-		//param_named eyeToSourceUVScale float2 1.0 1.0
-		//param_named eyeToSourceUVOffset float2 0.0 0.0
-		//param_named eyeRotationStart matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
-		//param_named eyeRotationEnd matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
 }
@@ -36,6 +32,7 @@ material Watercolor/LeftEye
             lighting off
 			texture_unit
             {
+				tex_address_mode clamp
             }
         }
     }
@@ -62,6 +59,7 @@ material Watercolor/RightEye
 
 			texture_unit 
             {
+				tex_address_mode clamp
             }
         }
     }

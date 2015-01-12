@@ -1,0 +1,39 @@
+compositor "Blur"
+{
+    technique
+    {
+		//compositor_logic Blur
+		
+        // Temporary textures
+        texture rt0 target_width target_height PF_A8R8G8B8
+        texture rt1 target_width target_height PF_A8R8G8B8
+
+        target rt0
+        {
+            // Render output from previous compositor (or original scene)
+            input previous
+        }
+
+        target rt1
+        {
+            // Blur horizontally
+            input none
+			pass render_quad
+			{
+				material Watercolor/BlurH
+				input 0 rt0
+			}
+        }
+
+		target_output
+        {
+            // Blur vertically
+            input none
+            pass render_quad
+            {
+				material Watercolor/BlurV
+                input 0 rt1
+            }
+        }
+    }
+}
