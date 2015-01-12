@@ -4,10 +4,10 @@
 namespace webcam
 {
 
-VideoPlayer::VideoPlayer()
-    : mState(NULL)
+VideoPlayer::VideoPlayer(int camNum)
+    : mState(NULL) 
 {
-
+	camNumber=camNum;
 }
 
 VideoPlayer::~VideoPlayer()
@@ -22,7 +22,7 @@ void VideoPlayer::playVideo(const std::string &resourceName)
         close();
 
     try {
-        mState = new webcamstate;
+        mState = new webcamstate(camNumber);
         mState->init();
 
         // wait until we have the first picture

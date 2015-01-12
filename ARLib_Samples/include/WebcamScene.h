@@ -18,7 +18,7 @@ class WebcamScene
 {
 	public:
 		WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root,
-			Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard, webcam::VideoPlayer *mVideoPlayer);
+			Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard, webcam::VideoPlayer *mVideoPlayerLeft, webcam::VideoPlayer *mVideoPlayerRight);
 		~WebcamScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }

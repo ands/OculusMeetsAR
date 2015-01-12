@@ -11,7 +11,7 @@ struct webcamstate;
 
 struct webcamstate
 {
-	webcamstate();
+	webcamstate(int camNum);
 	~webcamstate();
 
 	void init();
@@ -28,6 +28,8 @@ struct webcamstate
 	boost::thread capture_thread;
 
 	BYTE* sample;
+
+	int camNumber;
 };
 
 }

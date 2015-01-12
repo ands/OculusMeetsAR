@@ -16,7 +16,7 @@ namespace webcam
     class VideoPlayer
     {
     public:
-        VideoPlayer();
+        VideoPlayer(int camNum);
         ~VideoPlayer();
 
         /// @brief Set the MovieAudioFactory to use.
@@ -45,6 +45,7 @@ namespace webcam
         int getVideoWidth();
         /// Return the height of the currently playing video, or 0 if no video is playing.
         int getVideoHeight();
+		int camNumber;
 
 
     private:

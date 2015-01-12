@@ -11,8 +11,9 @@
 #include <OGRE/OgreStringConverter.h>
 
 namespace webcam{
-	webcamstate::webcamstate()
+	webcamstate::webcamstate(int camNum)
 	{
+		camNumber=camNum;
 		sample = new BYTE[2*1280*960];
 		CCapture::CreateInstance(&cap);
 	}
@@ -24,7 +25,6 @@ namespace webcam{
 
 	HRESULT webcamstate::update()
 	{
-		//SYNC??
 		HRESULT check=E_FAIL;
 		sample = cap->getLastImagesample(&check);
 		if(SUCCEEDED(check)){
@@ -62,9 +62,28 @@ namespace webcam{
 		list.EnumerateDevices();
 		int count = list.Count();
 		//todo: select the two C310 in right order
-		temp = list.m_ppDevices[0];
-		WCHAR *name=NULL;
-		temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,&name,NULL);
+
+		bool firstfound=false;
+		for(int i=0;i<list.Count();i++){
+			temp=list.m_ppDevices[i];
+			WCHAR *name=NULL;
+			temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,&name,NULL);
+			std::string displayname((char*) name);
+			
+
+			if(displayname.compare("USB-Videogerät")){
+				if(self->camNumber==0){
+					break;
+				}
+				else if(!firstfound){
+					firstfound=true;
+				}
+				else if(firstfound){
+					break;
+				}
+			}
+
+		}
 		const EncodingParameters params;
 		self->cap->StartCapture(temp,params);
 	}

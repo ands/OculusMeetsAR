@@ -5,7 +5,7 @@
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
-	OIS::Mouse *mouse, OIS::Keyboard *keyboard, webcam::VideoPlayer *mVideoPlayer)
+	OIS::Mouse *mouse, OIS::Keyboard *keyboard, webcam::VideoPlayer *mVideoPlayerLeft, webcam::VideoPlayer *mVideoPlayerRight)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -58,7 +58,6 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	mRoomNode->attachObject( roomLight );
 
-	//Videocube
 	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
@@ -74,20 +73,19 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::MeshManager::getSingleton().createPlane("PlaneMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *mMiniScreen, 20, 20, 1, 1, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
 	Ogre::Entity* mPlaneEnt = mSceneMgr->createEntity("PlaneEntity", "PlaneMesh");
 
-	//Videomaterial
+	//Videomaterial 1
 	Ogre::MaterialPtr videoMaterial = Ogre::MaterialManager::getSingleton().create(
                     "VideoMaterial", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
 	Ogre::Pass *pass = videoMaterial->getTechnique( 0 )->getPass( 0 );
-	//Ogre::Pass *pass = cubeEnt2->getSubEntity(0)->getTechnique()->getPass(0);
 	pass->setLightingEnabled( false );
 	Ogre::TextureUnitState *tex = pass->createTextureUnitState();
 
 	const std::string dummy = "dummy";
-	mVideoPlayer->playVideo(dummy);
+	mVideoPlayerLeft->playVideo(dummy);
 
-	if (!mVideoPlayer->getTextureName().empty())
+	if (!mVideoPlayerLeft->getTextureName().empty())
 	{
-		tex->setTextureName(mVideoPlayer->getTextureName());
+		tex->setTextureName(mVideoPlayerLeft->getTextureName());
 		mPlaneEnt->setMaterial(videoMaterial);		
 	}
 	miniScreen->attachObject(mPlaneEnt);
@@ -95,6 +93,35 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	miniScreen->yaw((const Ogre::Radian) -3.1415/2.0);
 	miniScreen->pitch((const Ogre::Radian) -3.1415/2.0);
 	miniScreen->translate(-2.0,1.0,3.0);
+
+	//WebcamScreen 2
+	Ogre::SceneNode* miniScreen2 = mRoomNode->createChildSceneNode();
+	Ogre::MovablePlane *mMiniScreen2 = new Ogre::MovablePlane("Screen2");
+	mMiniScreen2->d = 0;
+	mMiniScreen2->normal = Ogre::Vector3::UNIT_Y;
+	Ogre::MeshManager::getSingleton().createPlane("PlaneMesh", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *mMiniScreen2, 20, 20, 1, 1, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
+	Ogre::Entity* mPlaneEnt2 = mSceneMgr->createEntity("PlaneEntity2", "PlaneMesh");
+
+	//Videomaterial 2
+	Ogre::MaterialPtr videoMaterial2 = Ogre::MaterialManager::getSingleton().create(
+                    "VideoMaterial2", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	Ogre::Pass *pass2 = videoMaterial2->getTechnique( 0 )->getPass( 0 );
+	pass2->setLightingEnabled( false );
+	Ogre::TextureUnitState *tex2 = pass2->createTextureUnitState();
+
+	const std::string dummy2 = "dummy";
+	mVideoPlayerRight->playVideo(dummy2);
+
+	if (!mVideoPlayerRight->getTextureName().empty())
+	{
+		tex2->setTextureName(mVideoPlayerRight->getTextureName());
+		mPlaneEnt2->setMaterial(videoMaterial2);		
+	}
+	miniScreen2->attachObject(mPlaneEnt2);
+	miniScreen2->scale(0.25,0.25,0.25);
+	miniScreen2->yaw((const Ogre::Radian) -3.1415/2.0);
+	miniScreen2->pitch((const Ogre::Radian) -3.1415/2.0);
+	miniScreen2->translate(-1.5,1.0,0.0);
 
 	// rift node:
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!

@@ -30,7 +30,8 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		bool update();
 
 	private:
-		webcam::VideoPlayer *mVideoPlayer;
+		webcam::VideoPlayer *mVideoPlayerLeft;
+		webcam::VideoPlayer *mVideoPlayerRight;
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
         void initBullet(bool enableDebugDrawing);

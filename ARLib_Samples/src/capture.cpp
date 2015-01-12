@@ -494,7 +494,7 @@ HRESULT ConfigureSourceReader(IMFSourceReader *pReader)
 
     hr = pReader->GetNativeMediaType(
         (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-        90,  // Type index
+        74,  // Type index. For C310: 74 = 1280x960 MJPEG
         &pType
         );
 

@@ -16,7 +16,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
     , mGroundShape(nullptr)
-	, mVideoPlayer(nullptr)
+	, mVideoPlayerLeft(nullptr)
+	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 
@@ -32,8 +33,9 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoPlayer = new webcam::VideoPlayer();
-    mScene = new WebcamScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard, mVideoPlayer);
+	mVideoPlayerLeft = new webcam::VideoPlayer(0);
+	mVideoPlayerRight = new webcam::VideoPlayer(1);
+    mScene = new WebcamScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard, mVideoPlayerLeft,mVideoPlayerRight);
 	createViewports();
 	mRoot->startRendering();
 }
@@ -248,7 +250,8 @@ bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mMouse->capture();
 
 	//Videotexturupdate
-	mVideoPlayer->update();
+	mVideoPlayerLeft->update();
+	mVideoPlayerRight->update();
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
 	
