@@ -1,34 +1,34 @@
-vertex_program OculusDistortionVertex glsl
+vertex_program WatercolorVertex glsl
 {
-    source OculusDistortionVertex.glsl
+    source WatercolorVertex.glsl
 	default_params
 	{
-		param_named eyeToSourceUVScale float2 1.0 1.0
-		param_named eyeToSourceUVOffset float2 0.0 0.0
+		//param_named eyeToSourceUVScale float2 1.0 1.0
+		//param_named eyeToSourceUVOffset float2 0.0 0.0
 		//param_named eyeRotationStart matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 		//param_named eyeRotationEnd matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
 }
-fragment_program OculusDistortionFragment glsl
+fragment_program WatercolorFragment glsl
 {
-    source OculusDistortionFragment.glsl
+    source WatercolorFragment.glsl
 }
 
 
-material Oculus/LeftEye
+material Watercolor/LeftEye
 {
     receive_shadows off
 
     technique
     {
-        pass Oculus/LeftEye
+        pass Watercolor/LeftEye
         {
-			vertex_program_ref OculusDistortionVertex
+			vertex_program_ref WatercolorVertex
 			{
 			}
 
-			fragment_program_ref OculusDistortionFragment
+			fragment_program_ref WatercolorFragment
 			{
 				param_named diffuseMap int 0
 			}
@@ -41,19 +41,19 @@ material Oculus/LeftEye
     }
 }
 
-material Oculus/RightEye
+material Watercolor/RightEye
 {
     receive_shadows off
 
     technique
     {
-        pass Oculus/RightEye
+        pass Watercolor/RightEye
         {
-			vertex_program_ref OculusDistortionVertex
+			vertex_program_ref WatercolorVertex
 			{
 			}
 
-			fragment_program_ref OculusDistortionFragment
+			fragment_program_ref WatercolorFragment
 			{
 				param_named diffuseMap int 0
 			}

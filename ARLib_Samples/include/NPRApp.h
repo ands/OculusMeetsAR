@@ -6,6 +6,7 @@
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "ARLib/ARLibOgre.h"
+#include "NPRWatercolorRenderTarget.h"
 #include "Scene.h"
 
 class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
@@ -36,6 +37,7 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		void initTracking();
 		void quitTracking();
 		void createViewports();
+		//void addCompositors(Ogre::Viewport *vp);
 
 		OIS::Keyboard* mKeyboard;
 		OIS::Mouse* mMouse;
@@ -55,6 +57,8 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		ARLib::TrackingManager* mTracker;
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;
+		NPRWatercolorRenderTarget* mWatercolorRenderTarget;
+		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
 };
 
 #endif
