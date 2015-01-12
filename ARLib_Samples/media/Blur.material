@@ -11,7 +11,7 @@ fragment_program BlurHFragment glsl
     source BlurHFragment.glsl
 	default_params
 	{
-		param_named BlurRadius float2 0.003 0.003
+		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
 	}
 }
 fragment_program BlurVFragment glsl
@@ -19,7 +19,7 @@ fragment_program BlurVFragment glsl
     source BlurVFragment.glsl
 	default_params
 	{
-		param_named BlurRadius float2 0.003 0.003
+		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
 	}
 }
 
