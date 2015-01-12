@@ -11,7 +11,7 @@ class RiftSceneNode;
 
 class RenderTarget
 {
-	private:
+	public:
 		// sets the cameras that should render to this render target
 		virtual void SetCameras(
 			Ogre::Camera *left,

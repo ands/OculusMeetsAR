@@ -13,7 +13,6 @@ class DebugRenderTarget : public RenderTarget
 	public:
 		DebugRenderTarget(Ogre::RenderWindow *renderWindow);
 
-	private:
 		// sets the cameras that should render to this render target
 		virtual void SetCameras(
 			Ogre::Camera *left,
@@ -24,6 +23,7 @@ class DebugRenderTarget : public RenderTarget
 			Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
 			Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd);*/
 
+	private:
 		Ogre::RenderWindow *renderWindow;
 };
 

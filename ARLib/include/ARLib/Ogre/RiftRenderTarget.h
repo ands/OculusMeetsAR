@@ -15,7 +15,6 @@ class RiftRenderTarget : public RenderTarget
 		RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow);
 		~RiftRenderTarget();
 
-	private:
 		// sets the cameras that should render to this render target
 		virtual void SetCameras(
 			Ogre::Camera *left,
@@ -26,6 +25,7 @@ class RiftRenderTarget : public RenderTarget
 			Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
 			Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd);*/
 
+	private:
 		Rift *rift;
 		Ogre::Root *root;
 		Ogre::SceneManager *riftSceneManager;
