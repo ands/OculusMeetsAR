@@ -13,6 +13,7 @@
 
 const UINT WM_APP_PREVIEW_ERROR = WM_APP + 1;    // wparam = HRESULT
 
+//Class for enumerating videocapture devices
 class DeviceList
 {
 public:

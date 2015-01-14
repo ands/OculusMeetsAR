@@ -61,8 +61,8 @@ namespace webcam{
 		DeviceList list = DeviceList();
 		list.EnumerateDevices();
 		int count = list.Count();
-		//todo: select the two C310 in right order
 
+		//todo: select the two C310 in right order
 		bool firstfound=false;
 		for(unsigned int i=0;i<list.Count();i++){
 			temp=list.m_ppDevices[i];

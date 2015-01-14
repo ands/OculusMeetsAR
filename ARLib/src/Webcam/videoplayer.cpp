@@ -16,7 +16,7 @@ VideoPlayer::~VideoPlayer()
         close();
 }
 
-void VideoPlayer::playVideo(const std::string &resourceName)
+void VideoPlayer::playVideo()
 {
     if(mState)
         close();
@@ -38,11 +38,9 @@ void VideoPlayer::playVideo(const std::string &resourceName)
     }
 }
 
-bool VideoPlayer::update ()
+void VideoPlayer::update ()
 {
-    if(mState)
-        return mState->update();
-    return false;
+    mState->update();
 }
 
 std::string VideoPlayer::getTextureName()

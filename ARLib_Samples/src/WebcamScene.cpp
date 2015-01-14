@@ -80,8 +80,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	pass->setLightingEnabled( false );
 	Ogre::TextureUnitState *tex = pass->createTextureUnitState();
 
-	const std::string dummy = "dummy";
-	mVideoPlayerLeft->playVideo(dummy);
+	mVideoPlayerLeft->playVideo();
 
 	if (!mVideoPlayerLeft->getTextureName().empty())
 	{
@@ -109,8 +108,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	pass2->setLightingEnabled( false );
 	Ogre::TextureUnitState *tex2 = pass2->createTextureUnitState();
 
-	const std::string dummy2 = "dummy";
-	mVideoPlayerRight->playVideo(dummy2);
+	mVideoPlayerRight->playVideo();
 
 	if (!mVideoPlayerRight->getTextureName().empty())
 	{
