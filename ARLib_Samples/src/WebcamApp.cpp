@@ -1,7 +1,6 @@
-#include "OGRE/OgreCompositorManager.h"
-#include "App.h"
+#include "WebcamApp.h"
 
-App::App(bool showDebugWindow)
+WebcamApp::WebcamApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
 	, mMouse(nullptr)
@@ -14,6 +13,11 @@ App::App(bool showDebugWindow)
 	, mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
 	, mTracker(nullptr)
+    , mDebugDrawer(nullptr)
+    , mDynamicsWorld(nullptr)
+    , mGroundShape(nullptr)
+	, mVideoPlayerLeft(nullptr)
+	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 
@@ -24,15 +28,19 @@ App::App(bool showDebugWindow)
 		showDebugWindow = true;
 
 	initOgre(showDebugWindow);
+	initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
 	initRift();
 	initTracking();
-	mScene = new Scene(mRift, mTracker, mRoot, mMouse, mKeyboard);
+
+	mVideoPlayerLeft = new webcam::VideoPlayer(0);
+	mVideoPlayerRight = new webcam::VideoPlayer(1);
+    mScene = new WebcamScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard, mVideoPlayerLeft,mVideoPlayerRight);
 	createViewports();
 	mRoot->startRendering();
 }
 
-App::~App()
+WebcamApp::~WebcamApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
 	if (mRenderTarget) delete mRenderTarget;
@@ -43,11 +51,13 @@ App::~App()
 	if(mScene) delete mScene;
 	std::cout << "Closing OIS:" << std::endl;
 	quitOIS();
+    std::cout << "Closing Bullet:" << std::endl;
+    quitBullet();
 	std::cout << "Closing Ogre:" << std::endl;
 	quitOgre();
 }
 
-void App::initOgre(bool showDebugWindow)
+void WebcamApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
 #ifdef _DEBUG
@@ -105,12 +115,35 @@ void App::initOgre(bool showDebugWindow)
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
-void App::quitOgre()
+void WebcamApp::quitOgre()
 {
 	if(mRoot) delete mRoot;
 }
 
-void App::initOIS()
+void WebcamApp::initBullet(bool enableDebugDrawing){
+    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
+    mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
+    mDebugDrawer->setDrawWireframe(true);
+
+    mDynamicsWorld->setDebugDrawer(mDebugDrawer);
+    mDynamicsWorld->setShowDebugShapes(true);
+    
+    Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
+    node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
+    //and other stuff!
+}
+
+void WebcamApp::quitBullet(){
+    if(mGroundShape != nullptr)
+        delete mGroundShape;
+    if(mDebugDrawer != nullptr)
+        delete mDebugDrawer;
+    if(mDynamicsWorld != nullptr)
+        delete mDynamicsWorld;
+}
+
+void WebcamApp::initOIS()
 {
 	OIS::ParamList pl;
     size_t windowHnd = 0;
@@ -138,13 +171,13 @@ void App::initOIS()
 	mKeyboard->setEventCallback(this);
 	mMouse->setEventCallback(this);
 }
-void App::quitOIS()
+void WebcamApp::quitOIS()
 {
 	if(mKeyboard) delete mKeyboard;
 	if(mMouse) delete mMouse;
 }
 
-void App::initRift()
+void WebcamApp::initRift()
 {
 	// try to initialize the Oculus Rift (ID 0):
 	if (mRiftAvailable)
@@ -158,14 +191,14 @@ void App::initRift()
 		}
 	}
 }
-void App::quitRift()
+void WebcamApp::quitRift()
 {
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
 	if(mRift) delete mRift;
 	ARLib::Rift::shutdown();
 }
 		
-void App::initTracking()
+void WebcamApp::initTracking()
 {
 	if(mRiftAvailable)
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, mRift);
@@ -186,29 +219,29 @@ void App::initTracking()
 	}
 }
 		
-void App::quitTracking()
+void WebcamApp::quitTracking()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
 	//mTracker->uninitialize(); ::todo
 	if(mTracker) delete mTracker;
 }
 
-void App::createViewports()
+void WebcamApp::createViewports()
 {
 	if (mWindow && mRift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-		mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
+        mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
 	}
 
 	if (mSmallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-		mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
+        mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
 	}
 }
 
-bool App::frameRenderingQueued(const Ogre::FrameEvent& evt) 
+bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
 
@@ -216,14 +249,21 @@ bool App::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-	if (mTracker)
+	//Videotexturupdate
+	mVideoPlayerLeft->update();
+	mVideoPlayerRight->update();
+
+    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
+	
+    if (mTracker)
 		mTracker->update(); //right place?
-	mScene->update(evt.timeSinceLastFrame);
+	
+    mScene->update(evt.timeSinceLastFrame);
 
 	return true; 
 }
 
-bool App::keyPressed(const OIS::KeyEvent& e)
+bool WebcamApp::keyPressed(const OIS::KeyEvent& e)
 {
 	mScene->keyPressed(e);
 
@@ -234,28 +274,28 @@ bool App::keyPressed(const OIS::KeyEvent& e)
 
 	return true;
 }
-bool App::keyReleased(const OIS::KeyEvent& e)
+bool WebcamApp::keyReleased(const OIS::KeyEvent& e)
 {
 	mScene->keyReleased(e);
 	return true;
 }
-bool App::mouseMoved(const OIS::MouseEvent& e)
+bool WebcamApp::mouseMoved(const OIS::MouseEvent& e)
 {
 	mScene->mouseMoved(e);
 	return true;
 }
-bool App::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool WebcamApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
-bool App::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool WebcamApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
 
-void App::quit()
+void WebcamApp::quit()
 {
 	std::cout << "QUIT." << std::endl;
 	mShutdown = true;

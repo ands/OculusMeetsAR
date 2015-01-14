@@ -1,0 +1,88 @@
+vertex_program BlurVertex glsl
+{
+    source BlurVertex.glsl
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+fragment_program BlurHFragment glsl
+{
+    source BlurHFragment.glsl
+	default_params
+	{
+		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
+	}
+}
+fragment_program BlurVFragment glsl
+{
+    source BlurVFragment.glsl
+	default_params
+	{
+		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
+	}
+}
+
+//Blur: Horizontal Gaussian pass
+material Watercolor/BlurH
+{
+    receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			lighting off
+			//cull_hardware none
+			//cull_software none
+			//depth_check off
+            //polygon_mode_overrideable false
+
+			fragment_program_ref BlurHFragment
+			{
+				param_named Blur0 int 0
+			}
+			vertex_program_ref BlurVertex
+			{
+			}
+			texture_unit
+			{
+				//tex_coord_set 0
+				tex_address_mode clamp
+				//filtering trilinear
+			}
+		}
+	}
+}
+
+//Blur: Vertical Gaussian pass
+material Watercolor/BlurV
+{
+    receive_shadows off
+
+	technique
+	{
+		pass
+		{
+			lighting off
+			//cull_hardware none
+			//cull_software none
+			//depth_check off
+            //polygon_mode_overrideable false
+
+			fragment_program_ref BlurVFragment
+			{
+				param_named Blur0 int 0
+			}
+			vertex_program_ref BlurVertex
+			{
+			}
+			texture_unit
+			{
+				//tex_coord_set 0
+				tex_address_mode clamp
+				//filtering trilinear
+			}
+		}
+	}
+}

@@ -6,13 +6,16 @@
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "ARLib/ARLibOgre.h"
-#include "Scene.h"
+#include "WebcamScene.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "videoplayer.hpp"
 
-class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
+
+class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
 {
 	public:
-		App(bool showDebugWindow);
-		~App();
+		WebcamApp(bool showDebugWindow);
+		~WebcamApp();
 
 		void quit();
 
@@ -27,8 +30,12 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		bool update();
 
 	private:
+		webcam::VideoPlayer *mVideoPlayerLeft;
+		webcam::VideoPlayer *mVideoPlayerRight;
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
+        void initBullet(bool enableDebugDrawing);
+        void quitBullet();
 		void initOIS();
 		void quitOIS();
 		void initRift();
@@ -41,13 +48,14 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		OIS::Mouse* mMouse;
 
 		Ogre::Root* mRoot;
+        Ogre::SceneManager *mSceneMgr;
 
 		Ogre::RenderWindow* mWindow;
 		Ogre::RenderWindow* mSmallWindow;
 
 		bool mShutdown;
 
-		Scene* mScene;
+		WebcamScene* mScene;
 
 		bool mRiftAvailable;
 		bool mTrackingAvailable;
@@ -55,6 +63,10 @@ class App : public Ogre::FrameListener, public OIS::KeyListener, public OIS::Mou
 		ARLib::TrackingManager* mTracker;
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;
+
+        OgreBulletCollisions::DebugDrawer *mDebugDrawer;
+        OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
+        OgreBulletCollisions::CollisionShape *mGroundShape;
 };
 
 #endif

@@ -11,17 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\App.cpp" />
+    <ClCompile Include="..\src\NPRApp.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\NPRWatercolorRenderTarget.cpp" />
     <ClCompile Include="..\src\Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\App.h" />
+    <ClInclude Include="..\include\NPRApp.h" />
+    <ClInclude Include="..\include\NPRWatercolorRenderTarget.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
     <ClInclude Include="..\include\Scene.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D4448315-9DDE-4479-8873-71A82AD38002}</ProjectGuid>
+    <ProjectGuid>{8894C610-1410-49D6-BBF0-F620E537F254}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>ARLib_Sample</RootNamespace>
   </PropertyGroup>

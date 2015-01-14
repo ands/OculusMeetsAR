@@ -1,0 +1,66 @@
+vertex_program WatercolorVertex glsl
+{
+    source WatercolorVertex.glsl
+	default_params
+	{
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+fragment_program WatercolorFragment glsl
+{
+    source WatercolorFragment.glsl
+}
+
+
+material Watercolor/LeftEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass Watercolor/LeftEye
+        {
+			vertex_program_ref WatercolorVertex
+			{
+			}
+
+			fragment_program_ref WatercolorFragment
+			{
+				param_named diffuseMap int 0
+			}
+
+            lighting off
+			texture_unit
+            {
+				tex_address_mode clamp
+            }
+        }
+    }
+}
+
+material Watercolor/RightEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass Watercolor/RightEye
+        {
+			vertex_program_ref WatercolorVertex
+			{
+			}
+
+			fragment_program_ref WatercolorFragment
+			{
+				param_named diffuseMap int 0
+			}
+
+            lighting off
+
+			texture_unit 
+            {
+				tex_address_mode clamp
+            }
+        }
+    }
+}
