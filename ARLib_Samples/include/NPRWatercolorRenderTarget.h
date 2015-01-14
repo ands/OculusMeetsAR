@@ -10,7 +10,9 @@ class NPRWatercolorRenderTarget
 	public:
 		NPRWatercolorRenderTarget(
 			Ogre::Root *root, ARLib::RenderTarget *destination,
-			Ogre::uint eyeTextureWidth, Ogre::uint eyeTextureHeight);
+			Ogre::uint eyeTextureWidth, Ogre::uint eyeTextureHeight,
+			Ogre::uint tilesX, Ogre::uint tilesY,
+			Ogre::Real edgeThreshold = 0.018f);
 		~NPRWatercolorRenderTarget();
 
 		// sets the cameras that should render to this render target

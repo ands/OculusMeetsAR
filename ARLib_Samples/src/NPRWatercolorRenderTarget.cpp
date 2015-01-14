@@ -2,7 +2,9 @@
 
 NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 	Ogre::Root *root, ARLib::RenderTarget *destination,
-	Ogre::uint eyeTextureWidth, Ogre::uint eyeTextureHeight)
+	Ogre::uint eyeTextureWidth, Ogre::uint eyeTextureHeight,
+	Ogre::uint tilesX, Ogre::uint tilesY,
+	Ogre::Real edgeThreshold)
 	: root(root)
 {
 	watercolorSceneManager[0] = NULL;
@@ -41,28 +43,31 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 				eyeTextureWidth, eyeTextureHeight, 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
 			materialPass->getTextureUnitState(1)->setTexture(renderTextureOriginal[eyeNum]);
 		}
+
+		// set edge detection parameters
+		Ogre::GpuProgramParametersSharedPtr params = materialPass->getFragmentProgramParameters();
+		params->setNamedConstant("PixelSize", Ogre::Vector2(1.0f / eyeTextureWidth, 1.0f / eyeTextureHeight));
+		params->setNamedConstant("EdgeThreshold", edgeThreshold);
 		
 		// create the voronoi mesh:
 		const char *objectNames[] = { "WatercolorVoronoiLeft", "WatercolorVoronoiRight" };
 		Ogre::ManualObject* manual = watercolorSceneManager[eyeNum]->createManualObject(objectNames[eyeNum]);
-		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
-		int index = 0;
 		const int triangles = 15;
-		const int countX = 60*2;
-		const int countY = 68*2;
-		const float randRadiusX = 0.5f / countX;
-		const float randRadiusY = 0.5f / countY;
-		const float coneRadiusX = (0.5f / countX + randRadiusX) * 1.42f;
-		const float coneRadiusY = (0.5f / countY + randRadiusY) * 1.42f;
+		const float randRadiusX = 0.5f / tilesX;
+		const float randRadiusY = 0.5f / tilesY;
+		const float coneRadiusX = (0.5f / tilesX + randRadiusX) * 1.42f;
+		const float coneRadiusY = (0.5f / tilesY + randRadiusY) * 1.42f;
 		assert(coneRadiusX > randRadiusX && coneRadiusY > randRadiusY);
 
-		for (int y = 0; y < countY; y++)
+		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
+		int index = 0;
+		for (int y = 0; y < tilesY; y++)
 		{
-			for (int x = 0; x < countX; x++)
+			for (int x = 0; x < tilesX; x++)
 			{
-				float px = ((float)x / (float)(countX - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusX;
-				float py = ((float)y / (float)(countY - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusY;
+				float px = ((float)x / (float)(tilesX - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusX;
+				float py = ((float)y / (float)(tilesY - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusY;
 
 				float texCenterX = px;
 				float texCenterY = 1.0f - py;
@@ -157,7 +162,18 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 		vp->setSkiesEnabled(false);
 
 		// add blur compositor
-		Ogre::CompositorManager::getSingleton().addCompositor(vp, "Blur");
-		Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp, "Blur", true);
+		Ogre::CompositorInstance *blur = Ogre::CompositorManager::getSingleton().addCompositor(vp, "Blur");
+		blur->setEnabled(true);
+		
+		// set compositor parameters
+		Ogre::Pass *passes[2] = {
+			blur->getTechnique()->getTargetPass(1)->getPass(0)->getMaterial().get()->getBestTechnique()->getPass(0),
+			blur->getTechnique()->getOutputTargetPass()->getPass(0)->getMaterial().get()->getBestTechnique()->getPass(0)
+		};
+		for (int passIndex = 0; passIndex < 2; passIndex++)
+		{
+			Ogre::GpuProgramParametersSharedPtr params = passes[passIndex]->getFragmentProgramParameters();
+			params->setNamedConstant("BlurRadius", Ogre::Vector2(2.0f / (float)vp->getActualWidth(), 2.0f / (float)vp->getActualHeight()));
+		}
 	}
 }

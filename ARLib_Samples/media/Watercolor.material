@@ -22,6 +22,11 @@ material Watercolor/LeftEye
 	
         pass Watercolor/LeftEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check on
+		
 			vertex_program_ref WatercolorVertex
 			{
 			}
@@ -32,7 +37,6 @@ material Watercolor/LeftEye
 				param_named Original int 1
 			}
 
-            lighting off
 			texture_unit
             {
 				tex_address_mode clamp
@@ -55,6 +59,11 @@ material Watercolor/RightEye
 		
         pass Watercolor/RightEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check on
+		
 			vertex_program_ref WatercolorVertex
 			{
 			}
@@ -64,9 +73,7 @@ material Watercolor/RightEye
 				param_named Blurred int 0
 				param_named Original int 1
 			}
-
-            lighting off
-
+			
 			texture_unit 
             {
 				tex_coord_set 0

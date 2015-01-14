@@ -2,23 +2,22 @@
 
 uniform sampler2D Blurred;
 uniform sampler2D Original;
+uniform vec2 PixelSize;
+uniform float EdgeThreshold;
 
 in vec2 oUV0;
 in vec2 oUV1;
 
 out vec4 fragColor;
 
-const float EDGE_DETECT_DISTANE = 0.001;
-const float MIN_EDGE_DIFFERENCE = 0.015;
-
 vec3 sample(vec2 uv, vec2 offset)
 {
-	return texture(Original, uv + EDGE_DETECT_DISTANE * offset).rgb;
+	return texture(Original, uv + PixelSize * offset).rgb;
 }
 
 float isEdge(vec2 uv)
 {
-	uv = oUV1 + EDGE_DETECT_DISTANE * uv;
+	uv = oUV1 + PixelSize * uv;
 	
 #if 0
 	// sobel
@@ -53,7 +52,7 @@ float isEdge(vec2 uv)
 	vec3 result = sqrt(sumX * sumX + sumY * sumY);
 #endif
 
-	bool edge = any(greaterThan(result, vec3(MIN_EDGE_DIFFERENCE)));
+	bool edge = any(greaterThan(result, vec3(EdgeThreshold)));
 	return edge ? 1.0 : 0.0;
 }
 
