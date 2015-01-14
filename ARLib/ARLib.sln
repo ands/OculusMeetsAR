@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+# Visual C++ Express 2010
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLibOculus", "ARLibOculus.vcxproj", "{3868D32F-7B02-478D-BAAA-0DCEB2574B6F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLibTracking", "ARLibTracking.vcxproj", "{963869C4-75C7-499E-BD3F-3383F063E5E6}"
@@ -12,6 +12,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLibOgre", "ARLibOgre.vcxp
 	ProjectSection(ProjectDependencies) = postProject
 		{3868D32F-7B02-478D-BAAA-0DCEB2574B6F} = {3868D32F-7B02-478D-BAAA-0DCEB2574B6F}
 		{963869C4-75C7-499E-BD3F-3383F063E5E6} = {963869C4-75C7-499E-BD3F-3383F063E5E6}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLibWebcam", "ARLibWebcam.vcxproj", "{BB807500-CDBF-488B-89AE-CE03614D6559}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F2CE07FF-A392-47A2-9F84-BD290656AAFE} = {F2CE07FF-A392-47A2-9F84-BD290656AAFE}
 	EndProjectSection
 EndProject
 Global
@@ -32,6 +37,10 @@ Global
 		{F2CE07FF-A392-47A2-9F84-BD290656AAFE}.Debug|Win32.Build.0 = Debug|Win32
 		{F2CE07FF-A392-47A2-9F84-BD290656AAFE}.Release|Win32.ActiveCfg = Release|Win32
 		{F2CE07FF-A392-47A2-9F84-BD290656AAFE}.Release|Win32.Build.0 = Release|Win32
+		{BB807500-CDBF-488B-89AE-CE03614D6559}.Debug|Win32.ActiveCfg = Debug|Win32
+		{BB807500-CDBF-488B-89AE-CE03614D6559}.Debug|Win32.Build.0 = Debug|Win32
+		{BB807500-CDBF-488B-89AE-CE03614D6559}.Release|Win32.ActiveCfg = Release|Win32
+		{BB807500-CDBF-488B-89AE-CE03614D6559}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
