@@ -62,6 +62,8 @@ material Watercolor/BlurV
 
 	technique
 	{
+		scheme MRT
+	
 		pass
 		{
 			lighting off
@@ -73,6 +75,7 @@ material Watercolor/BlurV
 			fragment_program_ref BlurVFragment
 			{
 				param_named Blur0 int 0
+				param_named Original int 1
 			}
 			vertex_program_ref BlurVertex
 			{
@@ -81,7 +84,11 @@ material Watercolor/BlurV
 			{
 				//tex_coord_set 0
 				tex_address_mode clamp
-				//filtering trilinear
+			}
+			texture_unit
+			{
+				//tex_coord_set 0
+				tex_address_mode clamp
 			}
 		}
 	}

@@ -1,11 +1,13 @@
 #version 130
 
 uniform sampler2D Blur0;
+uniform sampler2D Original;
 uniform vec2 BlurRadius;
 
 in vec2 oUV;
 
-out vec4 fragColor;
+out vec4 fragColorBlurred;
+out vec4 fragColorOriginal;
 
 vec2 pos[11] = vec2[11]
 (
@@ -26,5 +28,6 @@ void main()
     vec4 sum = vec4(0);
     for(int i = 0; i < 11; i++)
         sum += texture(Blur0, oUV + pos[i] * BlurRadius) * samples[i];
-    fragColor = sum;
+    fragColorBlurred = sum;
+	fragColorOriginal = texture(Original, oUV);
 }

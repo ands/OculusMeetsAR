@@ -29,8 +29,32 @@ RiftSceneNode::RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float
 
 	// initialize the interpupillary distance
 	float ipd = 0.064f;
+
 	if (rift)
+	{
+		// set correct interpupillary distance
 		ipd = rift->getInterpupillaryDistance();
+
+		// set correct projections
+		float aspectRatios[2], projections[2][16];
+		rift->getProjections(
+			zNear, zFar, true,
+			&aspectRatios[0], projections[0],
+			&aspectRatios[1], projections[1]);
+
+		for (int eyeNum = 0; eyeNum < 2; eyeNum++)
+		{
+			cameras[eyeNum]->setAspectRatio(aspectRatios[eyeNum]);
+	
+			float *p = projections[eyeNum];
+			cameras[eyeNum]->setCustomProjectionMatrix(true, Ogre::Matrix4(
+				p[ 0], p[ 1], p[ 2], p[ 3],
+				p[ 4], p[ 5], p[ 6], p[ 7],
+				p[ 8], p[ 9], p[10], p[11],
+				p[12], p[13], p[14], p[15]));
+		}
+	}
+
 	cameras[0]->setPosition(-ipd/2.0f, 0.0f, 0.0f);
 	cameras[1]->setPosition( ipd/2.0f, 0.0f, 0.0f);
 }

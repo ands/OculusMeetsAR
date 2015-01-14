@@ -198,7 +198,7 @@ void App::createViewports()
 	if (mWindow && mRift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(mRoot, mRenderTarget, 1024, 1024);
+		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(mRoot, mRenderTarget, 1461, 1182);
 		mScene->getRiftSceneNode()->addRenderTarget(mWatercolorRenderTarget);
 
 		/*Ogre::Viewport *left = mScene->getRiftSceneNode()->getLeftCamera()->getViewport();
@@ -210,7 +210,7 @@ void App::createViewports()
 	if (mSmallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(mRoot, mSmallRenderTarget, 512, 512);
+		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(mRoot, mSmallRenderTarget, 1461/2, 1182/2);
 		mScene->getRiftSceneNode()->addRenderTarget(mSmallWatercolorRenderTarget);
 
 		/*Ogre::Viewport *left = mScene->getRiftSceneNode()->getLeftCamera()->getViewport();

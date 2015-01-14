@@ -1,18 +1,17 @@
 #version 130
 
-// Values automatically defined by Ogre/OpenGL:
+uniform mat4 worldViewProj;
+
 in vec4 vertex;
 in vec2 uv0;
+in vec2 uv1;
 
-// Load in values defined in the material:
-uniform mat4 worldViewProj;
-//uniform vec2 eyeToSourceUVScale;
-//uniform vec2 eyeToSourceUVOffset;
-//uniform mat4 eyeRotationStart;
-//uniform mat4 eyeRotationEnd;
+out vec2 oUV0;
+out vec2 oUV1;
 
 void main(void)
 {
 	gl_Position = worldViewProj * vertex;
-    gl_TexCoord[0].xy = uv0;
+    oUV0 = uv0;
+	oUV1 = uv1;
 }

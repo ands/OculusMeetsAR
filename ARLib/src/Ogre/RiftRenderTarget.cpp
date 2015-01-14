@@ -103,13 +103,6 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
-	float aspectRatios[2], projections[2][16];
-	rift->getProjections(
-		left->getNearClipDistance(), // use existing zNear & zFar values of one of the cameras
-		left->getFarClipDistance(), true,
-		&aspectRatios[0], projections[0],
-		&aspectRatios[1], projections[1]);
-
 	// attach both cameras
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
@@ -119,15 +112,6 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 		renderTextureTarget->getViewport(0)->setClearEveryFrame(true);
 		renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
 		renderTextureTarget->getViewport(0)->setOverlaysEnabled(true);
-	
-		cameras[eyeNum]->setAspectRatio(aspectRatios[eyeNum]);
-	
-		float *p = projections[eyeNum];
-		cameras[eyeNum]->setCustomProjectionMatrix(true, Ogre::Matrix4(
-			p[ 0], p[ 1], p[ 2], p[ 3],
-			p[ 4], p[ 5], p[ 6], p[ 7],
-			p[ 8], p[ 9], p[10], p[11],
-			p[12], p[13], p[14], p[15]));
 	}
 }
 
