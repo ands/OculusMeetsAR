@@ -14,11 +14,13 @@
     <ClCompile Include="..\src\BulletApp.cpp" />
     <ClCompile Include="..\src\bulletmain.cpp" />
     <ClCompile Include="..\src\BulletScene.cpp" />
+    <ClCompile Include="..\src\Remote.cpp" />
     <ClCompile Include="..\src\RigidListenerNode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BulletApp.h" />
     <ClInclude Include="..\include\BulletScene.h" />
+    <ClInclude Include="..\include\Remote.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

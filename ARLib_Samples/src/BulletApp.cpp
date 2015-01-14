@@ -117,7 +117,7 @@ void BulletApp::quitOgre()
 
 void BulletApp::initBullet(bool enableDebugDrawing){
     mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
-    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
+    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0));
     mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
     mDebugDrawer->setDrawWireframe(true);
 

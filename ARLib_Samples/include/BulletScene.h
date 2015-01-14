@@ -3,11 +3,13 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
+#include "Remote.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 
 class BulletScene
 {

@@ -13,7 +13,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mDynamicsWorld = dyWorld;
 
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f,0.1f,0.1f));
-	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+    mSceneMgr->setShadowTechnique(Ogre::SHADOWDETAILTYPE_TEXTURE);
 	mSceneMgr->setShadowFarDistance(30);
 
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
@@ -22,21 +22,14 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (tracker)
 		tracker->registerRigidBodyEventListener(cubeNodeT);
 
-	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
-	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
-	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
-	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition( 3.0, 0.0, 0.0 );
-	cubeNode2->setScale( 0.5, 0.5, 0.5 );
-
-    OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0,1,0), -5);
+    OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0.15,0.9,0), -5);
     mShapes.push_back(shape);
     OgreBulletDynamics::RigidBody *planeBody = new OgreBulletDynamics::RigidBody("GroundPlane", mDynamicsWorld);
     planeBody->setStaticShape(shape, 0.1, 0.8);
     mRigidBodies.push_back(planeBody);
 	
 	Ogre::SceneNode* cubeNode3 = mRoomNode->createChildSceneNode();
-	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "Cube.mesh" );
+	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "cube.mesh" );
 	cubeEnt3->getSubEntity(0)->setMaterialName( "CubeMaterialWhite" );
 	cubeNode3->attachObject( cubeEnt3 );
 	cubeNode3->setPosition( -1.0, 0.0, 0.0 );
@@ -47,9 +40,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletCollisions::BoxCollisionShape *sceneBoxShape = new OgreBulletCollisions::BoxCollisionShape(size);
     OgreBulletDynamics::RigidBody *defaultBody = new OgreBulletDynamics::RigidBody("defaultBox3",mDynamicsWorld);
     defaultBody->setShape(cubeNode3, sceneBoxShape, 0.6f, 0.6f, 1.0f, Ogre::Vector3(-1.0, 0.0, 0.0));
-
-
-
+    
 	Ogre::Entity* roomEnt = mSceneMgr->createEntity( "Room.mesh" );
 	roomEnt->setCastShadows( false );
 	mRoomNode->attachObject( roomEnt );
@@ -72,6 +63,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	//mRiftNode->getNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
 		tracker->registerRigidBodyEventListener(mRiftNode);
+
+    StarWarsRemote *remote = new StarWarsRemote(mRoomNode, mSceneMgr, mDynamicsWorld, Ogre::Vector3(-1,0,0),5.0f);
+    mRoot->addFrameListener(remote);
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
