@@ -455,83 +455,49 @@ done:
 //
 //  Sets the media type on the source reader.
 //-------------------------------------------------------------------
-
 HRESULT ConfigureSourceReader(IMFSourceReader *pReader)
 {
-    // The list of acceptable types.
-    GUID subtypes[] = {
-        MFVideoFormat_NV12, MFVideoFormat_YUY2, MFVideoFormat_UYVY,
-        MFVideoFormat_RGB32, MFVideoFormat_RGB24, MFVideoFormat_IYUV
-    };
-
     HRESULT hr = S_OK;
-    BOOL    bUseNativeType = FALSE;
-
     GUID subtype = { 0 };
-
     IMFMediaType *pType = NULL;
+	int mediaTypeIndex = 0;
 
-    // If the source's native format matches any of the formats in
-    // the list, prefer the native format.
+	while(SUCCEEDED(hr))
+	{
+		hr = pReader->GetNativeMediaType(
+			(DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+			mediaTypeIndex,
+			&pType
+			);
 
-    // Note: The camera might support multiple output formats,
-    // including a range of frame dimensions. The application could
-    // provide a list to the user and have the user select the
-    // camera's output format. That is outside the scope of this
-    // sample, however.
+		if (FAILED(hr)) { goto done; }
 
-    hr = pReader->GetNativeMediaType(
-        (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-        74,  // Type index. For C310: 74 = 1280x960 MJPEG
-        &pType
-        );
+		UINT32 width, height;
+		hr = ::MFGetAttributeSize(pType, MF_MT_FRAME_SIZE, &width, &height);
 
-    if (FAILED(hr)) { goto done; }
+		if (FAILED(hr)) { goto done; }
 
-    hr = pType->GetGUID(MF_MT_SUBTYPE, &subtype);
+		hr = pType->GetGUID(MF_MT_SUBTYPE, &subtype);
 
-    if (FAILED(hr)) { goto done; }
+		if (FAILED(hr)) { goto done; }
 
-    for (UINT32 i = 0; i < ARRAYSIZE(subtypes); i++)
-    {
-        if (subtype == subtypes[i])
-        {
-            hr = pReader->SetCurrentMediaType(
-                (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                NULL,
-                pType
-                );
+		/*char buf[256];
+		sprintf(buf, "%d x %d Guid = {%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}\n", 
+			width, height,
+			subtype.Data1, subtype.Data2, subtype.Data3, 
+			subtype.Data4[0], subtype.Data4[1], subtype.Data4[2], subtype.Data4[3],
+			subtype.Data4[4], subtype.Data4[5], subtype.Data4[6], subtype.Data4[7]);
+		OutputDebugStringA(buf);*/
 
-            bUseNativeType = TRUE;
-            break;
-        }
-    }
+		if (subtype == MFVideoFormat_RGB24/*MJPG*/ && width == 1280 && height == 960)
+		{
+			hr = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, pType);
+			if (FAILED(hr)) { goto done; }
+			break;
+		}
 
-    if (!bUseNativeType)
-    {
-        // None of the native types worked. The camera might offer
-        // output a compressed type such as MJPEG or DV.
-
-        // Try adding a decoder.
-
-        for (UINT32 i = 0; i < ARRAYSIZE(subtypes); i++)
-        {
-            hr = pType->SetGUID(MF_MT_SUBTYPE, subtypes[i]);
-
-            if (FAILED(hr)) { goto done; }
-
-            hr = pReader->SetCurrentMediaType(
-                (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                NULL,
-                pType
-                );
-
-            if (SUCCEEDED(hr))
-            {
-                break;
-            }
-        }
-    }
+		mediaTypeIndex++;
+	}
 
 done:
     SafeRelease(&pType);
@@ -617,15 +583,16 @@ BYTE* CCapture::getLastImagesample(HRESULT *res){
 		else{
 			curbuf = (currentbuffer-1)%10;
 		}
-		bufferlist[curbuf]->Unlock();
+		bufferlist[curbuf]->Unlock(); // ??
 
-		*res = bufferlist[curbuf]->Lock(&returndata,NULL,NULL);
+		//DWORD length = 0;
+		*res = bufferlist[curbuf]->Lock(&returndata,NULL,NULL/*&length*/);
+		/*char buf[256];
+		sprintf(buf, "%d/960 = %d; %d/960/3 = %d\n", length, length / 960, length, length / 960 / 3);
+		OutputDebugStringA(buf);*/
 
-		/*if(SUCCEEDED(res)){
-			memcpy_s(result,(rsize_t)4*1280*960,returndata,(rsize_t)2*1280*960);
-		}*/
-
-		bufferlist[curbuf]->Unlock();}
+		bufferlist[curbuf]->Unlock(); // TODO: muss nach der nutzung ausgeführt werden, nicht hier!
+	}
 	return returndata;
 }
 

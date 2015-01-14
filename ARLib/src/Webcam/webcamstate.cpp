@@ -14,7 +14,7 @@ namespace webcam{
 	webcamstate::webcamstate(int camNum)
 	{
 		camNumber=camNum;
-		sample = new BYTE[2*1280*960];
+		sample = new BYTE[3*1280*960];
 		CCapture::CreateInstance(&cap);
 	}
 
@@ -32,15 +32,15 @@ namespace webcam{
 			{
 				static int i = 0;
 				mTexture = Ogre::TextureManager::getSingleton().createManual(
-					"ffmpeg/VideoTexture" + Ogre::StringConverter::toString(++i),
+					"ARLibWebcam/VideoTexture" + Ogre::StringConverter::toString(++i),
 					Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
 					Ogre::TEX_TYPE_2D,
 					1280,960,
 					0,
-					Ogre::PF_BYTE_RGBA,
+					Ogre::PF_BYTE_BGR,
 					Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
 			}
-			Ogre::PixelBox pb(1280,960, 1, Ogre::PF_BYTE_LA, sample);
+			Ogre::PixelBox pb(1280,960, 1, Ogre::PF_BYTE_BGR, sample);
 			Ogre::HardwarePixelBufferSharedPtr buffer = mTexture->getBuffer();
 			buffer->blitFromMemory(pb);
 		}
@@ -71,7 +71,7 @@ namespace webcam{
 			std::string displayname((char*) name);
 			
 
-			if(displayname.compare("USB-Videogerät")){
+			if(displayname.compare(/*"USB-Videogerät"*/ "Logitech HD Webcam C310")){
 				if(self->camNumber==0){
 					break;
 				}
