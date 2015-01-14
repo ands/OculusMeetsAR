@@ -11,8 +11,6 @@
 #include <Dbt.h>
 #include <shlwapi.h>
 
-const UINT WM_APP_PREVIEW_ERROR = WM_APP + 1;    // wparam = HRESULT
-
 //Class for enumerating videocapture devices
 class DeviceList
 {
@@ -35,13 +33,6 @@ public:
     HRESULT EnumerateDevices();
     HRESULT GetDevice(UINT32 index, IMFActivate **ppActivate);
     HRESULT GetDeviceName(UINT32 index, WCHAR **ppszName);
-};
-
-
-struct EncodingParameters
-{
-    GUID    subtype;
-    UINT32  bitrate;
 };
 
 class CCapture : public IMFSourceReaderCallback
@@ -75,21 +66,12 @@ public:
         return S_OK;
     }
 
-    HRESULT     StartCapture(IMFActivate *pActivate, const EncodingParameters& param);
+    HRESULT     StartCapture(IMFActivate *pActivate);
     HRESULT     EndCaptureSession();
     HRESULT     CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost);
-	BYTE* CCapture::getLastImagesample(HRESULT *res);
-	bool		somebufferexist;
-	bool		allbuffersexist;
+	BYTE*       CCapture::getLastImagesample(HRESULT *res);
 
 protected:
-
-    enum State
-    {
-        State_NotReady = 0,
-        State_Ready,
-        State_Capturing,
-    };
 
     // Constructor is private. Use static CreateInstance method to instantiate.
     CCapture();
@@ -97,25 +79,21 @@ protected:
     // Destructor is private. Caller should call Release.
     virtual ~CCapture();
 
-    //void    NotifyError(HRESULT hr) { PostMessage(m_hwndEvent, WM_APP_PREVIEW_ERROR, (WPARAM)hr, 0L); }
-
     HRESULT OpenMediaSource(IMFMediaSource *pSource);
-    HRESULT ConfigureCapture(const EncodingParameters& param);
     HRESULT EndCaptureInternal();
 
     long                    m_nRefCount;        // Reference count.
     CRITICAL_SECTION        m_critsec;
-
     IMFSourceReader         *m_pReader;
-
-    BOOL                    m_bFirstSample;
-    LONGLONG                m_llBaseTime;
-
     WCHAR                   *m_pwszSymbolicLink;
 
 	//capturesamples
-	IMFMediaBuffer *bufferlist[10];
+#define BUFFER_NUM 10
+	IMFMediaBuffer *bufferlist[BUFFER_NUM];
 	int currentbuffer;
+
+	bool somebufferexist;
+	bool allbuffersexist;
 };
 
 #endif

@@ -9,9 +9,6 @@ template <class T> void SafeRelease(T **ppT)
     }
 }
 
-HRESULT CopyAttribute(IMFAttributes *pSrc, IMFAttributes *pDest, const GUID& key);
-
-
 void DeviceList::Clear()
 {
     for (UINT32 i = 0; i < m_cDevices; i++)
@@ -20,7 +17,6 @@ void DeviceList::Clear()
     }
     CoTaskMemFree(m_ppDevices);
     m_ppDevices = NULL;
-
     m_cDevices = 0;
 }
 
@@ -35,7 +31,6 @@ HRESULT DeviceList::EnumerateDevices()
 
     // Initialize an attribute store. We will use this to
     // specify the enumeration parameters.
-
     hr = MFCreateAttributes(&pAttributes, 1);
 
     // Ask for source type = video capture devices
@@ -91,7 +86,6 @@ HRESULT DeviceList::GetDeviceName(UINT32 index, WCHAR **ppszName)
 }
 
 
-
 //-------------------------------------------------------------------
 //  CreateInstance
 //
@@ -128,8 +122,6 @@ HRESULT CCapture::CreateInstance(
 CCapture::CCapture() :
     m_pReader(NULL),
     m_nRefCount(1),
-    m_bFirstSample(FALSE),
-    m_llBaseTime(0),
     m_pwszSymbolicLink(NULL),
 	currentbuffer(0),
 	somebufferexist(FALSE),
@@ -149,7 +141,6 @@ CCapture::~CCapture()
 }
 
 
-
 /////////////// IUnknown methods ///////////////
 
 //-------------------------------------------------------------------
@@ -160,7 +151,6 @@ ULONG CCapture::AddRef()
 {
     return InterlockedIncrement(&m_nRefCount);
 }
-
 
 //-------------------------------------------------------------------
 //  Release
@@ -175,8 +165,6 @@ ULONG CCapture::Release()
     }
     return uCount;
 }
-
-
 
 //-------------------------------------------------------------------
 //  QueryInterface
@@ -221,17 +209,6 @@ HRESULT CCapture::OnReadSample(
 
     if (pSample)
     {
-        if (m_bFirstSample)
-        {
-            m_llBaseTime = llTimeStamp;
-            m_bFirstSample = FALSE;
-        }
-
-        // rebase the time stamp
-        llTimeStamp -= m_llBaseTime;
-
-        hr = pSample->SetSampleTime(llTimeStamp);
-
 		if(currentbuffer==0 && somebufferexist){
 			allbuffersexist=TRUE;
 		}
@@ -241,16 +218,14 @@ HRESULT CCapture::OnReadSample(
 		HRESULT check = pSample->ConvertToContiguousBuffer(&bufferlist[currentbuffer]);
 
 		if(SUCCEEDED(check)){
-			currentbuffer=(currentbuffer+1)%10;
+			currentbuffer=(currentbuffer+1)%BUFFER_NUM;
 
 			if(currentbuffer==3){
 				somebufferexist=TRUE;
 			}
-
 		}
 
         if (FAILED(hr)) { goto done; }
-
     }
 
     // Read another sample.
@@ -278,7 +253,6 @@ done:
 HRESULT CCapture::OpenMediaSource(IMFMediaSource *pSource)
 {
     HRESULT hr = S_OK;
-
     IMFAttributes *pAttributes = NULL;
 
     hr = MFCreateAttributes(&pAttributes, 2);
@@ -307,14 +281,11 @@ HRESULT CCapture::OpenMediaSource(IMFMediaSource *pSource)
 //
 // Start capturing.
 //-------------------------------------------------------------------
+HRESULT ConfigureSourceReader(IMFSourceReader *pReader);
 
-HRESULT CCapture::StartCapture(
-    IMFActivate *pActivate,
-    const EncodingParameters& param
-    )
+HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameters& param*/)
 {
     HRESULT hr = S_OK;
-
     IMFMediaSource *pSource = NULL;
 
     EnterCriticalSection(&m_critsec);
@@ -327,7 +298,6 @@ HRESULT CCapture::StartCapture(
 
     // Get the symbolic link. This is needed to handle device-
     // loss notifications. (See CheckDeviceLost.)
-
     if (SUCCEEDED(hr))
     {
         hr = pActivate->GetAllocatedString(
@@ -342,19 +312,15 @@ HRESULT CCapture::StartCapture(
         hr = OpenMediaSource(pSource);
     }
 
-    // Set up the encoding parameters.
+    // Set up the reader.
     if (SUCCEEDED(hr))
     {
-        hr = ConfigureCapture(param);
+        hr = ConfigureSourceReader(m_pReader);
     }
 
     if (SUCCEEDED(hr))
     {
-        m_bFirstSample = TRUE;
-        m_llBaseTime = 0;
-
         // Request the first video frame.
-
         hr = m_pReader->ReadSample(
             (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
             0,
@@ -383,14 +349,9 @@ HRESULT CCapture::StartCapture(
 HRESULT CCapture::EndCaptureSession()
 {
     EnterCriticalSection(&m_critsec);
-
-    HRESULT hr = S_OK;
-
     SafeRelease(&m_pReader);
-
     LeaveCriticalSection(&m_critsec);
-
-    return hr;
+    return S_OK;
 }
 
 
@@ -411,8 +372,6 @@ HRESULT CCapture::CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost)
 
     EnterCriticalSection(&m_critsec);
 
-    DEV_BROADCAST_DEVICEINTERFACE *pDi = NULL;
-
     *pbDeviceLost = FALSE;
 
     if (pHdr == NULL)
@@ -425,12 +384,10 @@ HRESULT CCapture::CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost)
     }
 
     // Compare the device name with the symbolic link.
-
-    pDi = (DEV_BROADCAST_DEVICEINTERFACE*)pHdr;
+    DEV_BROADCAST_DEVICEINTERFACE *pDi = (DEV_BROADCAST_DEVICEINTERFACE*)pHdr;
 
     if (m_pwszSymbolicLink)
     {
-
 		size_t len = mbstowcs(nullptr, (char*) &pDi->dbcc_name[0], 0);
 		wchar_t* test = new wchar_t[len+1];
 		mbstowcs(&test[0], (char*) &pDi->dbcc_name[0], len);
@@ -447,8 +404,6 @@ done:
 
 
 /////////////// Private/protected class methods ///////////////
-
-
 
 //-------------------------------------------------------------------
 //  ConfigureSourceReader
@@ -506,54 +461,6 @@ done:
 
 
 //-------------------------------------------------------------------
-// ConfigureCapture
-//
-// Configures the capture session.
-//
-//-------------------------------------------------------------------
-
-HRESULT CCapture::ConfigureCapture(const EncodingParameters& param)
-{
-    HRESULT hr = S_OK;
-    DWORD sink_stream = 0;
-
-    IMFMediaType *pType = NULL;
-
-    hr = ConfigureSourceReader(m_pReader);
-
-    if (SUCCEEDED(hr))
-    {
-        hr = m_pReader->GetCurrentMediaType(
-            (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-            &pType
-            );
-    }
-
-    if (SUCCEEDED(hr))
-    {
-        // Register the color converter DSP for this process, in the video
-        // processor category. This will enable the sink writer to enumerate
-        // the color converter when the sink writer attempts to match the
-        // media types.
-
-        hr = MFTRegisterLocalByCLSID(
-            __uuidof(CColorConvertDMO),
-            MFT_CATEGORY_VIDEO_PROCESSOR,
-            L"",
-            MFT_ENUM_FLAG_SYNCMFT,
-            0,
-            NULL,
-            0,
-            NULL
-            );
-    }
-
-    SafeRelease(&pType);
-    return hr;
-}
-
-
-//-------------------------------------------------------------------
 // EndCaptureInternal
 //
 // Stops capture.
@@ -561,62 +468,31 @@ HRESULT CCapture::ConfigureCapture(const EncodingParameters& param)
 
 HRESULT CCapture::EndCaptureInternal()
 {
-    HRESULT hr = S_OK;
-
     SafeRelease(&m_pReader);
-
     CoTaskMemFree(m_pwszSymbolicLink);
     m_pwszSymbolicLink = NULL;
-
-    return hr;
+    return S_OK;
 }
 
 //get last image sample
-BYTE* CCapture::getLastImagesample(HRESULT *res){
+BYTE* CCapture::getLastImagesample(HRESULT *res)
+{
 	BYTE *returndata=NULL;
 	*res = E_FAIL;
 	if(somebufferexist){
 		int curbuf=0;
 		if(currentbuffer==0){
-			curbuf=9;
+			curbuf=BUFFER_NUM - 1;
 		}
 		else{
-			curbuf = (currentbuffer-1)%10;
+			curbuf = (currentbuffer-1)%BUFFER_NUM;
 		}
 		bufferlist[curbuf]->Unlock(); // ??
 
-		//DWORD length = 0;
-		*res = bufferlist[curbuf]->Lock(&returndata,NULL,NULL/*&length*/);
-		/*char buf[256];
-		sprintf(buf, "%d/960 = %d; %d/960/3 = %d\n", length, length / 960, length, length / 960 / 3);
-		OutputDebugStringA(buf);*/
+		DWORD len = 0;
+		*res = bufferlist[curbuf]->Lock(&returndata,NULL,&len);
 
 		bufferlist[curbuf]->Unlock(); // TODO: muss nach der nutzung ausgeführt werden, nicht hier!
 	}
 	return returndata;
-}
-
-
-
-//-------------------------------------------------------------------
-// CopyAttribute
-//
-// Copy an attribute value from one attribute store to another.
-//-------------------------------------------------------------------
-
-HRESULT CopyAttribute(IMFAttributes *pSrc, IMFAttributes *pDest, const GUID& key)
-{
-    PROPVARIANT var;
-    PropVariantInit(&var);
-
-    HRESULT hr = S_OK;
-
-    hr = pSrc->GetItem(key, &var);
-    if (SUCCEEDED(hr))
-    {
-        hr = pDest->SetItem(key, var);
-    }
-
-    PropVariantClear(&var);
-    return hr;
 }

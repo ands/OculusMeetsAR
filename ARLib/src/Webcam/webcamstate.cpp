@@ -14,7 +14,6 @@ namespace webcam{
 	webcamstate::webcamstate(int camNum)
 	{
 		camNumber=camNum;
-		sample = new BYTE[3*1280*960];
 		CCapture::CreateInstance(&cap);
 	}
 
@@ -26,7 +25,7 @@ namespace webcam{
 	HRESULT webcamstate::update()
 	{
 		HRESULT check=E_FAIL;
-		sample = cap->getLastImagesample(&check);
+		BYTE* sample = cap->getLastImagesample(&check);
 		if(SUCCEEDED(check)){
 			if (mTexture.isNull())
 			{
@@ -47,15 +46,10 @@ namespace webcam{
 		return check;
 	}
 
-	void webcamstate::init(){
-		this->capture_thread = boost::thread(capture_loop, this);
-	}
-
 	void webcamstate::deinit(){
-		//this->capture_thread.join();
 	}
 
-	void webcamstate::capture_loop(webcamstate *self){
+	void webcamstate::init(){
 		//cam selection
 		IMFActivate *temp = NULL;
 		DeviceList list = DeviceList();
@@ -72,7 +66,7 @@ namespace webcam{
 			
 
 			if(displayname.compare(/*"USB-Videogerät"*/ "Logitech HD Webcam C310")){
-				if(self->camNumber==0){
+				if(camNumber==0){
 					break;
 				}
 				else if(!firstfound){
@@ -84,8 +78,8 @@ namespace webcam{
 			}
 
 		}
-		const EncodingParameters params = EncodingParameters();
-		self->cap->StartCapture(temp,params);
+		//const EncodingParameters params = EncodingParameters();
+		cap->StartCapture(temp);
 	}
 
 }
