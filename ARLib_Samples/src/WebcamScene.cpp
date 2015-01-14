@@ -1,6 +1,6 @@
 #include "WebcamScene.h"
 #include "RigidListenerNode.h"
-#include "videoplayer.hpp"
+#include "ARLIB/Webcam/videoplayer.hpp"
 
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,

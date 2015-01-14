@@ -8,7 +8,7 @@
 #include "ARLib/ARLibOgre.h"
 #include "WebcamScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "videoplayer.hpp"
+#include "ARLib/Webcam/videoplayer.hpp"
 
 
 class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener

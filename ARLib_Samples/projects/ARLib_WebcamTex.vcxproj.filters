@@ -1,17 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClInclude Include="..\include\webcamstate.h" />
-    <ClInclude Include="..\include\capture.h" />
-    <ClInclude Include="..\include\videoplayer.hpp" />
     <ClInclude Include="..\include\WebcamApp.h" />
     <ClInclude Include="..\include\WebcamScene.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\webcamstate.cpp" />
-    <ClCompile Include="..\src\capture.cpp" />
-    <ClCompile Include="..\src\videoplayer.cpp" />
     <ClCompile Include="..\src\WebcamApp.cpp" />
     <ClCompile Include="..\src\webcammain.cpp" />
     <ClCompile Include="..\src\WebcamScene.cpp" />
