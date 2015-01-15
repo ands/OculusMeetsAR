@@ -347,7 +347,7 @@ HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameter
 //-------------------------------------------------------------------
 
 HRESULT CCapture::EndCaptureSession()
-{
+{	
     EnterCriticalSection(&m_critsec);
     SafeRelease(&m_pReader);
     LeaveCriticalSection(&m_critsec);

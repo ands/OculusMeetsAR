@@ -70,6 +70,7 @@ public:
     HRESULT     EndCaptureSession();
     HRESULT     CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost);
 	BYTE*       CCapture::getLastImagesample(HRESULT *res);
+	bool somebufferexist;
 
 protected:
 
@@ -88,11 +89,9 @@ protected:
     WCHAR                   *m_pwszSymbolicLink;
 
 	//capturesamples
-#define BUFFER_NUM 10
+	#define BUFFER_NUM 10
 	IMFMediaBuffer *bufferlist[BUFFER_NUM];
 	int currentbuffer;
-
-	bool somebufferexist;
 	bool allbuffersexist;
 };
 

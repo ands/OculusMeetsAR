@@ -3,12 +3,15 @@
 
 #include <string>
 #include <memory>
+#include <ARLib/Webcam/capture.h>
+#include <OGRE/OgreTexture.h>
+#include <OGRE/OgreTextureManager.h>
+#include <OGRE/OgreHardwarePixelBuffer.h>
+#include <OGRE/OgreResourceGroupManager.h>
+#include <OGRE/OgreStringConverter.h>
 
 namespace webcam
 {
-
-    struct webcamstate;
-
     /**
      *  Plays a video on an Ogre texture.
      */
@@ -18,27 +21,27 @@ namespace webcam
         VideoPlayer(int camNum);
         ~VideoPlayer();
 
-        /// Start the Webcamstream
-        void playVideo ();
+		/// Start the Webcamstream
+		void playVideo ();
+		/// Stop the stream
+		void close();
+		/// Return the texture name of the currently playing stream
+		std::string getTextureName();
+		/// Return the width of the currently playing stream
+		int getVideoWidth();
+		/// Return the height of the currently playing stream
+		int getVideoHeight();
+		//Gets the current webcam stream sample and copies it to mTexture
+		HRESULT update();
 
-        /// This should be called every frame by the user to update the video texture.
-        void update();
-
-        /// Stop the stream
-        void close();
-
-        /// Return the texture name of the currently playing stream
-        std::string getTextureName();
-        /// Return the width of the currently playing stream
-        int getVideoWidth();
-        /// Return the height of the currently playing stream
-        int getVideoHeight();
+	private:
 		/// 0 for left and 1 for right camera
 		int camNumber;
+		//capture class
+		CCapture *cap;
+		//Texture to copy the streamsamples to
+		Ogre::TexturePtr mTexture;
 
-
-    private:
-        webcamstate* mState;
     };
 
 }
