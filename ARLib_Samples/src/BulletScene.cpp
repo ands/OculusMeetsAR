@@ -68,8 +68,8 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	// rift node:
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
-	mRiftNode->getNode()->setPosition(4.0f, 1.5f, 4.0f);
-	//mRiftNode->getNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
+	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
+	//mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
 		tracker->registerRigidBodyEventListener(mRiftNode);
 
@@ -79,7 +79,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setAttenuation( 65, 1.0, 0.07, 0.017 );
 	light->setSpecularColour( .25, .25, .25 );
 	light->setDiffuseColour( 0.35, 0.27, 0.23 );
-	mRiftNode->getNode()->attachObject(light);
+	mRiftNode->getBodyNode()->attachObject(light);
 }
 
 BulletScene::~BulletScene()

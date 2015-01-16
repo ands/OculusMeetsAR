@@ -10,8 +10,6 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	, mSmallWindow(nullptr)
 	, mRiftAvailable(false)
 	, mRift(nullptr)
-	, mRenderTarget(nullptr)
-	, mSmallRenderTarget(nullptr)
 	, mTracker(nullptr)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
@@ -35,16 +33,19 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 
 	mVideoPlayerLeft = new webcam::VideoPlayer(0);
 	mVideoPlayerRight = new webcam::VideoPlayer(1);
-    mScene = new WebcamScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard, mVideoPlayerLeft,mVideoPlayerRight);
-	createViewports();
+    mScene = new WebcamScene(
+		mRift, mTracker,
+		mRoot, mSceneMgr,
+		mWindow, mSmallWindow,
+		mDynamicsWorld,
+		mMouse, mKeyboard,
+		mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
 WebcamApp::~WebcamApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
-	if (mRenderTarget) delete mRenderTarget;
-	if (mSmallRenderTarget) delete mSmallRenderTarget;
 	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
@@ -80,6 +81,24 @@ void WebcamApp::initOgre(bool showDebugWindow)
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(i->second, i->first, secName);
 	}
 
+
+	// choose monitor ids
+	int debugMonitorId = 0;
+	int oculusRiftMonitorId = 1;
+
+	int yesNoID = MessageBoxA(
+        NULL,
+        "Debug monitor id is 0, Oculus Rift monitor id is 1.\nDo you want to swap them?",
+        "Choose monitor ids",
+        MB_ICONQUESTION | MB_YESNO
+    );
+
+    if (yesNoID == IDYES)
+    {
+        oculusRiftMonitorId = 0;
+		debugMonitorId = 1;
+    }
+
 	// initialize render system
 	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
 	Ogre::ConfigOptionMap cfgMap = pRS->getConfigOptions();
@@ -100,14 +119,14 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	if (mRiftAvailable)
 	{
 		Ogre::NameValuePairList miscParams;
-		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1);
+		miscParams["monitorIndex"] = Ogre::StringConverter::toString(oculusRiftMonitorId);
 		miscParams["border"] = "none";
 		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
 		Ogre::NameValuePairList miscParamsSmall;
-		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0);
+		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(debugMonitorId);
 		mSmallWindow = mRoot->createRenderWindow("ARLib Example (debug window)", 1920 / 2, 1080 / 2, false, &miscParamsSmall);
 		if (!mWindow)
 			mWindow = mSmallWindow;
@@ -224,21 +243,6 @@ void WebcamApp::quitTracking()
 	std::cout << "Shutting down Tracking System" << std::endl;
 	//mTracker->uninitialize(); ::todo
 	if(mTracker) delete mTracker;
-}
-
-void WebcamApp::createViewports()
-{
-	if (mWindow && mRift)
-	{
-		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
-	}
-
-	if (mSmallWindow)
-	{
-		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
-	}
 }
 
 bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
