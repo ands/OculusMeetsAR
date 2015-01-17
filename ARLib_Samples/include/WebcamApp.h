@@ -61,8 +61,6 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		bool mTrackingAvailable;
 		ARLib::Rift* mRift;
 		ARLib::TrackingManager* mTracker;
-		ARLib::RenderTarget* mRenderTarget;
-		ARLib::RenderTarget* mSmallRenderTarget;
 
         OgreBulletCollisions::DebugDrawer *mDebugDrawer;
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;

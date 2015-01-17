@@ -1,0 +1,80 @@
+vertex_program VideoUndistortionVertex glsl
+{
+    source VideoUndistortionVertex.glsl
+}
+fragment_program VideoUndistortionFragment glsl
+{
+    source VideoUndistortionFragment.glsl
+}
+
+material Video/LeftEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass Video/LeftEye
+        {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		
+			vertex_program_ref VideoUndistortionVertex
+			{
+			}
+
+			fragment_program_ref VideoUndistortionFragment
+			{
+				param_named coordinateMap int 0
+				param_named videoTexture int 1
+			}
+
+			texture_unit
+            {
+            }
+			texture_unit
+            {
+				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_address_mode border
+            }
+        }
+    }
+}
+
+material Video/RightEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass Video/RightEye
+        {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+			depth_write off
+		
+			vertex_program_ref VideoUndistortionVertex
+			{
+			}
+
+			fragment_program_ref VideoUndistortionFragment
+			{
+				param_named coordinateMap int 0
+				param_named videoTexture int 1
+			}
+
+			texture_unit
+            {
+            }
+			texture_unit
+            {
+				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_address_mode border
+            }
+        }
+    }
+}
