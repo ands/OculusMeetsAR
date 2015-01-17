@@ -9,18 +9,10 @@ vertex_program BlurVertex glsl
 fragment_program BlurHFragment glsl
 {
     source BlurHFragment.glsl
-	default_params
-	{
-		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
-	}
 }
 fragment_program BlurVFragment glsl
 {
     source BlurVFragment.glsl
-	default_params
-	{
-		param_named BlurRadius float2 0.003 0.003 // TODO: auto calculate these in the code
-	}
 }
 
 //Blur: Horizontal Gaussian pass
@@ -33,10 +25,9 @@ material Watercolor/BlurH
 		pass
 		{
 			lighting off
-			//cull_hardware none
-			//cull_software none
-			//depth_check off
-            //polygon_mode_overrideable false
+			cull_hardware none
+			cull_software none
+			depth_check off
 
 			fragment_program_ref BlurHFragment
 			{
@@ -62,6 +53,8 @@ material Watercolor/BlurV
 
 	technique
 	{
+		scheme MRT
+	
 		pass
 		{
 			lighting off
@@ -73,6 +66,7 @@ material Watercolor/BlurV
 			fragment_program_ref BlurVFragment
 			{
 				param_named Blur0 int 0
+				param_named Original int 1
 			}
 			vertex_program_ref BlurVertex
 			{
@@ -81,7 +75,11 @@ material Watercolor/BlurV
 			{
 				//tex_coord_set 0
 				tex_address_mode clamp
-				//filtering trilinear
+			}
+			texture_unit
+			{
+				//tex_coord_set 0
+				tex_address_mode clamp
 			}
 		}
 	}

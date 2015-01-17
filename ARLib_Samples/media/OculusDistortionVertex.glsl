@@ -27,13 +27,6 @@ limitations under the License.
 
 #version 130
 
-// Values automatically defined by Ogre/OpenGL:
-in vec4 vertex;
-in vec2 uv0;			// Red channel
-in vec2 uv1;			// Green channel
-in vec2 uv2;			// Blue channel
-in vec4 colour;		// Vertex Colour
-
 // Load in values defined in the material:
 uniform mat4 worldViewProj;
 uniform vec2 eyeToSourceUVScale;
@@ -41,6 +34,16 @@ uniform vec2 eyeToSourceUVOffset;
 //uniform mat4 eyeRotationStart;
 //uniform mat4 eyeRotationEnd;
 
+// Values automatically defined by Ogre/OpenGL:
+in vec4 vertex;
+in vec2 uv0;		// Red channel
+in vec2 uv1;		// Green channel
+in vec2 uv2;		// Blue channel
+in vec4 colour;		// Vertex Colour
+
+out vec2 oUVR;
+out vec2 oUVG;
+out vec2 oUVB;
 out vec4 oColor;
 
 void main()
@@ -77,18 +80,14 @@ void main()
     
     // These are now still in TanEyeAngle space.
     // Scale them into the correct [0-1],[0-1] UV lookup space (depending on eye)
-    vec2 SrcCoordR = FlattenedR * eyeToSourceUVScale + eyeToSourceUVOffset;
-    vec2 SrcCoordG = FlattenedG * eyeToSourceUVScale + eyeToSourceUVOffset;
-    vec2 SrcCoordB = FlattenedB * eyeToSourceUVScale + eyeToSourceUVOffset; */
+    oUVR = FlattenedR * eyeToSourceUVScale + eyeToSourceUVOffset;
+    oUVG = FlattenedG * eyeToSourceUVScale + eyeToSourceUVOffset;
+    oUVB = FlattenedB * eyeToSourceUVScale + eyeToSourceUVOffset; */
     
 	// Without timewarp
-	vec2 SrcCoordR = uv0 * eyeToSourceUVScale + eyeToSourceUVOffset;
-    vec2 SrcCoordG = uv1 * eyeToSourceUVScale + eyeToSourceUVOffset;
-    vec2 SrcCoordB = uv2 * eyeToSourceUVScale + eyeToSourceUVOffset;
-	
-    gl_TexCoord[0] = vec4(SrcCoordR, 0.0, 0.0);
-    gl_TexCoord[1] = vec4(SrcCoordG, 0.0, 0.0);
-    gl_TexCoord[2] = vec4(SrcCoordB, 0.0, 0.0);
+	oUVR = uv0 * eyeToSourceUVScale + eyeToSourceUVOffset;
+    oUVG = uv1 * eyeToSourceUVScale + eyeToSourceUVOffset;
+    oUVB = uv2 * eyeToSourceUVScale + eyeToSourceUVOffset;
     
     oColor = vec4(colour.r, colour.r, colour.r, colour.r); // Used for vignette fade.
 }

@@ -33,6 +33,7 @@ compositor "Blur"
             {
 				material Watercolor/BlurV
                 input 0 rt1
+				input 1 rt0
             }
         }
     }

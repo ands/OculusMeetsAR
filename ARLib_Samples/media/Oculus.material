@@ -24,6 +24,11 @@ material Oculus/LeftEye
     {
         pass Oculus/LeftEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+		
 			vertex_program_ref OculusDistortionVertex
 			{
 			}
@@ -33,7 +38,6 @@ material Oculus/LeftEye
 				param_named diffuseMap int 0
 			}
 
-            lighting off
 			texture_unit
             {
             }
@@ -49,6 +53,11 @@ material Oculus/RightEye
     {
         pass Oculus/RightEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+		
 			vertex_program_ref OculusDistortionVertex
 			{
 			}
@@ -57,8 +66,6 @@ material Oculus/RightEye
 			{
 				param_named diffuseMap int 0
 			}
-
-            lighting off
 
 			texture_unit 
             {

@@ -1,17 +1,4 @@
-//////////////////////////////////////////////////////////////////////////
-//
-// capture.cpp: Manages video capture.
-//
-// THIS CODE AND INFORMATION IS PROVIDED "AS IS" WITHOUT WARRANTY OF
-// ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO
-// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A
-// PARTICULAR PURPOSE.
-//
-// Copyright (c) Microsoft Corporation. All rights reserved.
-//
-//////////////////////////////////////////////////////////////////////////
-
-#include "capture.h"
+#include "ARLib/Webcam/capture.h"
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -22,9 +9,6 @@ template <class T> void SafeRelease(T **ppT)
     }
 }
 
-HRESULT CopyAttribute(IMFAttributes *pSrc, IMFAttributes *pDest, const GUID& key);
-
-
 void DeviceList::Clear()
 {
     for (UINT32 i = 0; i < m_cDevices; i++)
@@ -33,7 +17,6 @@ void DeviceList::Clear()
     }
     CoTaskMemFree(m_ppDevices);
     m_ppDevices = NULL;
-
     m_cDevices = 0;
 }
 
@@ -48,7 +31,6 @@ HRESULT DeviceList::EnumerateDevices()
 
     // Initialize an attribute store. We will use this to
     // specify the enumeration parameters.
-
     hr = MFCreateAttributes(&pAttributes, 1);
 
     // Ask for source type = video capture devices
@@ -104,7 +86,6 @@ HRESULT DeviceList::GetDeviceName(UINT32 index, WCHAR **ppszName)
 }
 
 
-
 //-------------------------------------------------------------------
 //  CreateInstance
 //
@@ -141,8 +122,6 @@ HRESULT CCapture::CreateInstance(
 CCapture::CCapture() :
     m_pReader(NULL),
     m_nRefCount(1),
-    m_bFirstSample(FALSE),
-    m_llBaseTime(0),
     m_pwszSymbolicLink(NULL),
 	currentbuffer(0),
 	somebufferexist(FALSE),
@@ -162,7 +141,6 @@ CCapture::~CCapture()
 }
 
 
-
 /////////////// IUnknown methods ///////////////
 
 //-------------------------------------------------------------------
@@ -173,7 +151,6 @@ ULONG CCapture::AddRef()
 {
     return InterlockedIncrement(&m_nRefCount);
 }
-
 
 //-------------------------------------------------------------------
 //  Release
@@ -188,8 +165,6 @@ ULONG CCapture::Release()
     }
     return uCount;
 }
-
-
 
 //-------------------------------------------------------------------
 //  QueryInterface
@@ -234,18 +209,7 @@ HRESULT CCapture::OnReadSample(
 
     if (pSample)
     {
-        if (m_bFirstSample)
-        {
-            m_llBaseTime = llTimeStamp;
-            m_bFirstSample = FALSE;
-        }
-
-        // rebase the time stamp
-        llTimeStamp -= m_llBaseTime;
-
-        hr = pSample->SetSampleTime(llTimeStamp);
-
-		if(currentbuffer==0 & somebufferexist){
+		if(currentbuffer==0 && somebufferexist){
 			allbuffersexist=TRUE;
 		}
 		if(allbuffersexist){
@@ -254,16 +218,14 @@ HRESULT CCapture::OnReadSample(
 		HRESULT check = pSample->ConvertToContiguousBuffer(&bufferlist[currentbuffer]);
 
 		if(SUCCEEDED(check)){
-			currentbuffer=(currentbuffer+1)%10;
+			currentbuffer=(currentbuffer+1)%BUFFER_NUM;
 
 			if(currentbuffer==3){
 				somebufferexist=TRUE;
 			}
-
 		}
 
         if (FAILED(hr)) { goto done; }
-
     }
 
     // Read another sample.
@@ -291,7 +253,6 @@ done:
 HRESULT CCapture::OpenMediaSource(IMFMediaSource *pSource)
 {
     HRESULT hr = S_OK;
-
     IMFAttributes *pAttributes = NULL;
 
     hr = MFCreateAttributes(&pAttributes, 2);
@@ -320,14 +281,11 @@ HRESULT CCapture::OpenMediaSource(IMFMediaSource *pSource)
 //
 // Start capturing.
 //-------------------------------------------------------------------
+HRESULT ConfigureSourceReader(IMFSourceReader *pReader);
 
-HRESULT CCapture::StartCapture(
-    IMFActivate *pActivate,
-    const EncodingParameters& param
-    )
+HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameters& param*/)
 {
     HRESULT hr = S_OK;
-
     IMFMediaSource *pSource = NULL;
 
     EnterCriticalSection(&m_critsec);
@@ -340,7 +298,6 @@ HRESULT CCapture::StartCapture(
 
     // Get the symbolic link. This is needed to handle device-
     // loss notifications. (See CheckDeviceLost.)
-
     if (SUCCEEDED(hr))
     {
         hr = pActivate->GetAllocatedString(
@@ -355,19 +312,15 @@ HRESULT CCapture::StartCapture(
         hr = OpenMediaSource(pSource);
     }
 
-    // Set up the encoding parameters.
+    // Set up the reader.
     if (SUCCEEDED(hr))
     {
-        hr = ConfigureCapture(param);
+        hr = ConfigureSourceReader(m_pReader);
     }
 
     if (SUCCEEDED(hr))
     {
-        m_bFirstSample = TRUE;
-        m_llBaseTime = 0;
-
         // Request the first video frame.
-
         hr = m_pReader->ReadSample(
             (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
             0,
@@ -394,16 +347,11 @@ HRESULT CCapture::StartCapture(
 //-------------------------------------------------------------------
 
 HRESULT CCapture::EndCaptureSession()
-{
+{	
     EnterCriticalSection(&m_critsec);
-
-    HRESULT hr = S_OK;
-
     SafeRelease(&m_pReader);
-
     LeaveCriticalSection(&m_critsec);
-
-    return hr;
+    return S_OK;
 }
 
 
@@ -424,8 +372,6 @@ HRESULT CCapture::CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost)
 
     EnterCriticalSection(&m_critsec);
 
-    DEV_BROADCAST_DEVICEINTERFACE *pDi = NULL;
-
     *pbDeviceLost = FALSE;
 
     if (pHdr == NULL)
@@ -438,14 +384,13 @@ HRESULT CCapture::CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost)
     }
 
     // Compare the device name with the symbolic link.
-
-    pDi = (DEV_BROADCAST_DEVICEINTERFACE*)pHdr;
+    DEV_BROADCAST_DEVICEINTERFACE *pDi = (DEV_BROADCAST_DEVICEINTERFACE*)pHdr;
 
     if (m_pwszSymbolicLink)
     {
-		size_t len = mbstowcs(nullptr, &pDi->dbcc_name[0], 0);
+		size_t len = mbstowcs(nullptr, (char*) &pDi->dbcc_name[0], 0);
 		wchar_t* test = new wchar_t[len+1];
-		mbstowcs(&test[0], &pDi->dbcc_name[0], len);
+		mbstowcs(&test[0], (char*) &pDi->dbcc_name[0], len);
         if (_wcsicmp(m_pwszSymbolicLink, test) == 0)
         {
             *pbDeviceLost = TRUE;
@@ -460,140 +405,56 @@ done:
 
 /////////////// Private/protected class methods ///////////////
 
-
-
 //-------------------------------------------------------------------
 //  ConfigureSourceReader
 //
 //  Sets the media type on the source reader.
 //-------------------------------------------------------------------
-
 HRESULT ConfigureSourceReader(IMFSourceReader *pReader)
 {
-    // The list of acceptable types.
-    GUID subtypes[] = {
-        MFVideoFormat_NV12, MFVideoFormat_YUY2, MFVideoFormat_UYVY,
-        MFVideoFormat_RGB32, MFVideoFormat_RGB24, MFVideoFormat_IYUV
-    };
-
     HRESULT hr = S_OK;
-    BOOL    bUseNativeType = FALSE;
-
     GUID subtype = { 0 };
-
     IMFMediaType *pType = NULL;
+	int mediaTypeIndex = 0;
 
-    // If the source's native format matches any of the formats in
-    // the list, prefer the native format.
+	while(SUCCEEDED(hr))
+	{
+		hr = pReader->GetNativeMediaType(
+			(DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
+			mediaTypeIndex,
+			&pType
+			);
 
-    // Note: The camera might support multiple output formats,
-    // including a range of frame dimensions. The application could
-    // provide a list to the user and have the user select the
-    // camera's output format. That is outside the scope of this
-    // sample, however.
+		if (FAILED(hr)) { goto done; }
 
-    hr = pReader->GetNativeMediaType(
-        (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-        74,  // Type index. For C310: 74 = 1280x960 MJPEG
-        &pType
-        );
+		UINT32 width, height;
+		hr = ::MFGetAttributeSize(pType, MF_MT_FRAME_SIZE, &width, &height);
 
-    if (FAILED(hr)) { goto done; }
+		if (FAILED(hr)) { goto done; }
 
-    hr = pType->GetGUID(MF_MT_SUBTYPE, &subtype);
+		hr = pType->GetGUID(MF_MT_SUBTYPE, &subtype);
 
-    if (FAILED(hr)) { goto done; }
+		if (FAILED(hr)) { goto done; }
 
-    for (UINT32 i = 0; i < ARRAYSIZE(subtypes); i++)
-    {
-        if (subtype == subtypes[i])
-        {
-            hr = pReader->SetCurrentMediaType(
-                (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                NULL,
-                pType
-                );
+		/*char buf[256];
+		sprintf(buf, "%d x %d Guid = {%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}\n", 
+			width, height,
+			subtype.Data1, subtype.Data2, subtype.Data3, 
+			subtype.Data4[0], subtype.Data4[1], subtype.Data4[2], subtype.Data4[3],
+			subtype.Data4[4], subtype.Data4[5], subtype.Data4[6], subtype.Data4[7]);
+		OutputDebugStringA(buf);*/
 
-            bUseNativeType = TRUE;
-            break;
-        }
-    }
+		if (subtype == MFVideoFormat_RGB24/*MJPG*/ && width == 1280 && height == 960)
+		{
+			hr = pReader->SetCurrentMediaType((DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM, NULL, pType);
+			if (FAILED(hr)) { goto done; }
+			break;
+		}
 
-    if (!bUseNativeType)
-    {
-        // None of the native types worked. The camera might offer
-        // output a compressed type such as MJPEG or DV.
-
-        // Try adding a decoder.
-
-        for (UINT32 i = 0; i < ARRAYSIZE(subtypes); i++)
-        {
-            hr = pType->SetGUID(MF_MT_SUBTYPE, subtypes[i]);
-
-            if (FAILED(hr)) { goto done; }
-
-            hr = pReader->SetCurrentMediaType(
-                (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-                NULL,
-                pType
-                );
-
-            if (SUCCEEDED(hr))
-            {
-                break;
-            }
-        }
-    }
+		mediaTypeIndex++;
+	}
 
 done:
-    SafeRelease(&pType);
-    return hr;
-}
-
-
-//-------------------------------------------------------------------
-// ConfigureCapture
-//
-// Configures the capture session.
-//
-//-------------------------------------------------------------------
-
-HRESULT CCapture::ConfigureCapture(const EncodingParameters& param)
-{
-    HRESULT hr = S_OK;
-    DWORD sink_stream = 0;
-
-    IMFMediaType *pType = NULL;
-
-    hr = ConfigureSourceReader(m_pReader);
-
-    if (SUCCEEDED(hr))
-    {
-        hr = m_pReader->GetCurrentMediaType(
-            (DWORD)MF_SOURCE_READER_FIRST_VIDEO_STREAM,
-            &pType
-            );
-    }
-
-    if (SUCCEEDED(hr))
-    {
-        // Register the color converter DSP for this process, in the video
-        // processor category. This will enable the sink writer to enumerate
-        // the color converter when the sink writer attempts to match the
-        // media types.
-
-        hr = MFTRegisterLocalByCLSID(
-            __uuidof(CColorConvertDMO),
-            MFT_CATEGORY_VIDEO_PROCESSOR,
-            L"",
-            MFT_ENUM_FLAG_SYNCMFT,
-            0,
-            NULL,
-            0,
-            NULL
-            );
-    }
-
     SafeRelease(&pType);
     return hr;
 }
@@ -607,61 +468,31 @@ HRESULT CCapture::ConfigureCapture(const EncodingParameters& param)
 
 HRESULT CCapture::EndCaptureInternal()
 {
-    HRESULT hr = S_OK;
-
     SafeRelease(&m_pReader);
-
     CoTaskMemFree(m_pwszSymbolicLink);
     m_pwszSymbolicLink = NULL;
-
-    return hr;
+    return S_OK;
 }
 
 //get last image sample
-BYTE* CCapture::getLastImagesample(HRESULT *res){
+BYTE* CCapture::getLastImagesample(HRESULT *res)
+{
 	BYTE *returndata=NULL;
 	*res = E_FAIL;
 	if(somebufferexist){
 		int curbuf=0;
 		if(currentbuffer==0){
-			curbuf=9;
+			curbuf=BUFFER_NUM - 1;
 		}
 		else{
-			curbuf = (currentbuffer-1)%10;
+			curbuf = (currentbuffer-1)%BUFFER_NUM;
 		}
-		bufferlist[curbuf]->Unlock();
+		bufferlist[curbuf]->Unlock(); // ??
 
-		*res = bufferlist[curbuf]->Lock(&returndata,NULL,NULL);
+		DWORD len = 0;
+		*res = bufferlist[curbuf]->Lock(&returndata,NULL,&len);
 
-		/*if(SUCCEEDED(res)){
-			memcpy_s(result,(rsize_t)4*1280*960,returndata,(rsize_t)2*1280*960);
-		}*/
-
-		bufferlist[curbuf]->Unlock();}
+		bufferlist[curbuf]->Unlock(); // TODO: muss nach der nutzung ausgeführt werden, nicht hier!
+	}
 	return returndata;
-}
-
-
-
-//-------------------------------------------------------------------
-// CopyAttribute
-//
-// Copy an attribute value from one attribute store to another.
-//-------------------------------------------------------------------
-
-HRESULT CopyAttribute(IMFAttributes *pSrc, IMFAttributes *pDest, const GUID& key)
-{
-    PROPVARIANT var;
-    PropVariantInit(&var);
-
-    HRESULT hr = S_OK;
-
-    hr = pSrc->GetItem(key, &var);
-    if (SUCCEEDED(hr))
-    {
-        hr = pDest->SetItem(key, var);
-    }
-
-    PropVariantClear(&var);
-    return hr;
 }

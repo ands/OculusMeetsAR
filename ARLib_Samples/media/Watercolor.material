@@ -18,18 +18,29 @@ material Watercolor/LeftEye
 
     technique
     {
+		scheme MRT
+	
         pass Watercolor/LeftEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check on
+		
 			vertex_program_ref WatercolorVertex
 			{
 			}
 
 			fragment_program_ref WatercolorFragment
 			{
-				param_named diffuseMap int 0
+				param_named Blurred int 0
+				param_named Original int 1
 			}
 
-            lighting off
+			texture_unit
+            {
+				tex_address_mode clamp
+            }
 			texture_unit
             {
 				tex_address_mode clamp
@@ -44,21 +55,33 @@ material Watercolor/RightEye
 
     technique
     {
+		scheme MRT
+		
         pass Watercolor/RightEye
         {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check on
+		
 			vertex_program_ref WatercolorVertex
 			{
 			}
 
 			fragment_program_ref WatercolorFragment
 			{
-				param_named diffuseMap int 0
+				param_named Blurred int 0
+				param_named Original int 1
 			}
-
-            lighting off
-
+			
 			texture_unit 
             {
+				tex_coord_set 0
+				tex_address_mode clamp
+            }
+			texture_unit
+            {
+				tex_coord_set 1
 				tex_address_mode clamp
             }
         }

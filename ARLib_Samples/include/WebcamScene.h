@@ -17,8 +17,12 @@ namespace webcam
 class WebcamScene
 {
 	public:
-		WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root,
-			Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard, webcam::VideoPlayer *mVideoPlayerLeft, webcam::VideoPlayer *mVideoPlayerRight);
+		WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
+			Ogre::Root *root, Ogre::SceneManager *sceneMgr,
+			Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
+			OgreBulletDynamics::DynamicsWorld *dyWorld,
+			OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+			webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight);
 		~WebcamScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
@@ -43,8 +47,10 @@ class WebcamScene
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
-		Ogre::SceneNode* mRoomNode;
+		//Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
+		ARLib::RenderTarget* mRenderTarget;
+		ARLib::RenderTarget* mSmallRenderTarget;
 };
 
 #endif
