@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLib_WebcamTex", "ARLib_We
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLib_NPR_Sample", "ARLib_NPR_Sample.vcxproj", "{8894C610-1410-49D6-BBF0-F620E537F254}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ARLib_Sound_Test", "ARLib_Sound_Test.vcxproj", "{B1094C48-18EC-40BB-98F3-E1AC1B3CEB4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -31,6 +33,10 @@ Global
 		{8894C610-1410-49D6-BBF0-F620E537F254}.Debug|Win32.Build.0 = Debug|Win32
 		{8894C610-1410-49D6-BBF0-F620E537F254}.Release|Win32.ActiveCfg = Release|Win32
 		{8894C610-1410-49D6-BBF0-F620E537F254}.Release|Win32.Build.0 = Release|Win32
+		{B1094C48-18EC-40BB-98F3-E1AC1B3CEB4A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{B1094C48-18EC-40BB-98F3-E1AC1B3CEB4A}.Debug|Win32.Build.0 = Debug|Win32
+		{B1094C48-18EC-40BB-98F3-E1AC1B3CEB4A}.Release|Win32.ActiveCfg = Release|Win32
+		{B1094C48-18EC-40BB-98F3-E1AC1B3CEB4A}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
