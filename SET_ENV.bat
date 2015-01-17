@@ -10,4 +10,7 @@ call SET_ENV.bat
 cd ..\ARLib
 call SET_ENV.bat
 
+cd ..\OpenAL
+call SET_ENV.bat
+
 pause

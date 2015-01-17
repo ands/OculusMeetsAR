@@ -1,0 +1,1 @@
+SETX OPEN_AL %CD%
