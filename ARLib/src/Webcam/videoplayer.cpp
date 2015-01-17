@@ -1,22 +1,27 @@
-#include <ARLib/Webcam/videoplayer.hpp>
+#include "ARLib/Webcam/videoplayer.hpp"
+#include "ARLib/Webcam/ocam.h"
 
 namespace webcam
 {
-
-	VideoPlayer::VideoPlayer(int camNum)
+	VideoPlayer::VideoPlayer(int camNum, const char *ocamModelParametersFilename)
 	{
 		camNumber=camNum;
 		if (FAILED(CCapture::CreateInstance(&cap))){
 			cap = NULL;
 		}
+
+		mOcamModel = ocam_get_model(ocamModelParametersFilename);
 	}
 
 	VideoPlayer::~VideoPlayer()
 	{
 		close();
+
+		if (mOcamModel)
+			delete mOcamModel;
 	}
 
-	void VideoPlayer::playVideo()
+	void VideoPlayer::playVideo(float videoDistance)
 	{
 		if (cap){
 			//cam selection
@@ -55,6 +60,30 @@ namespace webcam
 				Sleep(10);
 				if (!mTexture.isNull() || SUCCEEDED(update())){
 					break;
+				}
+			}
+
+			// load undistortion texture
+			if (!mTexture.isNull())
+			{
+				float *undistortionMapXY = new float[2 * 1280 * 960];
+				if (undistortionMapXY)
+				{
+					ocam_create_perspecive_undistortion_map(mOcamModel, undistortionMapXY, 1280, 960, videoDistance);
+
+					mUndistortionMapTexture = Ogre::TextureManager::getSingleton().createManual(
+						getTextureName() + "Undistortion",
+						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+						Ogre::TEX_TYPE_2D,
+						1280, 960,
+						0,
+						Ogre::PF_FLOAT16_GR,
+						Ogre::TU_STATIC_WRITE_ONLY);
+
+					Ogre::PixelBox pb(1280, 960, 1, Ogre::PF_FLOAT32_GR, undistortionMapXY);
+					mUndistortionMapTexture->getBuffer()->blitFromMemory(pb);
+
+					delete[] undistortionMapXY;
 				}
 			}
 		}
@@ -114,4 +143,11 @@ namespace webcam
 	{
 	}
 
+	std::string VideoPlayer::getUndistortionMapTextureName()
+	{
+		std::string name;
+		if (!mUndistortionMapTexture.isNull())
+			name = mUndistortionMapTexture->getName();
+		return name;
+	}
 }

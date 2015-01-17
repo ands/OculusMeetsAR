@@ -31,8 +31,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoPlayerLeft = new webcam::VideoPlayer(0);
-	mVideoPlayerRight = new webcam::VideoPlayer(1);
+	mVideoPlayerLeft = new webcam::VideoPlayer(0, "calib_results_CAM1.txt");
+	mVideoPlayerRight = new webcam::VideoPlayer(1, "calib_results_CAM2.txt");
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,

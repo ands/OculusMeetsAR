@@ -52,18 +52,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	webcam::VideoPlayer *videoPlayer[] = { videoPlayerLeft, videoPlayerRight };
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
-		videoPlayer[eyeNum]->playVideo();
+		videoPlayer[eyeNum]->playVideo(3.0f); // TODO: video distance needs to be tweakable/calculated
 		if (!videoPlayer[eyeNum]->getTextureName().empty())
 		{
-			// video material
-			const char *materialName[] = { "LeftVideoMaterial", "RightVideoMaterial" };
-			Ogre::MaterialPtr videoMaterial = Ogre::MaterialManager::getSingleton().create(materialName[eyeNum], Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
-			Ogre::Pass *pass = videoMaterial->getTechnique(0)->getPass(0);
-			pass->setDepthCheckEnabled(false);
-			pass->setDepthWriteEnabled(false);
-			pass->setLightingEnabled(false);
-			pass->createTextureUnitState()->setTextureName(videoPlayer[eyeNum]->getTextureName());
-
 			// video background rendering rect
 			Ogre::Rectangle2D *rect = new Ogre::Rectangle2D(true);
 			const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
@@ -72,7 +63,12 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			rect->setUVs(Ogre::Vector2(1, 1), Ogre::Vector2(0, 1), Ogre::Vector2(1, 0), Ogre::Vector2(0, 0));
 			rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
 			rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
-			rect->setMaterial(videoMaterial->getName());
+			const char *materialName[] = { "Video/LeftEye", "Video/RightEye" };
+			rect->setMaterial(materialName[eyeNum]);
+
+			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
+			materialPass->getTextureUnitState(0)->setTextureName(videoPlayer[eyeNum]->getUndistortionMapTextureName());
+			materialPass->getTextureUnitState(1)->setTextureName(videoPlayer[eyeNum]->getTextureName());
 
 			const char *nodeName[] = { "LeftVideo", "RightVideo" };
 			mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
