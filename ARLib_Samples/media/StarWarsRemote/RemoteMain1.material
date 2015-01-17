@@ -1,0 +1,35 @@
+// RemoteMain1 genrated by blender2ogre 0.5.9
+
+material RemoteMain1 
+{
+    receive_shadows on 
+
+    technique
+    {
+        pass RemoteMain1
+        {
+            ambient 0.9797199964523315 0.9589728713035583 0.8926016688346863 1.0
+            diffuse 0.7837760088410377 0.7671783084746941 0.7140813457083901 1.0
+            specular 0.2982515334388225 0.289482765971929 0.27173049337587685 1.0 7.5
+            emissive 0.019594399491077663 0.019179456997376887 0.017852032977669685 1.0
+
+            alpha_to_coverage off
+            colour_write on
+            cull_hardware clockwise
+            depth_check on
+            depth_func less_equal
+            depth_write on
+            illumination_stage 
+            light_clip_planes off
+            light_scissor off
+            lighting on
+            normalise_normals off
+            polygon_mode solid
+            scene_blend one zero
+            scene_blend_op add
+            shading gouraud
+            transparent_sorting on
+
+        }
+    }
+}

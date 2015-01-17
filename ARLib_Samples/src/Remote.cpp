@@ -21,7 +21,7 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mAngularAccel.x = 0.0f;
 
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
-    Ogre::Entity *remoteEntity = sceneMgr->createEntity("remote.mesh");
+    Ogre::Entity *remoteEntity = sceneMgr->createEntity("remote1.mesh");
     mSceneNode->attachObject(remoteEntity);
 
     mSceneNode->setPosition(mSphericalPos.x * std::sin(mSphericalPos.y) * std::cos(mSphericalPos.z),
