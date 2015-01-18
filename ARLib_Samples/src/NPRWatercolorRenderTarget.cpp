@@ -6,6 +6,7 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 	Ogre::uint tilesX, Ogre::uint tilesY,
 	Ogre::Real edgeThreshold)
 	: root(root)
+	, destination(destination)
 {
 	watercolorSceneManager[0] = NULL;
 	watercolorSceneManager[1] = NULL;
@@ -135,8 +136,6 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 		mrt[eyeNum]->bindSurface(1, renderTextureOriginal[eyeNum]->getBuffer()->getRenderTarget());
 		mrt[eyeNum]->setAutoUpdated(true);
 	}
-
-	destination->SetCameras(camera[0], camera[1]);
 }
 
 NPRWatercolorRenderTarget::~NPRWatercolorRenderTarget()
@@ -176,4 +175,6 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 			params->setNamedConstant("BlurRadius", Ogre::Vector2(2.0f / (float)vp->getActualWidth(), 2.0f / (float)vp->getActualHeight()));
 		}
 	}
+
+	destination->SetCameras(camera[0], camera[1]);
 }

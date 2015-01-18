@@ -22,6 +22,7 @@ class NPRWatercolorRenderTarget
 
 	private:
 		Ogre::Root *root;
+		ARLib::RenderTarget *destination;
 		Ogre::SceneManager *watercolorSceneManager[2];
 		Ogre::TexturePtr renderTextureBlurred[2];
 		Ogre::TexturePtr renderTextureOriginal[2];

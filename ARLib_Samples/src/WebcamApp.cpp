@@ -18,7 +18,7 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
-
+	showDebugWindow = false; // for testing purposes
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);
@@ -83,7 +83,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
 
 
 	// choose monitor ids
-	int debugMonitorId = 0;
+	/*int debugMonitorId = 0;
 	int oculusRiftMonitorId = 1;
 
 	int yesNoID = MessageBoxA(
@@ -97,7 +97,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
     {
         oculusRiftMonitorId = 0;
 		debugMonitorId = 1;
-    }
+    }*/
 
 	// initialize render system
 	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
@@ -119,14 +119,14 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	if (mRiftAvailable)
 	{
 		Ogre::NameValuePairList miscParams;
-		miscParams["monitorIndex"] = Ogre::StringConverter::toString(oculusRiftMonitorId);
+		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1 /*oculusRiftMonitorId*/);
 		miscParams["border"] = "none";
 		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
 		Ogre::NameValuePairList miscParamsSmall;
-		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(debugMonitorId);
+		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0 /*debugMonitorId*/);
 		mSmallWindow = mRoot->createRenderWindow("ARLib Example (debug window)", 1920 / 2, 1080 / 2, false, &miscParamsSmall);
 		if (!mWindow)
 			mWindow = mSmallWindow;

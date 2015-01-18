@@ -1,5 +1,6 @@
 #include "WebcamScene.h"
 #include "RigidListenerNode.h"
+#include "NPRWatercolorRenderTarget.h"
 #include "ARLIB/Webcam/videoplayer.hpp"
 
 // eye visibility masks
@@ -14,6 +15,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight)
 	: mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
+	, enabledNPRRenderer(false)
+	, mWatercolorRenderTarget(nullptr)
+	, mSmallWatercolorRenderTarget(nullptr)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -35,7 +39,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (window && rift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-        mRiftNode->addRenderTarget(mRenderTarget);
+		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.07f);
+        mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
+
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
 		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
@@ -43,7 +49,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (smallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-        mRiftNode->addRenderTarget(mSmallRenderTarget);
+		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.07f);
+        mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
+
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
 		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
@@ -60,7 +68,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
 			rect->setVisibilityFlags(visibilityFlags[eyeNum]);
 			rect->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
-			rect->setUVs(Ogre::Vector2(1, 1), Ogre::Vector2(0, 1), Ogre::Vector2(1, 0), Ogre::Vector2(0, 0));
+			rect->setUVs(Ogre::Vector2(1, 0), Ogre::Vector2(0, 0), Ogre::Vector2(1, 1), Ogre::Vector2(0, 1));
 			rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
 			rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
 			const char *materialName[] = { "Video/LeftEye", "Video/RightEye" };
@@ -116,6 +124,8 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 WebcamScene::~WebcamScene()
 {
+	if (mWatercolorRenderTarget) delete mWatercolorRenderTarget;
+	if (mSmallWatercolorRenderTarget) delete mSmallWatercolorRenderTarget;
 	if (mRenderTarget) delete mRenderTarget;
 	if (mSmallRenderTarget) delete mSmallRenderTarget;
 
@@ -134,6 +144,40 @@ WebcamScene::~WebcamScene()
     }
     mShapes.clear();
 	delete mRiftNode;
+}
+
+void WebcamScene::toggleNPRRenderer()
+{
+	if (enabledNPRRenderer)
+	{
+		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+		{
+			mRiftNode->removeRenderTarget(mWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mRenderTarget);
+		}
+
+		if (mSmallRenderTarget)
+		{
+			mRiftNode->removeRenderTarget(mSmallWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mSmallRenderTarget);
+		}
+		enabledNPRRenderer = false;
+	}
+	else
+	{
+		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+		{
+			mRiftNode->removeRenderTarget(mRenderTarget);
+			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
+		}
+
+		if (mSmallRenderTarget)
+		{
+			mRiftNode->removeRenderTarget(mSmallRenderTarget);
+			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
+		}
+		enabledNPRRenderer = true;
+	}
 }
 
 void WebcamScene::update(float dt)
@@ -177,6 +221,8 @@ void WebcamScene::update(float dt)
 
 bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
+	if (e.key == OIS::KC_N)
+		toggleNPRRenderer();
 	return true;
 }
 bool WebcamScene::keyReleased( const OIS::KeyEvent& e )
