@@ -23,6 +23,7 @@ material Video/LeftEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
+				param_named float2 offset 0 0
 			}
 
 			fragment_program_ref VideoUndistortionFragment
@@ -59,6 +60,7 @@ material Video/RightEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
+				param_named float2 offset 0 0
 			}
 
 			fragment_program_ref VideoUndistortionFragment

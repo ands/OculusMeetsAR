@@ -77,6 +77,8 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
 			materialPass->getTextureUnitState(0)->setTextureName(videoPlayer[eyeNum]->getUndistortionMapTextureName());
 			materialPass->getTextureUnitState(1)->setTextureName(videoPlayer[eyeNum]->getTextureName());
+			Ogre::Vector2 offset[] = { Ogre::Vector2(0.0f, -0.04f), Ogre::Vector2(0.0f, 0.04f) };
+			materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
 
 			const char *nodeName[] = { "LeftVideo", "RightVideo" };
 			mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
