@@ -40,6 +40,7 @@ class WebcamScene
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 
 	private:
+		void setRenderTarget(ARLib::RenderTarget *renderTarget);
 		void toggleNPRRenderer();
 
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;

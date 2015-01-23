@@ -172,7 +172,7 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 		for (int passIndex = 0; passIndex < 2; passIndex++)
 		{
 			Ogre::GpuProgramParametersSharedPtr params = passes[passIndex]->getFragmentProgramParameters();
-			params->setNamedConstant("BlurRadius", Ogre::Vector2(2.0f / (float)vp->getActualWidth(), 2.0f / (float)vp->getActualHeight()));
+			params->setNamedConstant("BlurRadius", Ogre::Vector2(1.0f / (float)vp->getActualWidth(), 1.0f / (float)vp->getActualHeight()));
 		}
 	}
 

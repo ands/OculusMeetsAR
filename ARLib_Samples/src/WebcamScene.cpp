@@ -39,7 +39,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (window && rift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.07f);
+		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
         mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
 
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
@@ -49,7 +49,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (smallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.07f);
+		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
         mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
 
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
@@ -151,41 +151,32 @@ WebcamScene::~WebcamScene()
 	delete mRiftNode;
 }
 
+void WebcamScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
+{
+	mRiftNode->removeAllRenderTargets();
+	mRiftNode->addRenderTarget(renderTarget);
+	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
+	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+}
+
 void WebcamScene::toggleNPRRenderer()
 {
 	if (enabledNPRRenderer)
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-		{
-			mRiftNode->removeRenderTarget(mWatercolorRenderTarget);
-			mRiftNode->addRenderTarget(mRenderTarget);
-		}
-
+			setRenderTarget(mRenderTarget);
 		if (mSmallRenderTarget)
-		{
-			mRiftNode->removeRenderTarget(mSmallWatercolorRenderTarget);
-			mRiftNode->addRenderTarget(mSmallRenderTarget);
-		}
+			setRenderTarget(mSmallRenderTarget);
 		enabledNPRRenderer = false;
 	}
 	else
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-		{
-			mRiftNode->removeRenderTarget(mRenderTarget);
-			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
-		}
-
+			setRenderTarget(mWatercolorRenderTarget);
 		if (mSmallRenderTarget)
-		{
-			mRiftNode->removeRenderTarget(mSmallRenderTarget);
-			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
-		}
+			setRenderTarget(mSmallWatercolorRenderTarget);
 		enabledNPRRenderer = true;
 	}
-
-	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 }
 
 void WebcamScene::update(float dt)

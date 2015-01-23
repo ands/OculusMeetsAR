@@ -95,6 +95,12 @@ void RiftSceneNode::removeRenderTarget(RenderTarget *renderTarget)
 	// TODO: remove cameras from renderTarget!
 }
 
+void RiftSceneNode::removeAllRenderTargets()
+{
+	renderTargets.clear();
+	// TODO: remove cameras from renderTargets!
+}
+
 void RiftSceneNode::onChange(RigidBody *rb)
 {
 	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
