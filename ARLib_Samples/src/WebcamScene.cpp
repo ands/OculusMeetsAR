@@ -60,7 +60,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	webcam::VideoPlayer *videoPlayer[] = { videoPlayerLeft, videoPlayerRight };
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
-		videoPlayer[eyeNum]->playVideo(3.0f); // TODO: video distance needs to be tweakable/calculated
+		videoPlayer[eyeNum]->playVideo(4.0f);
 		if (!videoPlayer[eyeNum]->getTextureName().empty())
 		{
 			// video background rendering rect
@@ -77,8 +77,11 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
 			materialPass->getTextureUnitState(0)->setTextureName(videoPlayer[eyeNum]->getUndistortionMapTextureName());
 			materialPass->getTextureUnitState(1)->setTextureName(videoPlayer[eyeNum]->getTextureName());
-			Ogre::Vector2 offset[] = { Ogre::Vector2(0.0f, -0.04f), Ogre::Vector2(0.0f, 0.04f) };
+			Ogre::Vector2 offset[] = { Ogre::Vector2(0.04f, 0.02f), Ogre::Vector2(0.0f, -0.02f) };
+			//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
+			Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
 			materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
+			materialPass->getVertexProgramParameters()->setNamedConstant("scale", scale[eyeNum]);
 
 			const char *nodeName[] = { "LeftVideo", "RightVideo" };
 			mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
@@ -180,6 +183,9 @@ void WebcamScene::toggleNPRRenderer()
 		}
 		enabledNPRRenderer = true;
 	}
+
+	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
+	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 }
 
 void WebcamScene::update(float dt)
