@@ -83,7 +83,6 @@
   <ItemGroup>
     <ClInclude Include="..\include\NPRWatercolorRenderTarget.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
-    <ClInclude Include="..\include\stb_image_write.h" />
     <ClInclude Include="..\include\WebcamApp.h" />
     <ClInclude Include="..\include\WebcamScene.h" />
   </ItemGroup>
