@@ -76,7 +76,7 @@ void RiftSceneNode::setYaw(Ogre::Radian angle)
 void RiftSceneNode::addRenderTarget(RenderTarget *renderTarget)
 {
 	assert(renderTarget);
-	renderTarget->SetCameras(cameras[0], cameras[1]);
+	renderTarget->setCameras(cameras[0], cameras[1]);
 	renderTargets.push_back(renderTarget);
 }
 

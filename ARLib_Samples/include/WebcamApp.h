@@ -8,8 +8,6 @@
 #include "ARLib/ARLibOgre.h"
 #include "WebcamScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "ARLib/Webcam/videoplayer.hpp"
-
 
 class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
 {
@@ -30,8 +28,8 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		bool update();
 
 	private:
-		webcam::VideoPlayer *mVideoPlayerLeft;
-		webcam::VideoPlayer *mVideoPlayerRight;
+		ARLib::VideoTexture *mVideoTextureLeft;
+		ARLib::VideoTexture *mVideoTextureRight;
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
         void initBullet(bool enableDebugDrawing);

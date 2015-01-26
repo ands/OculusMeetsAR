@@ -1,15 +1,13 @@
 #ifndef ARLIB_CAPTURE_H
 #define ARLIB_CAPTURE_H
 
-#include <new>
 #include <windows.h>
 #include <mfapi.h>
 #include <mfidl.h>
 #include <mfreadwrite.h>
-#include <Wmcodecdsp.h>
-#include <assert.h>
 #include <Dbt.h>
-#include <shlwapi.h>
+
+namespace ARLib {
 
 //Class for enumerating videocapture devices
 class DeviceList
@@ -89,10 +87,13 @@ protected:
     WCHAR                   *m_pwszSymbolicLink;
 
 	//capturesamples
-	#define BUFFER_NUM 10
-	IMFMediaBuffer *bufferlist[BUFFER_NUM];
+	static const int someBuffers = 3;
+	static const int numBuffers = 10;
+	IMFMediaBuffer *bufferlist[numBuffers];
 	int currentbuffer;
 	bool allbuffersexist;
 };
+
+}; // ARLib namespace
 
 #endif

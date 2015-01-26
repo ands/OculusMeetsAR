@@ -146,7 +146,7 @@ NPRWatercolorRenderTarget::~NPRWatercolorRenderTarget()
 		root->destroySceneManager(watercolorSceneManager[1]);
 }
 
-void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
+void NPRWatercolorRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
@@ -176,5 +176,5 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 		}
 	}
 
-	destination->SetCameras(camera[0], camera[1]);
+	destination->setCameras(camera[0], camera[1]);
 }

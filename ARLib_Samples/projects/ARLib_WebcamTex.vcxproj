@@ -83,12 +83,12 @@
   <ItemGroup>
     <ClInclude Include="..\include\NPRWatercolorRenderTarget.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
+    <ClInclude Include="..\include\stb_image_write.h" />
     <ClInclude Include="..\include\WebcamApp.h" />
     <ClInclude Include="..\include\WebcamScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\NPRWatercolorRenderTarget.cpp" />
-    <ClCompile Include="..\src\RigidListenerNode.cpp" />
     <ClCompile Include="..\src\WebcamApp.cpp" />
     <ClCompile Include="..\src\webcammain.cpp" />
     <ClCompile Include="..\src\WebcamScene.cpp" />

@@ -82,14 +82,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Webcam\capture.cpp" />
+    <ClCompile Include="src\Webcam\CCapture.cpp" />
     <ClCompile Include="src\Webcam\ocam.cpp" />
-    <ClCompile Include="src\Webcam\videoplayer.cpp" />
+    <ClCompile Include="src\Webcam\VideoPlayer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ARLib\Webcam\capture.h" />
+    <ClInclude Include="include\ARLib\Webcam\CCapture.h" />
     <ClInclude Include="include\ARLib\Webcam\ocam.h" />
-    <ClInclude Include="include\ARLib\Webcam\videoplayer.hpp" />
+    <ClInclude Include="include\ARLib\Webcam\VideoPlayer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

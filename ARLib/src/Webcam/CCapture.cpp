@@ -1,4 +1,9 @@
-#include "ARLib/Webcam/capture.h"
+#include <new>
+#include <assert.h>
+#include <shlwapi.h>
+#include "ARLib/Webcam/CCapture.h"
+
+namespace ARLib {
 
 template <class T> void SafeRelease(T **ppT)
 {
@@ -209,20 +214,17 @@ HRESULT CCapture::OnReadSample(
 
     if (pSample)
     {
-		if(currentbuffer==0 && somebufferexist){
-			allbuffersexist=TRUE;
-		}
-		if(allbuffersexist){
+		if(currentbuffer == 0 && somebufferexist)
+			allbuffersexist = true;
+		if(allbuffersexist)
 			bufferlist[currentbuffer]->Release();
-		}
 		HRESULT check = pSample->ConvertToContiguousBuffer(&bufferlist[currentbuffer]);
 
-		if(SUCCEEDED(check)){
-			currentbuffer=(currentbuffer+1)%BUFFER_NUM;
-
-			if(currentbuffer==3){
-				somebufferexist=TRUE;
-			}
+		if(SUCCEEDED(check))
+		{
+			currentbuffer = (currentbuffer + 1) % numBuffers;
+			if(currentbuffer == someBuffers)
+				somebufferexist = true;
 		}
 
         if (FAILED(hr)) { goto done; }
@@ -347,7 +349,7 @@ HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameter
 //-------------------------------------------------------------------
 
 HRESULT CCapture::EndCaptureSession()
-{	
+{
     EnterCriticalSection(&m_critsec);
     SafeRelease(&m_pReader);
     LeaveCriticalSection(&m_critsec);
@@ -437,9 +439,9 @@ HRESULT ConfigureSourceReader(IMFSourceReader *pReader)
 		if (FAILED(hr)) { goto done; }
 
 		/*char buf[256];
-		sprintf(buf, "%d x %d Guid = {%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}\n", 
+		sprintf(buf, "%d x %d Guid = {%08lX-%04hX-%04hX-%02hhX%02hhX-%02hhX%02hhX%02hhX%02hhX%02hhX%02hhX}\n",
 			width, height,
-			subtype.Data1, subtype.Data2, subtype.Data3, 
+			subtype.Data1, subtype.Data2, subtype.Data3,
 			subtype.Data4[0], subtype.Data4[1], subtype.Data4[2], subtype.Data4[3],
 			subtype.Data4[4], subtype.Data4[5], subtype.Data4[6], subtype.Data4[7]);
 		OutputDebugStringA(buf);*/
@@ -477,22 +479,19 @@ HRESULT CCapture::EndCaptureInternal()
 //get last image sample
 BYTE* CCapture::getLastImagesample(HRESULT *res)
 {
-	BYTE *returndata=NULL;
+	EnterCriticalSection(&m_critsec);
+	BYTE *returndata = NULL;
 	*res = E_FAIL;
-	if(somebufferexist){
-		int curbuf=0;
-		if(currentbuffer==0){
-			curbuf=BUFFER_NUM - 1;
-		}
-		else{
-			curbuf = (currentbuffer-1)%BUFFER_NUM;
-		}
+	if(somebufferexist)
+	{
+		int curbuf = currentbuffer == 0 ? numBuffers - 1 : currentbuffer - 1;
 		bufferlist[curbuf]->Unlock(); // ??
-
 		DWORD len = 0;
-		*res = bufferlist[curbuf]->Lock(&returndata,NULL,&len);
-
-		bufferlist[curbuf]->Unlock(); // TODO: muss nach der nutzung ausgeführt werden, nicht hier!
+		*res = bufferlist[curbuf]->Lock(&returndata, NULL, &len);
+		bufferlist[curbuf]->Unlock(); // TODO: must be unlocked after use, not here!
 	}
+	LeaveCriticalSection(&m_critsec);
 	return returndata;
 }
+
+}; // ARLib namespace

@@ -24,7 +24,7 @@ class WebcamScene
 			Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
 			OgreBulletDynamics::DynamicsWorld *dyWorld,
 			OIS::Mouse *mouse, OIS::Keyboard *keyboard,
-			webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight);
+			ARLib::VideoTexture *videoTextureLeft, ARLib::VideoTexture *videoTextureRight);
 		~WebcamScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }

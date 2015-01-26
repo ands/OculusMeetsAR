@@ -100,7 +100,7 @@ RiftRenderTarget::~RiftRenderTarget()
 		root->destroySceneManager(riftSceneManager);
 }
 
-void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
+void RiftRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
@@ -116,7 +116,7 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 	}
 }
 
-/*void RiftRenderTarget::SetTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+/*void RiftRenderTarget::setTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
 										   Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd)
 {
 	Ogre::GpuProgramParametersSharedPtr params = material[0]->getTechnique(0)->getPass(0)->getVertexProgramParameters();

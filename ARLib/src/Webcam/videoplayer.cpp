@@ -1,153 +1,78 @@
-#include "ARLib/Webcam/videoplayer.hpp"
+#include "ARLib/Webcam/CCapture.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Webcam/ocam.h"
 
-namespace webcam
+namespace ARLib {
+
+VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float videoDistance)
+	: videoDistance(videoDistance)
 {
-	VideoPlayer::VideoPlayer(int camNum, const char *ocamModelParametersFilename)
+	if (FAILED(CCapture::CreateInstance(&capture)))
+		capture = NULL;
+
+	if (capture)
 	{
-		camNumber=camNum;
-		if (FAILED(CCapture::CreateInstance(&cap))){
-			cap = NULL;
-		}
-
-		mOcamModel = ocam_get_model(ocamModelParametersFilename);
-	}
-
-	VideoPlayer::~VideoPlayer()
-	{
-		close();
-
-		if (mOcamModel)
-			delete mOcamModel;
-	}
-
-	void VideoPlayer::playVideo(float videoDistance)
-	{
-		if (cap){
-			//cam selection
-			IMFActivate *temp = NULL;
-			DeviceList list = DeviceList();
-			list.EnumerateDevices();
-			int count = list.Count();
-			//todo: select the two C310 in right order
-			bool firstfound=false;
-			for(unsigned int i=0;i<list.Count();i++){
-				temp=list.m_ppDevices[i];
-				WCHAR *name=NULL;
-				temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,&name,NULL);
-				std::wstring displayname = name;
-				std::string helpname="Logitech HD Webcam C310";
-				std::wstring loginame(helpname.begin(),helpname.end());
-				if(displayname.compare(0,19,loginame,0,19)==0 && displayname.compare(loginame)>=0){//Accepts "Logitech HD Webcam Cx" with x>=310
-					if(camNumber==0){
-						break;
-					}
-					else if(!firstfound){
-						firstfound=true;
-					}
-					else if(firstfound){
-						break;
-					}
-				}
-
-			}
-			//Start capturing
-			cap->StartCapture(temp);
-
-			// wait until we have the first picture
-			const int timeout = 500; // 5 seconds timeout
-			for (int i = 0; i < timeout; i++){
-				Sleep(10);
-				if (!mTexture.isNull() || SUCCEEDED(update())){
+		// camera selection
+		IMFActivate *temp = NULL;
+		DeviceList list = DeviceList();
+		list.EnumerateDevices();
+		int count = list.Count();
+		// todo: select the two C310 in right order
+		bool firstfound = false;
+		for(unsigned int i = 0; i < list.Count(); i++)
+		{
+			temp = list.m_ppDevices[i];
+			WCHAR *name = NULL;
+			temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &name, NULL);
+			const WCHAR *searchname = L"Logitech HD Webcam C310";
+			// Accepts "Logitech HD Webcam Cx" with x>=310
+			if (!wcsncmp(name, searchname, 20) && wcsncmp(name, searchname, sizeof(searchname)) >= 0) {
+				if(cameraNumber == 0)
 					break;
-				}
-			}
-
-			// load undistortion texture
-			if (!mTexture.isNull())
-			{
-				float *undistortionMapXY = new float[2 * 1280 * 960];
-				if (undistortionMapXY)
-				{
-					ocam_create_perspecive_undistortion_map(mOcamModel, undistortionMapXY, 1280, 960, videoDistance);
-
-					mUndistortionMapTexture = Ogre::TextureManager::getSingleton().createManual(
-						getTextureName() + "Undistortion",
-						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-						Ogre::TEX_TYPE_2D,
-						1280, 960,
-						0,
-						Ogre::PF_FLOAT16_GR,
-						Ogre::TU_STATIC_WRITE_ONLY);
-
-					Ogre::PixelBox pb(1280, 960, 1, Ogre::PF_FLOAT32_GR, undistortionMapXY);
-					mUndistortionMapTexture->getBuffer()->blitFromMemory(pb);
-
-					delete[] undistortionMapXY;
-				}
+				else if(!firstfound)
+					firstfound = true;
+				else
+					break;
 			}
 		}
-	}
+		capture->StartCapture(temp);
 
-	HRESULT VideoPlayer::update()
-	{
-		HRESULT check=E_FAIL;
-		if(cap && cap->somebufferexist){
-			BYTE* sample = cap->getLastImagesample(&check);
-			if(SUCCEEDED(check)){
-				if (mTexture.isNull())
-				{
-					static int i = 0;
-					mTexture = Ogre::TextureManager::getSingleton().createManual(
-						"ARLibWebcam/VideoTexture" + Ogre::StringConverter::toString(++i),
-						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-						Ogre::TEX_TYPE_2D,
-						1280,960,
-						0,
-						Ogre::PF_BYTE_BGR,
-						Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
-				}
-				Ogre::PixelBox pb(1280,960, 1, Ogre::PF_BYTE_BGR, sample);
-				Ogre::HardwarePixelBufferSharedPtr buffer = mTexture->getBuffer();
-				buffer->blitFromMemory(pb);
-			}
-		}
-		return check;
-	}
-
-	std::string VideoPlayer::getTextureName()
-	{
-		std::string name;
-		if (!mTexture.isNull())
-			name = mTexture->getName();
-		return name;
-	}
-
-	int VideoPlayer::getVideoWidth()
-	{
-		int width=0;
-		if (!mTexture.isNull())
-			width = mTexture->getWidth();
-		return width;
-	}
-
-	int VideoPlayer::getVideoHeight()
-	{
-		int height=0;
-		if (!mTexture.isNull())
-			height = mTexture->getHeight();
-		return height;
-	}
-
-	void VideoPlayer::close()
-	{
-	}
-
-	std::string VideoPlayer::getUndistortionMapTextureName()
-	{
-		std::string name;
-		if (!mUndistortionMapTexture.isNull())
-			name = mUndistortionMapTexture->getName();
-		return name;
+		ocamModel = ocam_get_model(ocamModelParametersFilename);
 	}
 }
+
+VideoPlayer::~VideoPlayer()
+{
+	capture->EndCaptureSession();
+	capture->Release();
+	delete ocamModel;
+}
+
+void * VideoPlayer::update()
+{
+	HRESULT check = E_FAIL;
+	if(capture && capture->somebufferexist)
+	{
+		BYTE* sample = capture->getLastImagesample(&check);
+		if(SUCCEEDED(check))
+			return sample;
+	}
+	return NULL;
+}
+
+int VideoPlayer::getVideoWidth()
+{
+	return 1280; // TODO: request and read out actual dimensions 
+}
+
+int VideoPlayer::getVideoHeight()
+{
+	return 960; // TODO: request and read out actual dimensions 
+}
+
+void VideoPlayer::calculateUndistortionMap(float *xyMap)
+{
+	ocam_create_perspecive_undistortion_map(ocamModel, xyMap, getVideoWidth(), getVideoHeight(), videoDistance);
+}
+
+}; // ARLib namespace

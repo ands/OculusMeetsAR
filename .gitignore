@@ -227,3 +227,5 @@ OgreMain_d.pdb
 /ARLib_Samples/bin/Release/ARLib_Bullet_Test.lib
 /ARLib/lib/ARLibWebcam.lib
 /ARLib/lib/ARLibWebcam_d.lib
+/ARLib/lib/ARLibSound.lib
+/ARLib/lib/ARLibSound_d.lib
