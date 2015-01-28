@@ -64,7 +64,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(cubeNodeT);
+		tracker->addRigidBodyEventListener(cubeNodeT);
 
 	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
@@ -115,7 +115,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	//mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(mRiftNode);
+		tracker->addRigidBodyEventListener(mRiftNode);
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);

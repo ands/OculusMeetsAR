@@ -32,7 +32,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
 	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(mRiftNode);
+		tracker->addRigidBodyEventListener(mRiftNode);
 
 	// create viewports
 	if (window && rift)
@@ -85,7 +85,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(cubeNodeT);
+		tracker->addRigidBodyEventListener(cubeNodeT);
 	
 	Ogre::SceneNode* cubeNode3 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "Cube.mesh" );
