@@ -25,7 +25,8 @@ typedef struct RigidBody{
 
 
 typedef struct RBFrame{
-	RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency);
+	RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool Ownership = false);
+    RBFrame(const RBFrame& lFrame, const RBFrame& rFrame, float weight);
 	~RBFrame();
 
 	void addRigidBody(unsigned int index, RigidBody* rb);
@@ -36,6 +37,8 @@ typedef struct RBFrame{
 	int mFrameID;
 	double mTimestamp;
 	float mLatency;
+    bool mValid;
+    bool mOwnership;
 } RBFrame;
 
 };

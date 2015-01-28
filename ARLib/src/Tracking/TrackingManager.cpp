@@ -3,13 +3,13 @@
 
 namespace ARLib{
 	
-TrackingManager::TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD)
+TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD)
 	: mTracking(tracking)
 	, mRiftHandle(oculusHMD)
 	, mEvaluator(nullptr)
 	, mNatNetHandler(nullptr)
 	, mInitialized(false){
-	mEvaluator = new FrameEvaluator();
+	mEvaluator = new FrameEvaluator(frameBufferSize);
 }
 
 TrackingManager::~TrackingManager(){
@@ -53,10 +53,15 @@ void TrackingManager::uninitialize(){
 	}
 	mInitialized = false;
 }
+
+TRACKING_ERROR_CODE TrackingManager::reinitialize(){
+    uninitialize();
+    return initialize();
+}
 		
-void TrackingManager::update(){
+void TrackingManager::update(float retroActiveQueryTime){
 	if(mInitialized){
-		mEvaluator->evaluate();
+		mEvaluator->evaluate(retroActiveQueryTime);
 	}
 }
 
@@ -72,8 +77,12 @@ void TrackingManager::setNatNetClientIP(const std::string& cIP){
 	mNatNetClientIP = cIP;
 }
 
-void TrackingManager::registerRigidBodyEventListener(RigidBodyEventListener* listener){
-	mEvaluator->registerRigidBodyEventListener(listener);
+void TrackingManager::setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval){
+    mEvaluator->setEvaluationMethod(eval);
+}
+
+void TrackingManager::addRigidBodyEventListener(RigidBodyEventListener* listener){
+	mEvaluator->addRigidBodyEventListener(listener);
 }
 
 };

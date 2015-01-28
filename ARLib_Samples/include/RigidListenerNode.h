@@ -11,13 +11,14 @@ public:
 		Ogre::Entity* cubeEnt = sceneManager->createEntity( "Cube.mesh" );
 		cubeEnt->getSubEntity(0)->setMaterialName( "CubeMaterialRed" );
 		mRigidBodyNode->attachObject( cubeEnt );
-		mRigidBodyNode->setPosition( 1.0, 0.0, 0.0 );
-		mRigidBodyNode->setScale( 0.5, 0.5, 0.5 );
 	};
 	void onChange(ARLib::RigidBody* rb){
 		mRigidBodyNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
 		//do other interresting stuff
 	};
+    Ogre::SceneNode *getSceneNode(){
+        return mRigidBodyNode;
+    }
 private:
 	Ogre::SceneNode *mRigidBodyNode;
 };

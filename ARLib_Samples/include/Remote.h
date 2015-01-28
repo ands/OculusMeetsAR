@@ -5,16 +5,12 @@
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 
-class StarWarsRemote : public Ogre::FrameListener{
+class StarWarsRemote{
 public:
     StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::Vector3 normalDirection, float radius);
     ~StarWarsRemote();
-    
-    bool frameStarted(const Ogre::FrameEvent& evt);
 		
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
-    bool frameEnded(const Ogre::FrameEvent& evt);
+    void update(float dt);
 
     void fire(const Ogre::Vector3& target);
     void pickNewDestination();

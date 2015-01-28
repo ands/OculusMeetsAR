@@ -29,18 +29,20 @@ namespace ARLib{
 
 	class TrackingManager{
 	public:
-		TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD = nullptr);
+		TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD = nullptr);
 		~TrackingManager();
-
+        
 		TRACKING_ERROR_CODE initialize(); 
 		void uninitialize();
-		void update();
+		TRACKING_ERROR_CODE reinitialize(); 
+		void update(float retroActiveQueryTime = 0);
 
 		void setNatNetConnectionType(ConnectionType cType);
 		void setNatNetServerIP(const std::string& sIP = "");
 		void setNatNetClientIP(const std::string& cIP = "");
+        void setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval);
 
-		void registerRigidBodyEventListener(RigidBodyEventListener* listener);
+		void addRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
 		bool mInitialized;
 

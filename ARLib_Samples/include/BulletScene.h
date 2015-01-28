@@ -36,6 +36,8 @@ class BulletScene
         std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
         std::deque<OgreBulletDynamics::RigidBody *> mRigidBodies;
 
+        StarWarsRemote *mRemote;
+
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;

@@ -37,6 +37,7 @@ namespace ARLib{
 		const std::string& getClientIP() const;
 
 		void registerFrameEvaluator(FrameEvaluator* evaluator);
+        double getPing()const;
 	private:
 		static const std::string invalidIP;
 

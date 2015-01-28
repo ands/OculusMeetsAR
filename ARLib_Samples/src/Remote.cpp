@@ -21,16 +21,16 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mAngularAccel.x = 0.0f;
 
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
-    Ogre::Entity *remoteEntity = sceneMgr->createEntity("remote1.mesh");
+    Ogre::Entity *remoteEntity = sceneMgr->createEntity("cube.mesh");
     mSceneNode->attachObject(remoteEntity);
+    mSceneNode->setInheritOrientation(false);
 
-    mSceneNode->setPosition(mSphericalPos.x * std::sin(mSphericalPos.y) * std::cos(mSphericalPos.z),
-                            mSphericalPos.x * std::sin(mSphericalPos.y) * std::sin(mSphericalPos.z),
-                            mSphericalPos.x * std::cos(mSphericalPos.y));
 
     mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(1.0f);
     mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
-    mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(-1.0f, 0.0f, 0.0f));
+    mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, -2.0f, 0.0f));
+
+    mRemoteBody->setLinearVelocity(0,0,0);
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -38,40 +38,9 @@ StarWarsRemote::~StarWarsRemote(){
     delete mRemoteBody;
 }
 
-bool StarWarsRemote::frameStarted(const Ogre::FrameEvent& evt){
-    (void)evt;
-    return true;
-}
 
-bool StarWarsRemote::frameRenderingQueued(const Ogre::FrameEvent& evt){
-    if(mTravelDest == mSceneNode->getPosition()){
-        if(mShotsFired == false){
-            fire(Ogre::Vector3(0.0f));
-        }
-        pickNewDestination();
-    }
-    else{
-        float invert = 1.0f;
-        if((mTravelDest).distance(mSphericalPos) < 5.0f){
-            invert = -invert;
-        }
-        Ogre::Vector3 dir = (mTravelDest - mSphericalPos).normalisedCopy();
-        mSphericalPos.y = std::fmodf(mSphericalPos.y + invert * dir.y * mAngularVelo.y * evt.timeSinceLastFrame, 360.f);
-        mSphericalPos.z = std::fmodf(mSphericalPos.z + invert * dir.z * mAngularVelo.z * evt.timeSinceLastFrame, 360.f);
-
-        mAngularVelo.y = std::min(mAngularVelo.y + mAngularAccel.y * evt.timeSinceLastFrame, mMaxVelo);
-        mAngularVelo.z = std::min(mAngularVelo.z + mAngularAccel.z * evt.timeSinceLastFrame, mMaxVelo);
-        
-        mSceneNode->setPosition(mSphericalPos.x * std::sin(mSphericalPos.y) * std::cos(mSphericalPos.z),
-                                mSphericalPos.x * std::sin(mSphericalPos.y) * std::sin(mSphericalPos.z),
-                                mSphericalPos.x * std::cos(mSphericalPos.y));
-    }
-    return true;
-}
-
-bool StarWarsRemote::frameEnded(const Ogre::FrameEvent& evt){
-    (void) evt;
-    return true;
+void StarWarsRemote::update(float dt){
+   
 }
 
 void StarWarsRemote::fire(const Ogre::Vector3& target){

@@ -1,0 +1,126 @@
+material "remoteRemoteMain1"
+{
+	technique remoteRemoteMain1_technique
+	{
+		pass remoteRemoteMain1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.78376 0.7672 0.71408 1
+			specular 0 0 0 0 0
+			emissive 0.019594 0.01918 0.017852 1
+		}
+	}
+}
+material "remoteRemoteBlack1"
+{
+	technique remoteRemoteBlack1_technique
+	{
+		pass remoteRemoteBlack1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.14416 0.13104 0.1092 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteRemoteDarkGray2"
+{
+	technique remoteRemoteDarkGray2_technique
+	{
+		pass remoteRemoteDarkGray2_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.21936 0.20752 0.18792 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteRemoteRelief2"
+{
+	technique remoteRemoteRelief2_technique
+	{
+		pass remoteRemoteRelief2_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.60576 0.58288 0.55568 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteSmallRelief1"
+{
+	technique remoteSmallRelief1_technique
+	{
+		pass remoteSmallRelief1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.43112 0.40416 0.36792 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteChrome1"
+{
+	technique remoteChrome1_technique
+	{
+		pass remoteChrome1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.586499 0.612976 0.637765 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteRemoteRed1"
+{
+	technique remoteRemoteRed1_technique
+	{
+		pass remoteRemoteRed1_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.42584 0.08712 0.06568 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteRemoteRed1_001"
+{
+	technique remoteRemoteRed1_001_technique
+	{
+		pass remoteRemoteRed1_001_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.42584 0.08712 0.06568 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}
+material "remoteEmiterCenter2"
+{
+	technique remoteEmiterCenter2_technique
+	{
+		pass remoteEmiterCenter2_standard
+		{
+			shading phong
+			ambient 1 1 1 1
+			diffuse 0.10662 0.610133 0 1
+			specular 0 0 0 0 0
+			emissive 0 0 0 1
+		}
+	}
+}

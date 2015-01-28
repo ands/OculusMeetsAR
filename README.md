@@ -19,6 +19,8 @@ Including:
 
 - OpenAL Soft 1.1
 
+- TinyThread++ 1.1
+
 
 For Visual Studio 2010 ONLY
 

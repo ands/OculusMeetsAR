@@ -19,20 +19,29 @@ namespace ARLib{
 		mMarkers[index].mZ = z;
 	};
 
-	RBFrame::RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency)
+	RBFrame::RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool ownership)
 		: mNRigidBodys(nRigidBodys)
 		, mFrameID(frameID) 
 		, mTimestamp(timestamp)
 		, mLatency(latency)
-		, mChange(true){
+		, mChange(true)
+        , mValid(valid)
+        , mOwnership(ownership){
 			mRbs = new RigidBody*[mNRigidBodys];
 	}
+    
+    RBFrame::RBFrame(const RBFrame& lFrame, const RBFrame& rFrame, float weight)
+        : mOwnership(true){
+        //todo
+    }
 
 	RBFrame::~RBFrame(){
-		for(unsigned int i = 0; i < mNRigidBodys ; i++){
-			delete mRbs[i];
-		}
-		delete [] mRbs;
+        if(mOwnership){
+            for(unsigned int i = 0; i < mNRigidBodys ; i++){
+                delete mRbs[i];
+            }
+            delete [] mRbs;
+        }
 	}
 
 	void RBFrame::addRigidBody(unsigned int index, RigidBody* rb){
