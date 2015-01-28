@@ -23,6 +23,8 @@ material Video/LeftEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
+				param_named float2 offset 0 0
+				param_named float2 scale 1 1
 			}
 
 			fragment_program_ref VideoUndistortionFragment
@@ -33,6 +35,8 @@ material Video/LeftEye
 
 			texture_unit
             {
+				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_address_mode border
             }
 			texture_unit
             {
@@ -59,6 +63,8 @@ material Video/RightEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
+				param_named float2 offset 0 0
+				param_named float2 scale 1 1
 			}
 
 			fragment_program_ref VideoUndistortionFragment
@@ -69,6 +75,8 @@ material Video/RightEye
 
 			texture_unit
             {
+				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_address_mode border
             }
 			texture_unit
             {

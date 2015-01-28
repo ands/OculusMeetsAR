@@ -1,6 +1,6 @@
 #include "WebcamScene.h"
 #include "RigidListenerNode.h"
-#include "ARLIB/Webcam/videoplayer.hpp"
+#include "NPRWatercolorRenderTarget.h"
 
 // eye visibility masks
 #define VISIBILITY_FLAG_LEFT  (1 << 0)
@@ -11,9 +11,12 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
 	OIS::Mouse *mouse, OIS::Keyboard *keyboard,
-	webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight)
+	ARLib::VideoTexture *videoTextureLeft, ARLib::VideoTexture *videoTextureRight)
 	: mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
+	, enabledNPRRenderer(false)
+	, mWatercolorRenderTarget(nullptr)
+	, mSmallWatercolorRenderTarget(nullptr)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -35,7 +38,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (window && rift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-        mRiftNode->addRenderTarget(mRenderTarget);
+		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
+        mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
+
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
 		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
@@ -43,36 +48,39 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	if (smallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-        mRiftNode->addRenderTarget(mSmallRenderTarget);
+		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
+        mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
+
 		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
 		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
 
 	// start background video players for the eyes
-	webcam::VideoPlayer *videoPlayer[] = { videoPlayerLeft, videoPlayerRight };
+	ARLib::VideoTexture *videoTexture[] = { videoTextureLeft, videoTextureRight };
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
-		videoPlayer[eyeNum]->playVideo(3.0f); // TODO: video distance needs to be tweakable/calculated
-		if (!videoPlayer[eyeNum]->getTextureName().empty())
-		{
-			// video background rendering rect
-			Ogre::Rectangle2D *rect = new Ogre::Rectangle2D(true);
-			const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
-			rect->setVisibilityFlags(visibilityFlags[eyeNum]);
-			rect->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
-			rect->setUVs(Ogre::Vector2(1, 1), Ogre::Vector2(0, 1), Ogre::Vector2(1, 0), Ogre::Vector2(0, 0));
-			rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
-			rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
-			const char *materialName[] = { "Video/LeftEye", "Video/RightEye" };
-			rect->setMaterial(materialName[eyeNum]);
+		// video background rendering rect
+		Ogre::Rectangle2D *rect = new Ogre::Rectangle2D(true);
+		const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
+		rect->setVisibilityFlags(visibilityFlags[eyeNum]);
+		rect->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
+		rect->setUVs(Ogre::Vector2(1, 0), Ogre::Vector2(0, 0), Ogre::Vector2(1, 1), Ogre::Vector2(0, 1));
+		rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
+		rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
+		const char *materialName[] = { "Video/LeftEye", "Video/RightEye" };
+		rect->setMaterial(materialName[eyeNum]);
 
-			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
-			materialPass->getTextureUnitState(0)->setTextureName(videoPlayer[eyeNum]->getUndistortionMapTextureName());
-			materialPass->getTextureUnitState(1)->setTextureName(videoPlayer[eyeNum]->getTextureName());
+		Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
+		materialPass->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
+		materialPass->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
+		Ogre::Vector2 offset[] = { Ogre::Vector2(0.04f, 0.02f), Ogre::Vector2(0.0f, -0.02f) };
+		//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
+		Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
+		materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
+		materialPass->getVertexProgramParameters()->setNamedConstant("scale", scale[eyeNum]);
 
-			const char *nodeName[] = { "LeftVideo", "RightVideo" };
-			mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
-		}
+		const char *nodeName[] = { "LeftVideo", "RightVideo" };
+		mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
 	}
 
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr);
@@ -116,6 +124,8 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 WebcamScene::~WebcamScene()
 {
+	if (mWatercolorRenderTarget) delete mWatercolorRenderTarget;
+	if (mSmallWatercolorRenderTarget) delete mSmallWatercolorRenderTarget;
 	if (mRenderTarget) delete mRenderTarget;
 	if (mSmallRenderTarget) delete mSmallRenderTarget;
 
@@ -134,6 +144,34 @@ WebcamScene::~WebcamScene()
     }
     mShapes.clear();
 	delete mRiftNode;
+}
+
+void WebcamScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
+{
+	mRiftNode->removeAllRenderTargets();
+	mRiftNode->addRenderTarget(renderTarget);
+	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
+	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+}
+
+void WebcamScene::toggleNPRRenderer()
+{
+	if (enabledNPRRenderer)
+	{
+		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+			setRenderTarget(mRenderTarget);
+		if (mSmallRenderTarget)
+			setRenderTarget(mSmallRenderTarget);
+		enabledNPRRenderer = false;
+	}
+	else
+	{
+		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+			setRenderTarget(mWatercolorRenderTarget);
+		if (mSmallRenderTarget)
+			setRenderTarget(mSmallWatercolorRenderTarget);
+		enabledNPRRenderer = true;
+	}
 }
 
 void WebcamScene::update(float dt)
@@ -177,6 +215,8 @@ void WebcamScene::update(float dt)
 
 bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
+	if (e.key == OIS::KC_N)
+		toggleNPRRenderer();
 	return true;
 }
 bool WebcamScene::keyReleased( const OIS::KeyEvent& e )

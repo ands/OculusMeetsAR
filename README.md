@@ -22,7 +22,7 @@ Including:
 - TinyThread++ 1.1
 
 
-For Visual Studio 2010 ONLY
+For Visual Studio 2010 (with service pack 1!) ONLY
 
 Contents
 ========

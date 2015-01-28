@@ -14,6 +14,7 @@
     <ClCompile Include="src\Ogre\DebugRenderTarget.cpp" />
     <ClCompile Include="src\Ogre\RiftSceneNode.cpp" />
     <ClCompile Include="src\Ogre\RiftRenderTarget.cpp" />
+    <ClCompile Include="src\Ogre\VideoTexture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ARLib\ARLibOgre.h" />
@@ -21,6 +22,7 @@
     <ClInclude Include="include\ARLib\Ogre\RenderTarget.h" />
     <ClInclude Include="include\ARLib\Ogre\RiftSceneNode.h" />
     <ClInclude Include="include\ARLib\Ogre\RiftRenderTarget.h" />
+    <ClInclude Include="include\ARLib\Ogre\VideoTexture.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2CE07FF-A392-47A2-9F84-BD290656AAFE}</ProjectGuid>

@@ -14,6 +14,8 @@ namespace webcam
 	class VideoPlayer;
 }
 
+class NPRWatercolorRenderTarget;
+
 class WebcamScene
 {
 	public:
@@ -22,7 +24,7 @@ class WebcamScene
 			Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
 			OgreBulletDynamics::DynamicsWorld *dyWorld,
 			OIS::Mouse *mouse, OIS::Keyboard *keyboard,
-			webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight);
+			ARLib::VideoTexture *videoTextureLeft, ARLib::VideoTexture *videoTextureRight);
 		~WebcamScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
@@ -38,6 +40,9 @@ class WebcamScene
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 
 	private:
+		void setRenderTarget(ARLib::RenderTarget *renderTarget);
+		void toggleNPRRenderer();
+
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 
         std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
@@ -51,6 +56,9 @@ class WebcamScene
 		ARLib::RiftSceneNode* mRiftNode;
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;
+		NPRWatercolorRenderTarget* mWatercolorRenderTarget;
+		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
+		bool enabledNPRRenderer;
 };
 
 #endif

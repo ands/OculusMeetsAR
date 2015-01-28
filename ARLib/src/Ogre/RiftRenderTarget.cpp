@@ -3,10 +3,10 @@
 
 namespace ARLib {
 
-RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow)
-	: rift(rift)
-	, root(root)
-	, riftSceneManager(NULL)
+RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderWindow *renderWindow)
+	: rift(_rift)
+	, root(_root)
+	, riftSceneManager(nullptr)
 {
 	// get rift parameters for both eyes
 	int recommendedTexSize[2][2];
@@ -89,8 +89,9 @@ RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWin
 	meshNode->setScale(1, 1, -1);
 
 	Ogre::Viewport *viewport = renderWindow->addViewport(combinedCamera);
-	viewport->setBackgroundColour(Ogre::ColourValue::Black);
-	viewport->setOverlaysEnabled(true);
+	viewport->setClearEveryFrame(true, Ogre::FBT_DEPTH);
+	//viewport->setBackgroundColour(Ogre::ColourValue::Black);
+	viewport->setOverlaysEnabled(false);
 }
 
 RiftRenderTarget::~RiftRenderTarget()
@@ -99,7 +100,7 @@ RiftRenderTarget::~RiftRenderTarget()
 		root->destroySceneManager(riftSceneManager);
 }
 
-void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
+void RiftRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
@@ -109,13 +110,13 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 		Ogre::RenderTexture* renderTextureTarget = renderTexture[eyeNum]->getBuffer()->getRenderTarget();
 		renderTextureTarget->removeAllViewports();
 		renderTextureTarget->addViewport(cameras[eyeNum]);
-		renderTextureTarget->getViewport(0)->setClearEveryFrame(true);
-		renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-		renderTextureTarget->getViewport(0)->setOverlaysEnabled(true);
+		renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
+		//renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
+		renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
 	}
 }
 
-/*void RiftRenderTarget::SetTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+/*void RiftRenderTarget::setTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
 										   Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd)
 {
 	Ogre::GpuProgramParametersSharedPtr params = material[0]->getTechnique(0)->getPass(0)->getVertexProgramParameters();

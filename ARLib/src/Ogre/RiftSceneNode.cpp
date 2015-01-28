@@ -3,9 +3,9 @@
 
 namespace ARLib {
 
-RiftSceneNode::RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
+RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
 	: RigidBodyEventListener(rigidBodyID)
-	, rift(rift)
+	, rift(_rift)
 {
 	// create a virtual body node that the rift is correctly attached to
 	Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
@@ -76,7 +76,7 @@ void RiftSceneNode::setYaw(Ogre::Radian angle)
 void RiftSceneNode::addRenderTarget(RenderTarget *renderTarget)
 {
 	assert(renderTarget);
-	renderTarget->SetCameras(cameras[0], cameras[1]);
+	renderTarget->setCameras(cameras[0], cameras[1]);
 	renderTargets.push_back(renderTarget);
 }
 
@@ -93,6 +93,12 @@ void RiftSceneNode::removeRenderTarget(RenderTarget *renderTarget)
 	}
 
 	// TODO: remove cameras from renderTarget!
+}
+
+void RiftSceneNode::removeAllRenderTargets()
+{
+	renderTargets.clear();
+	// TODO: remove cameras from renderTargets!
 }
 
 void RiftSceneNode::onChange(RigidBody *rb)

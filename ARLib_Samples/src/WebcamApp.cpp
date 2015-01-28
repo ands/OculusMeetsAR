@@ -1,5 +1,8 @@
 #include "WebcamApp.h"
 
+//#define STB_IMAGE_WRITE_IMPLEMENTATION
+//#include "stb_image_write.h"
+
 WebcamApp::WebcamApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
@@ -14,11 +17,11 @@ WebcamApp::WebcamApp(bool showDebugWindow)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
     , mGroundShape(nullptr)
-	, mVideoPlayerLeft(nullptr)
-	, mVideoPlayerRight(nullptr)
+	, mVideoTextureLeft(nullptr)
+	, mVideoTextureRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
-
+	//showDebugWindow = false; // for testing purposes
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);
@@ -31,15 +34,15 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoPlayerLeft = new webcam::VideoPlayer(0, "calib_results_CAM1.txt");
-	mVideoPlayerRight = new webcam::VideoPlayer(1, "calib_results_CAM2.txt");
+	mVideoTextureLeft = new ARLib::VideoTexture("VideoLeft", "VideoUndistortLeft", 0, "calib_results_CAM1.txt", 4.0f);
+	mVideoTextureRight = new ARLib::VideoTexture("VideoRight", "VideoUndistortRight", 1, "calib_results_CAM2.txt", 4.0f);
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,
 		mWindow, mSmallWindow,
 		mDynamicsWorld,
 		mMouse, mKeyboard,
-		mVideoPlayerLeft, mVideoPlayerRight);
+		mVideoTextureLeft, mVideoTextureRight);
 	mRoot->startRendering();
 }
 
@@ -83,7 +86,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
 
 
 	// choose monitor ids
-	int debugMonitorId = 0;
+	/*int debugMonitorId = 0;
 	int oculusRiftMonitorId = 1;
 
 	int yesNoID = MessageBoxA(
@@ -97,7 +100,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
     {
         oculusRiftMonitorId = 0;
 		debugMonitorId = 1;
-    }
+    }*/
 
 	// initialize render system
 	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
@@ -119,14 +122,14 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	if (mRiftAvailable)
 	{
 		Ogre::NameValuePairList miscParams;
-		miscParams["monitorIndex"] = Ogre::StringConverter::toString(oculusRiftMonitorId);
+		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1 /*oculusRiftMonitorId*/);
 		miscParams["border"] = "none";
 		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
 		Ogre::NameValuePairList miscParamsSmall;
-		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(debugMonitorId);
+		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0 /*debugMonitorId*/);
 		mSmallWindow = mRoot->createRenderWindow("ARLib Example (debug window)", 1920 / 2, 1080 / 2, false, &miscParamsSmall);
 		if (!mWindow)
 			mWindow = mSmallWindow;
@@ -253,9 +256,23 @@ bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-	//Videotexturupdate
-	mVideoPlayerLeft->update();
-	mVideoPlayerRight->update();
+	// get new video frames
+	mVideoTextureLeft->update();
+	mVideoTextureRight->update();
+
+	/*static int counter = 0;
+	if (++counter == 30)
+	{
+		counter = 0;
+		char filename[64];
+		static int imageIndex = 0;
+		sprintf(filename, "calibration/cam_img_%03d_l.png", imageIndex);
+		stbi_write_png(filename, 1280, 960, 3, mVideoPlayerLeft->getMemory(), 1280 * 3);
+		sprintf(filename, "calibration/cam_img_%03d_r.png", imageIndex);
+		stbi_write_png(filename, 1280, 960, 3, mVideoPlayerRight->getMemory(), 1280 * 3);
+		imageIndex++;
+	}*/
+
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
 	
