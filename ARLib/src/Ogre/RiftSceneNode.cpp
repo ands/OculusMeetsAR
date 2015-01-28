@@ -3,9 +3,9 @@
 
 namespace ARLib {
 
-RiftSceneNode::RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
+RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
 	: RigidBodyEventListener(rigidBodyID)
-	, rift(rift)
+	, rift(_rift)
 {
 	// create a virtual body node that the rift is correctly attached to
 	Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();

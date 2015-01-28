@@ -3,8 +3,8 @@
 
 namespace ARLib {
 
-DebugRenderTarget::DebugRenderTarget(Ogre::RenderWindow *renderWindow)
-	: renderWindow(renderWindow)
+DebugRenderTarget::DebugRenderTarget(Ogre::RenderWindow *_renderWindow)
+	: renderWindow(_renderWindow)
 {
 }
 

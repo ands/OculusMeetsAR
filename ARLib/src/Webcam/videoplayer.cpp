@@ -4,8 +4,8 @@
 
 namespace ARLib {
 
-VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float videoDistance)
-	: videoDistance(videoDistance)
+VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float _videoDistance)
+	: videoDistance(_videoDistance)
 {
 	if (FAILED(CCapture::CreateInstance(&capture)))
 		capture = NULL;

@@ -3,10 +3,10 @@
 
 namespace ARLib {
 
-RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow)
-	: rift(rift)
-	, root(root)
-	, riftSceneManager(NULL)
+RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderWindow *renderWindow)
+	: rift(_rift)
+	, root(_root)
+	, riftSceneManager(nullptr)
 {
 	// get rift parameters for both eyes
 	int recommendedTexSize[2][2];
