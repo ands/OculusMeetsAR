@@ -39,6 +39,13 @@ void bgr2rgb(void *data, int width, int height)
 	}
 }
 
+LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	if (msg == WM_PAINT)
+		return 0;
+	return DefWindowProcA(window, msg, wparam, lparam);
+}
+
 int main(int argc, char **argv)
 {
 	const char *destinationDir = argv[1];
@@ -86,6 +93,29 @@ int main(int argc, char **argv)
 	int captureIndex = 0;
 
 	printf("press the C key to capture or ESCAPE to quit\n");
+
+	// window
+	WNDCLASSA windowClass = {};
+	windowClass.style = CS_HREDRAW | CS_VREDRAW;
+	windowClass.lpfnWndProc = WindowProc;
+	windowClass.hInstance = GetModuleHandle(NULL);
+	windowClass.lpszClassName = "VideoWindowClass";
+
+	if (!RegisterClassA(&windowClass))
+	{
+		fprintf(stderr, "could not create window class\n");
+		return -1;
+	}
+
+	HWND window = CreateWindowExA(
+		0, windowClass.lpszClassName, "Live Capture", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
+		CW_USEDEFAULT, CW_USEDEFAULT, 960, 640, 0, 0, windowClass.hInstance, 0);
+
+	if (!window)
+	{
+		fprintf(stderr, "could not create window\n");
+		return -1;
+	}
 
 	while(42)
 	{
@@ -141,7 +171,18 @@ int main(int argc, char **argv)
 			break;
 		}
 
-		Sleep(10);
+		// TODO: this doesn't work yet!
+		MSG msg;
+		while (PeekMessageA(&msg, window, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&msg);
+			DispatchMessageA(&msg);
+		}
+		HDC dc = GetDC(window);
+		StretchDIBits(dc, 0, 0, 480, 640, 0, 0, 1280, 960, memL, 0, DIB_RGB_COLORS, SRCCOPY);
+		ReleaseDC(window, dc);
+
+		//Sleep(10);
 	}
 
 	free(memL);
