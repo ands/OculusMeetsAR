@@ -129,21 +129,21 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
 	// Create a panel
 	Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
-		overlayManager->createOverlayElement("Panel", "PanelName"));
-	panel->setMetricsMode(Ogre::GMM_PIXELS);
-	panel->setPosition(10, 10);
-	panel->setDimensions(100, 100);
+		overlayManager->createOverlayElement("Panel", "TextPanel"));
+	panel->setMetricsMode(Ogre::GMM_RELATIVE);
+	panel->setPosition(0.0, 0.2);
+	panel->setDimensions(0.5, 0.2);
 	// Create a text area
-	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "TextAreaName"));
-	mTextArea->setMetricsMode(Ogre::GMM_PIXELS);
-	mTextArea->setPosition(200, 200);
-	mTextArea->setDimensions(200, 50);
-	mTextArea->setCaption("Time: ? us");
-	mTextArea->setCharHeight(32);
+	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "Text"));
+	mTextArea->setMetricsMode(Ogre::GMM_RELATIVE);
+	mTextArea->setPosition(0, 0);
+	mTextArea->setDimensions(0.5, 0.2);
+	mTextArea->setCaption("Time: ? ms");
+	mTextArea->setCharHeight(0.1);
 	mTextArea->setFontName("DefaultFont");
-	mTextArea->setColourBottom(Ogre::ColourValue(0.5, 0.7, 0.5));
-	mTextArea->setColourTop(Ogre::ColourValue(0.7, 0.9, 0.7));
-	Ogre::Overlay* overlay = overlayManager->create("OverlayName");
+	mTextArea->setColourBottom(Ogre::ColourValue(1.0, 0.0, 0.5));
+	mTextArea->setColourTop(Ogre::ColourValue(1.0, 0.0, 0.5));
+	Ogre::Overlay* overlay = overlayManager->create("TextOverlay");
 	overlay->add2D(panel);
 	panel->addChild(mTextArea);
 	overlay->show();
@@ -241,8 +241,8 @@ void WebcamScene::update(float dt)
 	if (mTextArea->isVisible())
 	{
 		char buf[256];
-		unsigned long time = timer.getMicroseconds();
-		_snprintf(buf, 256, "Time: %lu us", time);
+		unsigned long time = timer.getMilliseconds();
+		_snprintf(buf, 256, "Time: %lu ms", time);
 		mTextArea->setCaption(buf);
 	}
 }

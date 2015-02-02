@@ -90,8 +90,6 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 
 	Ogre::Viewport *viewport = renderWindow->addViewport(combinedCamera);
 	viewport->setClearEveryFrame(true, Ogre::FBT_DEPTH);
-	//viewport->setBackgroundColour(Ogre::ColourValue::Black);
-	viewport->setOverlaysEnabled(false);
 }
 
 RiftRenderTarget::~RiftRenderTarget()
@@ -112,7 +110,7 @@ void RiftRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 		renderTextureTarget->addViewport(cameras[eyeNum]);
 		renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
 		//renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-		renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
+		//renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
 	}
 }
 
