@@ -71,6 +71,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	mRoot = new Ogre::Root("plugins.cfg");
 	cf.load("resources.cfg");
 #endif
+	mOverlaySystem = new Ogre::OverlaySystem();
 	mRoot->addFrameListener(this);
  
     // add resources
@@ -136,14 +137,17 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	}
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+	mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+	mSceneMgr->addRenderQueueListener(mOverlaySystem);
 }
 void WebcamApp::quitOgre()
 {
-	if(mRoot) delete mRoot;
+	delete mOverlaySystem;
+	delete mRoot;
 }
 
 void WebcamApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
     mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
     mDebugDrawer->setDrawWireframe(true);

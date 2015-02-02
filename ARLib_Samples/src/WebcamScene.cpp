@@ -2,6 +2,10 @@
 #include "RigidListenerNode.h"
 #include "NPRWatercolorRenderTarget.h"
 
+#include "OGRE/Overlay/OgreOverlayManager.h"
+#include "OGRE/Overlay/OgreOverlayContainer.h"
+#include "OGRE/Overlay/OgreFontManager.h"
+
 // eye visibility masks
 #define VISIBILITY_FLAG_LEFT  (1 << 0)
 #define VISIBILITY_FLAG_RIGHT (1 << 1)
@@ -120,6 +124,30 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setSpecularColour( .25, .25, .25 );
 	light->setDiffuseColour( 0.35, 0.27, 0.23 );
 	mRiftNode->getBodyNode()->attachObject(light);
+
+	// Overlay stuff
+	Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
+	// Create a panel
+	Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
+		overlayManager->createOverlayElement("Panel", "PanelName"));
+	panel->setMetricsMode(Ogre::GMM_PIXELS);
+	panel->setPosition(10, 10);
+	panel->setDimensions(100, 100);
+	// Create a text area
+	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "TextAreaName"));
+	mTextArea->setMetricsMode(Ogre::GMM_PIXELS);
+	mTextArea->setPosition(200, 200);
+	mTextArea->setDimensions(200, 50);
+	mTextArea->setCaption("Time: ? us");
+	mTextArea->setCharHeight(32);
+	mTextArea->setFontName("DefaultFont");
+	mTextArea->setColourBottom(Ogre::ColourValue(0.5, 0.7, 0.5));
+	mTextArea->setColourTop(Ogre::ColourValue(0.7, 0.9, 0.7));
+	Ogre::Overlay* overlay = overlayManager->create("OverlayName");
+	overlay->add2D(panel);
+	panel->addChild(mTextArea);
+	overlay->show();
+	mTextArea->hide(); // hide by default
 }
 
 WebcamScene::~WebcamScene()
@@ -207,6 +235,16 @@ void WebcamScene::update(float dt)
 	Ogre::Vector3 dirZ = mBodyTiltNode->_getDerivedOrientation()*Ogre::Vector3::UNIT_Z;
 
 	mBodyNode->setPosition( mBodyNode->getPosition() + dirZ*forward*dt + dirX*leftRight*dt );*/
+	
+	// update text box time
+	static Ogre::Timer timer;
+	if (mTextArea->isVisible())
+	{
+		char buf[256];
+		unsigned long time = timer.getMicroseconds();
+		_snprintf(buf, 256, "Time: %lu us", time);
+		mTextArea->setCaption(buf);
+	}
 }
 
 //////////////////////////////////////////////////////////////
@@ -217,6 +255,13 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
 	if (e.key == OIS::KC_N)
 		toggleNPRRenderer();
+	if (e.key == OIS::KC_T)
+	{
+		if (mTextArea->isVisible())
+			mTextArea->hide();
+		else
+			mTextArea->show();
+	}
 	return true;
 }
 bool WebcamScene::keyReleased( const OIS::KeyEvent& e )

@@ -23,8 +23,8 @@ material Video/LeftEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
-				param_named float2 offset 0 0
-				param_named float2 scale 1 1
+				param_named offset float2 0 0
+				param_named scale float2 1 1
 			}
 
 			fragment_program_ref VideoUndistortionFragment
@@ -63,8 +63,8 @@ material Video/RightEye
 		
 			vertex_program_ref VideoUndistortionVertex
 			{
-				param_named float2 offset 0 0
-				param_named float2 scale 1 1
+				param_named offset float2 0 0
+				param_named scale float2 1 1
 			}
 
 			fragment_program_ref VideoUndistortionFragment
