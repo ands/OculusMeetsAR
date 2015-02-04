@@ -2,6 +2,7 @@
 #define APP_H
 
 #include "OGRE/Ogre.h"
+#include "OGRE/Overlay/OgreOverlaySystem.h"
 #include "OIS/OIS.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
@@ -50,6 +51,8 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 
 		Ogre::RenderWindow* mWindow;
 		Ogre::RenderWindow* mSmallWindow;
+
+		Ogre::OverlaySystem *mOverlaySystem;
 
 		bool mShutdown;
 

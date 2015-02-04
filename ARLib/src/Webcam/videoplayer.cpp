@@ -6,6 +6,7 @@ namespace ARLib {
 
 VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float _videoDistance)
 	: videoDistance(_videoDistance)
+	, ocamModel(NULL)
 {
 	if (FAILED(CCapture::CreateInstance(&capture)))
 		capture = NULL;
@@ -37,7 +38,8 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 		}
 		capture->StartCapture(temp);
 
-		ocamModel = ocam_get_model(ocamModelParametersFilename);
+		if (ocamModelParametersFilename)
+			ocamModel = ocam_get_model(ocamModelParametersFilename);
 	}
 }
 
@@ -72,7 +74,24 @@ int VideoPlayer::getVideoHeight()
 
 void VideoPlayer::calculateUndistortionMap(float *xyMap)
 {
-	ocam_create_perspecive_undistortion_map(ocamModel, xyMap, getVideoWidth(), getVideoHeight(), videoDistance);
+	if (ocamModel)
+	{
+		ocam_create_perspecive_undistortion_map(ocamModel, xyMap, getVideoWidth(), getVideoHeight(), videoDistance);
+	}
+	else
+	{
+		// calculates the identity xy map
+		float invMaxX = 1.0f / (float)(getVideoWidth() - 1);
+		float invMaxY = 1.0f / (float)(getVideoHeight() - 1);
+		for (int y = 0; y < getVideoHeight(); y++)
+		{
+			for (int x = 0; x < getVideoWidth(); x++)
+			{
+				*xyMap++ = x * invMaxX;
+				*xyMap++ = y * invMaxY;
+			}
+		}
+	}
 }
 
 }; // ARLib namespace

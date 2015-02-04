@@ -2,6 +2,7 @@
 #define SCENE_H
 
 #include "OGRE/Ogre.h"
+#include "OGRE/Overlay/OgreTextAreaOverlayElement.h"
 #include "OIS/OIS.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
@@ -52,6 +53,7 @@ class WebcamScene
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
+		Ogre::TextAreaOverlayElement* mTextArea;
 		//Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
 		ARLib::RenderTarget* mRenderTarget;

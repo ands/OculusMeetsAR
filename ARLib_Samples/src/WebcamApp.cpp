@@ -71,6 +71,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	mRoot = new Ogre::Root("plugins.cfg");
 	cf.load("resources.cfg");
 #endif
+	mOverlaySystem = new Ogre::OverlaySystem();
 	mRoot->addFrameListener(this);
  
     // add resources
@@ -136,10 +137,14 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	}
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+	mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+	mSceneMgr->addRenderQueueListener(mOverlaySystem);
 }
 void WebcamApp::quitOgre()
 {
-	if(mRoot) delete mRoot;
+	delete mOverlaySystem;
+	delete mRoot;
 }
 
 void WebcamApp::initBullet(bool enableDebugDrawing){
@@ -259,20 +264,6 @@ bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	// get new video frames
 	mVideoTextureLeft->update();
 	mVideoTextureRight->update();
-
-	/*static int counter = 0;
-	if (++counter == 30)
-	{
-		counter = 0;
-		char filename[64];
-		static int imageIndex = 0;
-		sprintf(filename, "calibration/cam_img_%03d_l.png", imageIndex);
-		stbi_write_png(filename, 1280, 960, 3, mVideoPlayerLeft->getMemory(), 1280 * 3);
-		sprintf(filename, "calibration/cam_img_%03d_r.png", imageIndex);
-		stbi_write_png(filename, 1280, 960, 3, mVideoPlayerRight->getMemory(), 1280 * 3);
-		imageIndex++;
-	}*/
-
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
 	

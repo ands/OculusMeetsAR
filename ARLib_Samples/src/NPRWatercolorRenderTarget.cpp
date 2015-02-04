@@ -156,9 +156,6 @@ void NPRWatercolorRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *rig
 		mrt[eyeNum]->removeAllViewports();
 		Ogre::Viewport *vp = mrt[eyeNum]->addViewport(cameras[eyeNum]);
 		vp->setMaterialScheme("MRT");
-		//vp->setClearEveryFrame(true);
-		vp->setOverlaysEnabled(false);
-		vp->setSkiesEnabled(false);
 
 		// add blur compositor
 		Ogre::CompositorInstance *blur = Ogre::CompositorManager::getSingleton().addCompositor(vp, "Blur");

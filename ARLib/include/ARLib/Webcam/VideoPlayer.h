@@ -9,7 +9,7 @@ struct ocam_model;
 class VideoPlayer
 {
 public:
-    VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float videoDistance);
+    VideoPlayer(int cameraNumber = 0, const char *ocamModelParametersFilename = NULL, float videoDistance = 4.0f);
     ~VideoPlayer();
 	/// Returns the width of the video image
 	int getVideoWidth();
