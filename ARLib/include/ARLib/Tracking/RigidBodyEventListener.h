@@ -13,7 +13,7 @@ namespace ARLib{
 	class RigidBodyEventListener{
 	public:
 		RigidBodyEventListener(unsigned int rigidBodyID);
-		virtual void onChange(RigidBody *rb) = 0;
+		virtual void onChange(const RigidBody *rb) = 0;
 		unsigned int getRigidBodyID()const;
         bool isRiftListener()const;
 	protected:

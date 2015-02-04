@@ -1,0 +1,50 @@
+#define RENDER_SCENE 1
+#define BLUR_RADIUS 2
+
+//blur in X
+float4 GlowX_fp( float2 uv: TEXCOORD0,
+				uniform sampler2D scene: register(s0),
+				uniform float4 invTexSize) : COLOR
+{
+	float4 color = float4(0);
+	float blurSize = BLUR_RADIUS * invTexSize.x;
+	
+	//change to 1D Gaussian Blur
+	color += tex2D(scene, float2(uv.x - 4.0*blurSize, uv.y)) * 1.0/25.0;
+	color += tex2D(scene, float2(uv.x - 3.0*blurSize, uv.y)) * 2.0/25.0;
+	color += tex2D(scene, float2(uv.x - 2.0*blurSize, uv.y)) * 3.0/25.0;
+	color += tex2D(scene, float2(uv.x - blurSize, uv.y)) * 4.0/25.0;
+	color += tex2D(scene, float2(uv.x, uv.y)) * 5.0/25.0;
+	color += tex2D(scene, float2(uv.x + blurSize, uv.y)) * 4.0/25.0;
+	color += tex2D(scene, float2(uv.x + 2.0*blurSize, uv.y)) * 3.0/25.0;
+	color += tex2D(scene, float2(uv.x + 3.0*blurSize, uv.y)) * 2.0/25.0;
+	color += tex2D(scene, float2(uv.x + 4.0*blurSize, uv.y)) * 1.0/25.0;
+	
+	return color;
+}
+
+float4 GlowY_fp( float2 uv: TEXCOORD0,
+				uniform sampler2D scene: register(s0),
+				uniform sampler2D blurX: register(s1),
+				uniform float4 invTexSize) : COLOR
+{
+	float4 color = float4(0);
+	float blurSize = BLUR_RADIUS * invTexSize.y;
+	
+	//change to 1D Gaussian Blur should look far better
+	color += tex2D(blurX, float2(uv.x, uv.y - 4.0*blurSize)) * 1.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y - 3.0*blurSize)) * 2.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y - 2.0*blurSize)) * 3.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y - blurSize)) * 4.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y)) * 5.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y + blurSize)) * 4.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y + 2.0*blurSize)) * 3.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y + 3.0*blurSize)) * 2.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y + 4.0*blurSize)) * 1.0/25.0;
+	
+	return 
+#if RENDER_SCENE
+			tex2D(scene,uv) + 
+#endif
+			color * 4;
+}

@@ -28,7 +28,7 @@ class RiftSceneNode : public RigidBodyEventListener
 		void removeRenderTarget(RenderTarget *renderTarget);
 		void removeAllRenderTargets();
 
-		virtual void onChange(RigidBody *rb);
+		virtual void onChange(const RigidBody *rb);
 
 	private:
 		Rift *rift;

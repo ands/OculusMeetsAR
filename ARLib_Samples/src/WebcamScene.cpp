@@ -83,7 +83,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 		mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
 	}
 
-	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr);
+	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 0);
 	if (tracker)
 		tracker->addRigidBodyEventListener(cubeNodeT);
 	
@@ -98,9 +98,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	roomLight->setType(Ogre::Light::LT_POINT);
 	roomLight->setCastShadows( true );
 	roomLight->setShadowFarDistance( 30 );
-	roomLight->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	roomLight->setSpecularColour( .25, .25, .25 );
-	roomLight->setDiffuseColour( 0.85, 0.76, 0.7 );
+	roomLight->setAttenuation( 65, 1.0f, 0.07f, 0.017f );
+	roomLight->setSpecularColour( .25f, .25f, .25f );
+	roomLight->setDiffuseColour( 0.85f, 0.76f, 0.7f );
 
 	roomLight->setPosition( 5, 5, 5 );
 
@@ -110,15 +110,15 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition( 3.0, 0.0, 0.0 );
-	cubeNode2->setScale( 0.5, 0.5, 0.5 );
+	cubeNode2->setPosition( 3.0f, 0.0f, 0.0f );
+	cubeNode2->setScale( 0.5f, 0.5f, 0.5f );
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
-	light->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	light->setSpecularColour( .25, .25, .25 );
-	light->setDiffuseColour( 0.35, 0.27, 0.23 );
+	light->setAttenuation( 65, 1.0f, 0.07f, 0.017f );
+	light->setSpecularColour( .25f, .25f, .25f );
+	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
 	mRiftNode->getBodyNode()->attachObject(light);
 }
 
@@ -227,8 +227,8 @@ bool WebcamScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
-		mRiftNode->setYaw(Ogre::Degree(-0.3*e.state.X.rel));
-		mRiftNode->setPitch(Ogre::Degree(-0.3*e.state.Y.rel));
+		mRiftNode->setYaw(Ogre::Degree(-0.3f*e.state.X.rel));
+		mRiftNode->setPitch(Ogre::Degree(-0.3f*e.state.Y.rel));
 	}
 	return true;
 }

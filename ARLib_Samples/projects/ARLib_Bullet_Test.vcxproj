@@ -15,13 +15,18 @@
     <ClCompile Include="..\src\bulletmain.cpp" />
     <ClCompile Include="..\src\BulletScene.cpp" />
     <ClCompile Include="..\src\Remote.cpp" />
+    <ClCompile Include="..\src\RemotePuppet.cpp" />
     <ClCompile Include="..\src\RigidListenerNode.cpp" />
+    <ClCompile Include="..\src\Sword.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\BulletApp.h" />
     <ClInclude Include="..\include\BulletScene.h" />
+    <ClInclude Include="..\include\GlowMaterialListener.h" />
     <ClInclude Include="..\include\Remote.h" />
+    <ClInclude Include="..\include\RemotePuppet.h" />
     <ClInclude Include="..\include\RigidListenerNode.h" />
+    <ClInclude Include="..\include\Sword.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}</ProjectGuid>

@@ -3,6 +3,7 @@
 
 #include "OGRE/Ogre.h"
 #include "OIS/OIS.h"
+#include "RemotePuppet.h"
 #include "Remote.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
@@ -14,12 +15,15 @@
 class BulletScene
 {
 	public:
-		BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root,
+		BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
             Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
 		~BulletScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
 		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
+
+        void setRenderTarget(ARLib::RenderTarget *renderTarget);
+        void toggleGlow();
 
 		void update(float dt);
 
@@ -29,14 +33,15 @@ class BulletScene
 		bool mouseMoved(const OIS::MouseEvent&);
 		bool mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID);
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
-
 	private:
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 
         std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
         std::deque<OgreBulletDynamics::RigidBody *> mRigidBodies;
 
-        StarWarsRemote *mRemote;
+        bool mToggle;
+        StarWarsRemotePuppet *mRemotePuppet;
+        StarWarsRemote* mRemote;
 
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
@@ -44,6 +49,9 @@ class BulletScene
 		Ogre::SceneManager* mSceneMgr;
 		Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
+
+        ARLib::RenderTarget* mRenderTarget;
+        ARLib::RenderTarget* mSmallRenderTarget;
 };
 
 #endif

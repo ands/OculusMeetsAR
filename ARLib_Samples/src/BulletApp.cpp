@@ -30,8 +30,7 @@ BulletApp::BulletApp(bool showDebugWindow)
 	initOIS();
 	initRift();
 	initTracking();
-    mScene = new BulletScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard);
-	createViewports();
+    mScene = new BulletScene(mRift, mTracker, mRoot, mWindow, mSmallWindow, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard);
 	mRoot->startRendering();
 }
 
@@ -116,17 +115,20 @@ void BulletApp::quitOgre()
 }
 
 void BulletApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
-    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0));
-    mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
-    mDebugDrawer->setDrawWireframe(true);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
+   
+    if(enableDebugDrawing == true){
+        mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
+        mDebugDrawer->setDrawWireframe(true);
 
-    mDynamicsWorld->setDebugDrawer(mDebugDrawer);
-    mDynamicsWorld->setShowDebugShapes(true);
-    
-    Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
-    node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
-    //and other stuff!
+        mDynamicsWorld->setDebugDrawer(mDebugDrawer);
+        mDynamicsWorld->setShowDebugShapes(true);
+
+        Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
+        node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
+    }
+
 }
 
 void BulletApp::quitBullet(){
@@ -221,21 +223,6 @@ void BulletApp::quitTracking()
 	if(mTracker) delete mTracker;
 }
 
-void BulletApp::createViewports()
-{
-	if (mWindow && mRift)
-	{
-		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
-	}
-
-	if (mSmallWindow)
-	{
-		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
-	}
-}
-
 bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
@@ -244,7 +231,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
+    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
 	
     if (mTracker)
 		mTracker->update(); //right place?

@@ -11,13 +11,20 @@ public:
     ~StarWarsRemote();
 		
     void update(float dt);
+    void changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat);
+    void changeMaterial(float interp);
 
     void fire(const Ogre::Vector3& target);
     void pickNewDestination();
 private:
     Ogre::SceneNode *mSceneNode;
+    Ogre::SceneNode *mSpinNode;
     OgreBulletCollisions::SphereCollisionShape *mRemoteSphere;
     OgreBulletDynamics::RigidBody *mRemoteBody;
+
+    Ogre::Pass *mThrusterHighPass;
+    Ogre::Pass *mThrusterLowPass;
+    Ogre::Pass *mThrusterIntermediatePass;
 
     Ogre::Vector3 mSphericalPos;
     Ogre::Vector3 mAngularAccel;

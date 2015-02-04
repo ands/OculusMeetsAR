@@ -11,7 +11,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
 	ALCdevice *device;
-	ALCenum error;
+	//ALCenum error;
 
 	device = alcOpenDevice((nullptr));
 	if(!device){
@@ -62,7 +62,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
 
-	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
+	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr, 0);
 	if (tracker)
 		tracker->addRigidBodyEventListener(cubeNodeT);
 
@@ -76,7 +76,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0,1,0), -5);
     mShapes.push_back(shape);
     OgreBulletDynamics::RigidBody *planeBody = new OgreBulletDynamics::RigidBody("GroundPlane", mDynamicsWorld);
-    planeBody->setStaticShape(shape, 0.1, 0.8);
+    planeBody->setStaticShape(shape, 0.1f, 0.8f);
     mRigidBodies.push_back(planeBody);
 	
 	Ogre::SceneNode* cubeNode3 = mRoomNode->createChildSceneNode();
@@ -101,12 +101,12 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Light* roomLight = mSceneMgr->createLight();
 	roomLight->setType(Ogre::Light::LT_POINT);
 	roomLight->setCastShadows( true );
-	roomLight->setShadowFarDistance( 30 );
-	roomLight->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	roomLight->setSpecularColour( .25, .25, .25 );
-	roomLight->setDiffuseColour( 0.85, 0.76, 0.7 );
+	roomLight->setShadowFarDistance( 30.f );
+	roomLight->setAttenuation( 65.f, 1.0f, 0.07f, 0.017f );
+	roomLight->setSpecularColour( .25f, .25f, .25f );
+	roomLight->setDiffuseColour( 0.85f, 0.76f, 0.7f );
 
-	roomLight->setPosition( 5, 5, 5 );
+	roomLight->setPosition( 5.f, 5.f, 5.f );
 
 	mRoomNode->attachObject( roomLight );
 
@@ -120,9 +120,9 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
-	light->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	light->setSpecularColour( .25, .25, .25 );
-	light->setDiffuseColour( 0.35, 0.27, 0.23 );
+	light->setAttenuation( 65.f, 1.0f, 0.07f, 0.017f );
+	light->setSpecularColour( .25f, .25f, .25f );
+	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
 	mRiftNode->getBodyNode()->attachObject(light);
 }
 
@@ -196,8 +196,8 @@ bool SoundScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
-		mRiftNode->setYaw(Ogre::Degree(-0.3*e.state.X.rel));
-		mRiftNode->setPitch(Ogre::Degree(-0.3*e.state.Y.rel));
+		mRiftNode->setYaw(Ogre::Degree(-0.3f*e.state.X.rel));
+		mRiftNode->setPitch(Ogre::Degree(-0.3f*e.state.Y.rel));
 	}
 	return true;
 }

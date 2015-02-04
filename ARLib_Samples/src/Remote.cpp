@@ -21,16 +21,22 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mAngularAccel.x = 0.0f;
 
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
-    Ogre::Entity *remoteEntity = sceneMgr->createEntity("cube.mesh");
-    mSceneNode->attachObject(remoteEntity);
     mSceneNode->setInheritOrientation(false);
 
+    mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
+    Ogre::Entity *remoteEntity = sceneMgr->createEntity("cube.mesh");
+    remoteEntity->setMaterialName("Thruster_intermediate");
+    mSpinNode->attachObject(remoteEntity);
+    mSpinNode->setFixedYawAxis(true);
+
+    Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
+    mThrusterHighPass = materialManager->getByName("Thruster_high")->getTechnique("Thruster_high_technique")->getPass("Thruster_high_pass");
+    mThrusterLowPass = materialManager->getByName("Thruster_low")->getTechnique("Thruster_low_technique")->getPass("Thruster_low_pass");
+    mThrusterIntermediatePass = materialManager->getByName("Thruster_intermediate")->getTechnique("Thruster_intermediate_technique")->getPass("Thruster_intermediate_pass");
 
     mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(1.0f);
     mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
-    mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, -2.0f, 0.0f));
-
-    mRemoteBody->setLinearVelocity(0,0,0);
+    mRemoteBody->setShape(mSpinNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, -2.0f, 0.0f));
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -38,9 +44,27 @@ StarWarsRemote::~StarWarsRemote(){
     delete mRemoteBody;
 }
 
-
 void StarWarsRemote::update(float dt){
-   
+    if(mShotsFired){
+        //animate remote and shoot lazors
+    }
+}
+
+void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){
+    mRemoteBody->setPosition(newPos);
+    mSpinNode->setOrientation(quat);
+}
+
+void StarWarsRemote::changeMaterial(float interp){
+    mThrusterIntermediatePass->setAmbient(mThrusterHighPass->getAmbient()*(1-interp) + mThrusterLowPass->getAmbient() * interp);
+    mThrusterIntermediatePass->setDiffuse(mThrusterHighPass->getDiffuse()*(1-interp) + mThrusterLowPass->getDiffuse() * interp);
+    mThrusterIntermediatePass->setSpecular(mThrusterHighPass->getSpecular()*(1-interp) + mThrusterLowPass->getSpecular() * interp);
+    mThrusterIntermediatePass->setEmissive(mThrusterHighPass->getEmissive()*(1-interp) + mThrusterLowPass->getEmissive() * interp);
+
+    /*Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
+    Ogre::MaterialPtr mp = materialManager->getByName("test");
+    printf((std::string(mp->getParameter("diffuse").c_str()) + "\n").c_str());
+    mp->getTechnique("test_technique")->getPass("test_standard")->setDiffuse(0,0,1,1);*/
 }
 
 void StarWarsRemote::fire(const Ogre::Vector3& target){

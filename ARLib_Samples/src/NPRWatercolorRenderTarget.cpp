@@ -63,9 +63,9 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 
 		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
 		int index = 0;
-		for (int y = 0; y < tilesY; y++)
+		for (unsigned int y = 0; y < tilesY; y++)
 		{
-			for (int x = 0; x < tilesX; x++)
+			for (unsigned int x = 0; x < tilesX; x++)
 			{
 				float px = ((float)x / (float)(tilesX - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusX;
 				float py = ((float)y / (float)(tilesY - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusY;

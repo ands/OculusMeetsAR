@@ -1,0 +1,83 @@
+fragment_program GlowX_fp cg
+{
+	source glow.cg
+	entry_point GlowX_fp
+	
+	default_params
+	{
+		param_named_auto invTexSize inverse_texture_size 0
+	}
+	
+	profiles ps_2_0 arbfp1
+}
+
+material GlowCompositorMat/GlowX
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+			
+			fragment_program_ref GlowX_fp
+			{
+			
+			}
+			
+			texture_unit map
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+fragment_program GlowY_fp cg
+{
+	source glow.cg
+	entry_point GlowY_fp
+	
+	default_params
+	{
+		param_named_auto invTexSize inverse_texture_size 0
+		//param_named_auto time time_0_2pi 4
+	}
+	
+	profiles ps_2_0 arbfp1
+}
+
+material GlowCompositorMat/GlowY
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_func always_pass
+			
+			fragment_program_ref GlowY_fp
+			{
+			
+			}
+		
+			texture_unit scene
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+	
+			texture_unit map
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}

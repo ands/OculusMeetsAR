@@ -39,7 +39,6 @@ class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitRift();
 		void initTracking();
 		void quitTracking();
-		void createViewports();
 
 		OIS::Keyboard* mKeyboard;
 		OIS::Mouse* mMouse;

@@ -116,7 +116,7 @@ void SoundApp::quitOgre()
 }
 
 void SoundApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
     mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
     mDebugDrawer->setDrawWireframe(true);
