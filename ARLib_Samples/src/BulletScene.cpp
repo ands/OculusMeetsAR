@@ -68,9 +68,6 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	roomLight->setPosition( 5.f, 5.f, 5.f );
 	mRoomNode->attachObject( roomLight );
 
-	//RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
-	//if (tracker)
-	//	tracker->addRigidBodyEventListener(cubeNodeT);
 
     //ground-plane
     OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0.15f,0.9f,0.0f), -5.0f);

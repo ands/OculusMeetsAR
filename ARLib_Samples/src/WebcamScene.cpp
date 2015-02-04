@@ -131,15 +131,15 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
 		overlayManager->createOverlayElement("Panel", "TextPanel"));
 	panel->setMetricsMode(Ogre::GMM_RELATIVE);
-	panel->setPosition(0.0, 0.2);
-	panel->setDimensions(0.5, 0.2);
+	panel->setPosition(0.0f, 0.2f);
+	panel->setDimensions(0.5f, 0.2f);
 	// Create a text area
 	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "Text"));
 	mTextArea->setMetricsMode(Ogre::GMM_RELATIVE);
 	mTextArea->setPosition(0, 0);
-	mTextArea->setDimensions(0.5, 0.2);
+	mTextArea->setDimensions(0.5f, 0.2f);
 	mTextArea->setCaption("Time: ? ms");
-	mTextArea->setCharHeight(0.1);
+	mTextArea->setCharHeight(0.1f);
 	mTextArea->setFontName("DefaultFont");
 	mTextArea->setColourBottom(Ogre::ColourValue(1.0, 0.0, 0.5));
 	mTextArea->setColourTop(Ogre::ColourValue(1.0, 0.0, 0.5));

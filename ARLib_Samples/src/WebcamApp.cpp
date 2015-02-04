@@ -138,7 +138,7 @@ void WebcamApp::initOgre(bool showDebugWindow)
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 
-	mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
 	mSceneMgr->addRenderQueueListener(mOverlaySystem);
 }
 void WebcamApp::quitOgre()
