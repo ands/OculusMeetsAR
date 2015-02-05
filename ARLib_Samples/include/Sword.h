@@ -4,13 +4,15 @@
 #include "OGRE/Ogre.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 
-class StarWarsLaserSword{
+class StarWarsLightSaber{
 public:
-    StarWarsLaserSword(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr);
-    ~StarWarsLaserSword();
+    StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr);
+    ~StarWarsLightSaber();
 
+    void draw();
 private:
     Ogre::SceneNode *mSceneNode;
+    bool mDrawn;
 };
 
 #endif

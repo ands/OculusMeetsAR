@@ -50,6 +50,8 @@ class BulletScene
 		Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
 
+        Ogre::CompositorInstance *mGlow[2];
+
         ARLib::RenderTarget* mRenderTarget;
         ARLib::RenderTarget* mSmallRenderTarget;
 };

@@ -12,8 +12,10 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OIS::Mouse *mouse, OIS::Keyboard *keyboard)
     : mRenderTarget(nullptr)
     , mSmallRenderTarget(nullptr)
-    , mToggle(false)
+    , mToggle(true)
 {
+    mGlow[0] = nullptr;
+    mGlow[1] = nullptr;
 	mRoot = root;
 	mMouse = mouse;
 	mKeyboard = keyboard;
@@ -44,10 +46,10 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     }
 
     //add Glow compositor
-    Ogre::CompositorInstance *glow = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "Glow");
-    glow->setEnabled(true);
-    glow = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "Glow");
-    glow->setEnabled(true);
+    mGlow[0] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "Glow");
+    mGlow[0]->setEnabled(mToggle);
+    mGlow[1] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "Glow");
+    mGlow[1]->setEnabled(mToggle);
     GlowMaterialListener *gml = new GlowMaterialListener();
     Ogre::MaterialManager::getSingleton().addListener(gml);
 
@@ -95,7 +97,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
 
     RigidListenerNode *mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 1);
-    StarWarsLaserSword* sword = new StarWarsLaserSword(mSwordParentNode->getSceneNode(), mSceneMgr);
+    StarWarsLightSaber* sword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr);
     if(tracker){
         tracker->addRigidBodyEventListener(mSwordParentNode);
     }
@@ -142,6 +144,9 @@ void BulletScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
 
 void BulletScene::toggleGlow()
 {
+    mToggle = !mToggle;
+    mGlow[0]->setEnabled(mToggle);
+    mGlow[1]->setEnabled(mToggle);
 }
 
 void BulletScene::update(float dt)

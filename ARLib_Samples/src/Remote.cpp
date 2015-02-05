@@ -24,19 +24,47 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mSceneNode->setInheritOrientation(false);
 
     mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
-    Ogre::Entity *remoteEntity = sceneMgr->createEntity("cube.mesh");
-    remoteEntity->setMaterialName("Thruster_intermediate");
-    mSpinNode->attachObject(remoteEntity);
     mSpinNode->setFixedYawAxis(true);
 
-    Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
-    mThrusterHighPass = materialManager->getByName("Thruster_high")->getTechnique("Thruster_high_technique")->getPass("Thruster_high_pass");
-    mThrusterLowPass = materialManager->getByName("Thruster_low")->getTechnique("Thruster_low_technique")->getPass("Thruster_low_pass");
-    mThrusterIntermediatePass = materialManager->getByName("Thruster_intermediate")->getTechnique("Thruster_intermediate_technique")->getPass("Thruster_intermediate_pass");
+    //Scene Construction
 
-    mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(1.0f);
+    const char* MeshNames[] = { "BigHatch.mesh",
+                    "BlackHatch.mesh",
+                    "BottomRing.mesh",
+                    "ChromeWheel.mesh",
+                    "GreebleBottom.mesh",
+                    "GreebleTop.mesh",
+                    "LargeRelief.mesh",
+                    "Remote.mesh",
+                    "SmallRelief.mesh",
+                    "TankPart.mesh",
+                    "Thruster.mesh",
+                    "TopPart.mesh",
+                    "UShape.mesh" };
+
+    for(unsigned int i = 0; i < 13; i++){
+        Ogre::SceneNode* mNode = mSpinNode->createChildSceneNode();
+        Ogre::Entity *entity = sceneMgr->createEntity(MeshNames[i]);
+        mNode->attachObject(entity);
+    }
+
+    mThrusterNode = mSpinNode->createChildSceneNode("Thruster");
+    Ogre::Entity *entity = sceneMgr->createEntity("Thruster.mesh");
+    entity->setMaterialName("Thruster_intermediate");
+    mThrusterNode->attachObject(entity);
+
+    mCannons = new StarWarsLaserCannon(mSpinNode, sceneMgr);
+
+    Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
+    mThrusterHighPass = materialManager->getByName("Thruster_high")->getTechnique(0)->getPass(0);
+    mThrusterLowPass = materialManager->getByName("Thruster_low")->getTechnique(0)->getPass(0);
+    mThrusterIntermediatePass = materialManager->getByName("Thruster_intermediate")->getTechnique(0)->getPass(0);
+
+    mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.5f);
     mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
-    mRemoteBody->setShape(mSpinNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, -2.0f, 0.0f));
+    mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, 0.0f, 0.0f));
+
+    mAccumTime = 0.0f;
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -48,11 +76,21 @@ void StarWarsRemote::update(float dt){
     if(mShotsFired){
         //animate remote and shoot lazors
     }
+    mAccumTime += dt;
+    if(mAccumTime >= 2.0f){
+        mAccumTime = 0.0f;
+        changeMaterial(0.0f);
+    }
+    if(mAccumTime >= 1.0f){
+        changeMaterial(1.0f - mAccumTime);
+    }else{
+        changeMaterial(mAccumTime);
+    }
 }
 
 void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){
-    mRemoteBody->setPosition(newPos);
-    mSpinNode->setOrientation(quat);
+    //mRemoteBody->setPosition(newPos);
+    //mSpinNode->setOrientation(quat);
 }
 
 void StarWarsRemote::changeMaterial(float interp){

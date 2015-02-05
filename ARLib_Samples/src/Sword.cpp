@@ -1,14 +1,26 @@
 #include "Sword.h"
 
-StarWarsLaserSword::StarWarsLaserSword(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr){
+StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr)
+    : mDrawn(false){
     mSceneNode = parentNode->createChildSceneNode("StarWarsLaserSword");
-    Ogre::Entity *swordEntity = sceneMgr->createEntity("cube.mesh");
+    Ogre::Entity *swordEntity = sceneMgr->createEntity("Blade.mesh");
     swordEntity->setMaterialName("SwordMaterial");
     mSceneNode->attachObject(swordEntity);
-    mSceneNode->setScale(0.3f, 1.0f, 0.3f);
-    
+    mSceneNode->setScale(1.0f, 0.0f, 1.0f);
+
+    //create bullet collision object
+
+        
 }
 
-StarWarsLaserSword::~StarWarsLaserSword(){
+StarWarsLightSaber::~StarWarsLightSaber(){
 
+}
+
+void StarWarsLightSaber::draw(){
+    if(!mDrawn){
+        
+    }else{
+    
+    }
 }

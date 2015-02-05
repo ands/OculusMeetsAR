@@ -1,0 +1,35 @@
+// ThrusterCenter1 genrated by blender2ogre 0.5.9
+
+material ThrusterCenter1 
+{
+    receive_shadows on 
+
+    technique
+    {
+        pass ThrusterCenter1
+        {
+            ambient 0.7338356971740723 0.8042395710945129 0.8700339794158936 1.0
+            diffuse 0.6520385429126918 0.714594833841673 0.7730554542487766 1.0
+            specular 0.5 0.5 0.5 1.0 12.5
+            emissive 0.24216578969024738 0.26539906900720034 0.28711122461601946 1.0
+
+            alpha_to_coverage off
+            colour_write on
+            cull_hardware clockwise
+            depth_check on
+            depth_func less_equal
+            depth_write on
+            illumination_stage 
+            light_clip_planes off
+            light_scissor off
+            lighting on
+            normalise_normals off
+            polygon_mode solid
+            scene_blend one zero
+            scene_blend_op add
+            shading gouraud
+            transparent_sorting on
+
+        }
+    }
+}

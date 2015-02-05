@@ -2,6 +2,7 @@
 #define REMOTE_H
 
 #include "OGRE/Ogre.h"
+#include "Cannon.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 
@@ -22,9 +23,12 @@ private:
     OgreBulletCollisions::SphereCollisionShape *mRemoteSphere;
     OgreBulletDynamics::RigidBody *mRemoteBody;
 
+    Ogre::SceneNode *mThrusterNode;
     Ogre::Pass *mThrusterHighPass;
     Ogre::Pass *mThrusterLowPass;
     Ogre::Pass *mThrusterIntermediatePass;
+
+    StarWarsLaserCannon *mCannons;
 
     Ogre::Vector3 mSphericalPos;
     Ogre::Vector3 mAngularAccel;
@@ -34,6 +38,7 @@ private:
 
     Ogre::Vector3 mNormalDirection;
     float mRadius;
+    float mAccumTime;
     bool mShotsFired;
 };
 
