@@ -6,13 +6,20 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-bool directoryExists(const char *path)
+static const char *destinationDir;
+static bool done = false;
+static int captureIndex = 0;
+static ARLib::VideoPlayer *leftPlayer, *rightPlayer;
+static int width, height;
+static void *memL, *memR;
+
+static bool directoryExists(const char *path)
 {
 	DWORD attribs = GetFileAttributesA(path);
 	return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-int recursiveDelete(const char *path)
+static int recursiveDelete(const char *path)
 {
     char dir[MAX_PATH + 1];
     SHFILEOPSTRUCTA fos = {0};
@@ -27,7 +34,7 @@ int recursiveDelete(const char *path)
     return SHFileOperationA(&fos);
 }
 
-void bgr2rgb(void *data, int width, int height)
+static void bgr2rgb(void *data, int width, int height)
 {
 	unsigned char *p = (unsigned char*)data;
 	for (int i = 0; i < width * height; i++)
@@ -39,16 +46,81 @@ void bgr2rgb(void *data, int width, int height)
 	}
 }
 
-LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
+static LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
 {
-	if (msg == WM_PAINT)
-		return 0;
-	return DefWindowProcA(window, msg, wparam, lparam);
+	switch (msg)
+	{
+		case WM_PAINT:
+		{
+			PAINTSTRUCT paint;
+			HDC DeviceContext = BeginPaint(window, &paint);
+			// ignore
+			EndPaint(window, &paint);
+			return 0;
+		} break;
+		case WM_KEYDOWN:
+		{
+			if (wparam == VK_SPACE)
+			{
+				printf("capturing");
+
+				captureIndex++;
+
+				void *dataL = NULL, *dataR = NULL;
+				while (!dataL || !dataR)
+				{
+					void *dL = leftPlayer->update();
+					void *dR = rightPlayer->update();
+					if (dL) { dataL = dL; memcpy(memL, dL, width * height * 3); }
+					if (dR) { dataR = dR; memcpy(memR, dR, width * height * 3); }
+				}
+
+				printf(".");
+
+				bgr2rgb(memL, width, height);
+				bgr2rgb(memR, width, height);
+
+				printf(".");
+
+				char filename[MAX_PATH];
+				_snprintf(filename, MAX_PATH, "%s\\capture_%003d_L.bmp", destinationDir, captureIndex);
+				if(!stbi_write_bmp(filename, width, height, 3, memL))
+				{
+					fprintf(stderr, "could not save \"%s\"\n", filename);
+					done = true;
+				}
+
+				printf(".");
+
+				_snprintf(filename, MAX_PATH, "%s\\capture_%003d_R.bmp", destinationDir, captureIndex);
+				if(!stbi_write_bmp(filename, width, height, 3, memR))
+				{
+					fprintf(stderr, "could not save \"%s\"\n", filename);
+					done = true;
+				}
+
+				printf("saved capture %003d\n", captureIndex);
+				return 0;
+			}
+			else if (wparam == VK_ESCAPE)
+			{
+				done = true;
+				return 0;
+			}
+		} break;
+		case WM_CLOSE:
+		{
+			done = true;
+			return 0;
+		} break;
+		default:
+			return DefWindowProcA(window, msg, wparam, lparam);
+	}
 }
 
 int main(int argc, char **argv)
 {
-	const char *destinationDir = argv[1];
+	destinationDir = argv[1];
 
 	if (argc < 2)
 	{
@@ -78,21 +150,18 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	ARLib::VideoPlayer leftPlayer(0);
-	ARLib::VideoPlayer rightPlayer(1);
+	// video initialization
+	leftPlayer = new ARLib::VideoPlayer(0);
+	rightPlayer = new ARLib::VideoPlayer(1);
 
-	assert(leftPlayer.getVideoWidth() == rightPlayer.getVideoWidth() &&
-		   leftPlayer.getVideoHeight() == rightPlayer.getVideoHeight());
+	assert(leftPlayer->getVideoWidth() == rightPlayer->getVideoWidth() &&
+		   leftPlayer->getVideoHeight() == rightPlayer->getVideoHeight());
 
-	int width = leftPlayer.getVideoWidth();
-	int height = rightPlayer.getVideoHeight();
+	width = leftPlayer->getVideoWidth();
+	height = rightPlayer->getVideoHeight();
 
-	void *memL = malloc(width * height * 3);
-	void *memR = malloc(width * height * 3);
-
-	int captureIndex = 0;
-
-	printf("press the C key to capture or ESCAPE to quit\n");
+	memL = new unsigned char[width * height * 3];
+	memR = new unsigned char[width * height * 3];
 
 	// window
 	WNDCLASSA windowClass = {};
@@ -109,7 +178,7 @@ int main(int argc, char **argv)
 
 	HWND window = CreateWindowExA(
 		0, windowClass.lpszClassName, "Live Capture", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		CW_USEDEFAULT, CW_USEDEFAULT, 960, 640, 0, 0, windowClass.hInstance, 0);
+		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 480, 0, 0, windowClass.hInstance, 0);
 
 	if (!window)
 	{
@@ -117,76 +186,44 @@ int main(int argc, char **argv)
 		return -1;
 	}
 
-	while(42)
+	// bitmap
+	BITMAPINFO bmp = {};
+	bmp.bmiHeader.biSize = sizeof(bmp.bmiHeader);
+    bmp.bmiHeader.biWidth = width;
+    bmp.bmiHeader.biHeight = height;
+    bmp.bmiHeader.biPlanes = 1;
+    bmp.bmiHeader.biBitCount = 24;
+    bmp.bmiHeader.biCompression = BI_RGB;
+
+
+	printf("press SPACE to capture or ESCAPE to quit\n");
+
+	while(!done)
 	{
-		leftPlayer.update();
-		rightPlayer.update();
-
-		int c = getch();
-		if (c == 'c')
-		{
-			printf("capturing");
-
-			captureIndex++;
-
-			void *dataL = NULL, *dataR = NULL;
-			while (!dataL || !dataR)
-			{
-				void *dL = leftPlayer.update();
-				void *dR = rightPlayer.update();
-				if (dL) { dataL = dL; memcpy(memL, dL, width * height * 3); }
-				if (dR) { dataR = dR; memcpy(memR, dR, width * height * 3); }
-			}
-
-			printf(".");
-
-			bgr2rgb(memL, width, height);
-			bgr2rgb(memR, width, height);
-
-			printf(".");
-
-			char filename[MAX_PATH];
-			_snprintf(filename, MAX_PATH, "%s\\capture_%003d_L.bmp", destinationDir, captureIndex);
-			//if(!stbi_write_png(filename, width, height, 3, memL, width * 3))
-			if(!stbi_write_bmp(filename, width, height, 3, memL))
-			{
-				fprintf(stderr, "could not save \"%s\"\n", filename);
-				break;
-			}
-
-			printf(".");
-
-			_snprintf(filename, MAX_PATH, "%s\\capture_%003d_R.bmp", destinationDir, captureIndex);
-			//if(!stbi_write_png(filename, width, height, 3, memR, width * 3))
-			if(!stbi_write_bmp(filename, width, height, 3, memR))
-			{
-				fprintf(stderr, "could not save \"%s\"\n", filename);
-				break;
-			}
-
-			printf("saved capture %003d\n", captureIndex);
-		}
-		else if (c == 27)
-		{
-			break;
-		}
-
-		// TODO: this doesn't work yet!
+		// message handling
 		MSG msg;
 		while (PeekMessageA(&msg, window, 0, 0, PM_REMOVE))
 		{
 			TranslateMessage(&msg);
 			DispatchMessageA(&msg);
 		}
-		HDC dc = GetDC(window);
-		StretchDIBits(dc, 0, 0, 480, 640, 0, 0, 1280, 960, memL, 0, DIB_RGB_COLORS, SRCCOPY);
-		ReleaseDC(window, dc);
 
-		//Sleep(10);
+		// video display
+		HDC dc = GetDC(window);
+		SetStretchBltMode(dc, HALFTONE);
+		void *streamL = leftPlayer->update();
+		if (streamL)
+			StretchDIBits(dc, 0, 0, 640, 480, 0, 0, width, height, streamL, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		void *streamR = rightPlayer->update();
+		if (streamR)
+			StretchDIBits(dc, 640, 0, 640, 480, 0, 0, width, height, streamR, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		ReleaseDC(window, dc);
 	}
 
-	free(memL);
-	free(memR);
+	delete[] memL;
+	delete[] memR;
+	delete leftPlayer;
+	delete rightPlayer;
 
 	return 0;
 }
