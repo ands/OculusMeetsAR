@@ -1,8 +1,5 @@
 #include "WebcamApp.h"
 
-//#define STB_IMAGE_WRITE_IMPLEMENTATION
-//#include "stb_image_write.h"
-
 WebcamApp::WebcamApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
@@ -34,8 +31,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoTextureLeft = new ARLib::VideoTexture("VideoLeft", "VideoUndistortLeft", 0, "calib_results_CAM1.txt", 4.0f);
-	mVideoTextureRight = new ARLib::VideoTexture("VideoRight", "VideoUndistortRight", 1, "calib_results_CAM2.txt", 4.0f);
+	mVideoTextureLeft  = new ARLib::VideoTexture("ARLib/Video/LeftTexture",  "ARLib/Video/UndistortionTextureLeft",  0, "calib_results_CAM1.txt", 4.0f);
+	mVideoTextureRight = new ARLib::VideoTexture("ARLib/Video/RightTexture", "ARLib/Video/UndistortionTextureRight", 1, "calib_results_CAM2.txt", 4.0f);
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,

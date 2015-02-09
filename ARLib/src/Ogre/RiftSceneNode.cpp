@@ -9,14 +9,14 @@ RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, floa
 {
 	// create a virtual body node that the rift is correctly attached to
 	Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
-	bodyNode = rootNode->createChildSceneNode("BodyNode");
+	bodyNode = rootNode->createChildSceneNode("ARLib/Oculus/BodyNode");
 	bodyNode->setFixedYawAxis(true);
 
 	bodyTiltNode = bodyNode->createChildSceneNode();
-	headNode = bodyTiltNode->createChildSceneNode("HeadNode");
+	headNode = bodyTiltNode->createChildSceneNode("ARLib/Oculus/HeadNode");
 
-	cameras[0] = sceneManager->createCamera( "LeftCamera");
-	cameras[1] = sceneManager->createCamera("RightCamera");
+	cameras[0] = sceneManager->createCamera("ARLib/Oculus/LeftCamera");
+	cameras[1] = sceneManager->createCamera("ARLib/Oculus/RightCamera");
 
 	headNode->attachObject(cameras[0]);
 	headNode->attachObject(cameras[1]);

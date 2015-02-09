@@ -1,6 +1,6 @@
-vertex_program OculusDistortionVertex glsl
+vertex_program ARLib/Oculus/DistortionVertex glsl
 {
-    source OculusDistortionVertex.glsl
+    source ARLibOculusDistortionVertex.glsl
 	default_params
 	{
 		param_named eyeToSourceUVScale float2 1.0 1.0
@@ -10,30 +10,30 @@ vertex_program OculusDistortionVertex glsl
 		param_named_auto worldViewProj worldviewproj_matrix
 	}
 }
-fragment_program OculusDistortionFragment glsl
+fragment_program ARLib/Oculus/DistortionFragment glsl
 {
-    source OculusDistortionFragment.glsl
+    source ARLibOculusDistortionFragment.glsl
 }
 
 
-material Oculus/LeftEye
+material ARLib/Oculus/LeftEye
 {
     receive_shadows off
 
     technique
     {
-        pass Oculus/LeftEye
+        pass
         {
 			lighting off
 			cull_hardware none
 			cull_software none
 			depth_check off
 		
-			vertex_program_ref OculusDistortionVertex
+			vertex_program_ref ARLib/Oculus/DistortionVertex
 			{
 			}
 
-			fragment_program_ref OculusDistortionFragment
+			fragment_program_ref ARLib/Oculus/DistortionFragment
 			{
 				param_named diffuseMap int 0
 			}
@@ -45,24 +45,24 @@ material Oculus/LeftEye
     }
 }
 
-material Oculus/RightEye
+material ARLib/Oculus/RightEye
 {
     receive_shadows off
 
     technique
     {
-        pass Oculus/RightEye
+        pass
         {
 			lighting off
 			cull_hardware none
 			cull_software none
 			depth_check off
 		
-			vertex_program_ref OculusDistortionVertex
+			vertex_program_ref ARLib/Oculus/DistortionVertex
 			{
 			}
 
-			fragment_program_ref OculusDistortionFragment
+			fragment_program_ref ARLib/Oculus/DistortionFragment
 			{
 				param_named diffuseMap int 0
 			}

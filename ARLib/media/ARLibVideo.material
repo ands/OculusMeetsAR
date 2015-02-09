@@ -1,19 +1,19 @@
-vertex_program VideoUndistortionVertex glsl
+vertex_program ARLib/Video/UndistortionVertex glsl
 {
-    source VideoUndistortionVertex.glsl
+    source ARLibVideoUndistortionVertex.glsl
 }
-fragment_program VideoUndistortionFragment glsl
+fragment_program ARLib/Video/UndistortionFragment glsl
 {
-    source VideoUndistortionFragment.glsl
+    source ARLibVideoUndistortionFragment.glsl
 }
 
-material Video/LeftEye
+material ARLib/Video/LeftEye
 {
     receive_shadows off
 
     technique
     {
-        pass Video/LeftEye
+        pass
         {
 			lighting off
 			cull_hardware none
@@ -21,13 +21,13 @@ material Video/LeftEye
 			depth_check off
 			depth_write off
 		
-			vertex_program_ref VideoUndistortionVertex
+			vertex_program_ref ARLib/Video/UndistortionVertex
 			{
 				param_named offset float2 0 0
 				param_named scale float2 1 1
 			}
 
-			fragment_program_ref VideoUndistortionFragment
+			fragment_program_ref ARLib/Video/UndistortionFragment
 			{
 				param_named coordinateMap int 0
 				param_named videoTexture int 1
@@ -47,13 +47,13 @@ material Video/LeftEye
     }
 }
 
-material Video/RightEye
+material ARLib/Video/RightEye
 {
     receive_shadows off
 
     technique
     {
-        pass Video/RightEye
+        pass
         {
 			lighting off
 			cull_hardware none
@@ -61,13 +61,13 @@ material Video/RightEye
 			depth_check off
 			depth_write off
 		
-			vertex_program_ref VideoUndistortionVertex
+			vertex_program_ref ARLib/Video/UndistortionVertex
 			{
 				param_named offset float2 0 0
 				param_named scale float2 1 1
 			}
 
-			fragment_program_ref VideoUndistortionFragment
+			fragment_program_ref ARLib/Video/UndistortionFragment
 			{
 				param_named coordinateMap int 0
 				param_named videoTexture int 1
