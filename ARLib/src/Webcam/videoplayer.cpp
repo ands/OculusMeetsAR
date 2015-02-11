@@ -1,10 +1,11 @@
+#include <stdio.h>
 #include "ARLib/Webcam/CCapture.h"
 #include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Webcam/ocam.h"
 
 namespace ARLib {
 
-VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float _videoDistance)
+VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float _videoDistance, const char *homographyMatrixFilename)
 	: videoDistance(_videoDistance)
 	, ocamModel(NULL)
 {
@@ -41,6 +42,38 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 		if (ocamModelParametersFilename)
 			ocamModel = ocam_get_model(ocamModelParametersFilename);
 	}
+
+	// load homography matrix from file
+	bool homographyLoaded = false;
+	if (homographyMatrixFilename)
+	{
+		FILE *file = fopen(homographyMatrixFilename, "r");
+		if(file)
+		{
+			int count1 = fscanf(file, "%f %f %f", &homographyMatrix[0], &homographyMatrix[1], &homographyMatrix[2]);
+			int count2 = fscanf(file, "%f %f %f", &homographyMatrix[3], &homographyMatrix[4], &homographyMatrix[5]);
+			int count3 = fscanf(file, "%f %f %f", &homographyMatrix[6], &homographyMatrix[7], &homographyMatrix[8]);
+			fclose(file);
+
+			if (count1 == count2 == count3 == 3)
+				homographyLoaded = true;
+			else
+				fprintf(stderr, "ERROR: Could not read homography matrix from %s\n", homographyMatrixFilename);
+		}
+		else
+			fprintf(stderr, "ERROR: Could not open %s\n", homographyMatrixFilename);
+	}
+
+	if (!homographyLoaded)
+	{
+		float identity[] =
+		{
+			1, 0, 0, 
+			0, 1, 0, 
+			0, 0, 1
+		};
+		memcpy(homographyMatrix, identity, sizeof(identity));
+	}
 }
 
 VideoPlayer::~VideoPlayer()
@@ -74,22 +107,40 @@ int VideoPlayer::getVideoHeight()
 
 void VideoPlayer::calculateUndistortionMap(float *xyMap)
 {
+	int width = getVideoWidth();
+	int height = getVideoHeight();
+
+	// ocam undistortion
 	if (ocamModel)
 	{
-		ocam_create_perspecive_undistortion_map(ocamModel, xyMap, getVideoWidth(), getVideoHeight(), videoDistance);
+		ocam_create_perspecive_undistortion_map(ocamModel, xyMap, width, height, videoDistance);
 	}
 	else
 	{
 		// calculates the identity xy map
-		float invMaxX = 1.0f / (float)(getVideoWidth() - 1);
-		float invMaxY = 1.0f / (float)(getVideoHeight() - 1);
-		for (int y = 0; y < getVideoHeight(); y++)
+		float invMaxX = 1.0f / (float)(width - 1);
+		float invMaxY = 1.0f / (float)(height - 1);
+		float *localXYmap = xyMap;
+		for (int y = 0; y < height; y++)
 		{
-			for (int x = 0; x < getVideoWidth(); x++)
+			for (int x = 0; x < width; x++)
 			{
-				*xyMap++ = x * invMaxX;
-				*xyMap++ = y * invMaxY;
+				*localXYmap++ = x * invMaxX;
+				*localXYmap++ = y * invMaxY;
 			}
+		}
+	}
+
+	// homography "undistortion"
+	float *localXYmap = xyMap;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			float mapX = localXYmap[0], mapY = localXYmap[1];
+			float inverseZ =    1.0f / (mapX * homographyMatrix[6] + mapY * homographyMatrix[7] + homographyMatrix[8]);
+			*localXYmap++ = inverseZ * (mapX * homographyMatrix[0] + mapY * homographyMatrix[1] + homographyMatrix[2]);
+			*localXYmap++ = inverseZ * (mapX * homographyMatrix[3] + mapY * homographyMatrix[4] + homographyMatrix[5]);
 		}
 	}
 }
