@@ -9,6 +9,7 @@ out vec4 fragColor;
 
 void main(void)
 {
-	vec2 uv = texture(coordinateMap, vec2(/*1.0 - */oUV.x, oUV.y)).ba;
-	fragColor = texture(videoTexture, vec2(/*1.0 - */uv.x, uv.y));
+	// TODO: do the axis inversion in the coordinate map!
+	vec2 uv = texture(coordinateMap, vec2(1.0 - oUV.x, oUV.y)).ba;
+	fragColor = texture(videoTexture, vec2(1.0 - uv.x, uv.y));
 }

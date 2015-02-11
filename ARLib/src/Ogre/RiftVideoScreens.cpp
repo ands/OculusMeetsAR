@@ -32,8 +32,8 @@ namespace ARLib {
 			materialPass->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
 
 			// TODO: make these configurable!
-			const float yOffset = 0.08f, yOffsetRight = -0.01f, xDistance = 0.03f;
-			Ogre::Vector2 offset[] = { Ogre::Vector2(yOffset, xDistance), Ogre::Vector2(yOffset + yOffsetRight, -xDistance) };
+			const float yOffset = 0.08f, yOffsetRight = -0.02f, xDistance = 0.02f;
+			Ogre::Vector2 offset[] = { Ogre::Vector2(-yOffset, xDistance), Ogre::Vector2(-yOffset - yOffsetRight, -xDistance) };
 			//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
 			Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
 
