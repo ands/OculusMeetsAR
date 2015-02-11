@@ -6,16 +6,12 @@
 #include "OGRE/Overlay/OgreOverlayContainer.h"
 #include "OGRE/Overlay/OgreFontManager.h"
 
-// eye visibility masks
-#define VISIBILITY_FLAG_LEFT  (1 << 0)
-#define VISIBILITY_FLAG_RIGHT (1 << 1)
-
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
 	OIS::Mouse *mouse, OIS::Keyboard *keyboard,
-	ARLib::VideoTexture *videoTextureLeft, ARLib::VideoTexture *videoTextureRight)
+	ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight)
 	: mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
 	, enabledNPRRenderer(false)
@@ -44,9 +40,6 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
 		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
         mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
-
-		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
 
 	if (smallWindow)
@@ -54,40 +47,12 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
 		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
         mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
-
-		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
 	}
 
-	// start background video players for the eyes
-	ARLib::VideoTexture *videoTexture[] = { videoTextureLeft, videoTextureRight };
-	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
-	{
-		// video background rendering rect
-		Ogre::Rectangle2D *rect = new Ogre::Rectangle2D(true);
-		const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
-		rect->setVisibilityFlags(visibilityFlags[eyeNum]);
-		rect->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
-		rect->setUVs(Ogre::Vector2(1, 0), Ogre::Vector2(0, 0), Ogre::Vector2(1, 1), Ogre::Vector2(0, 1));
-		rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
-		rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
-		const char *materialName[] = { "ARLib/Video/LeftEye", "ARLib/Video/RightEye" };
-		rect->setMaterial(materialName[eyeNum]);
+	// attach video screens
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mRiftNode, videoPlayerLeft, videoPlayerRight);
 
-		Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
-		materialPass->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
-		materialPass->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
-		const float yOffset = 0.08f, yOffsetRight = -0.01f, xDistance = 0.03f;
-		Ogre::Vector2 offset[] = { Ogre::Vector2(yOffset, xDistance), Ogre::Vector2(yOffset + yOffsetRight, -xDistance) };
-		//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
-		Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
-		materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
-		materialPass->getVertexProgramParameters()->setNamedConstant("scale", scale[eyeNum]);
-
-		const char *nodeName[] = { "ARLib/Video/LeftScreen", "ARLib/Video/RightScreen" };
-		mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
-	}
-
+	// other stuff in the scene
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 0);
 	if (tracker)
 		tracker->addRigidBodyEventListener(cubeNodeT);
@@ -153,10 +118,11 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 WebcamScene::~WebcamScene()
 {
-	if (mWatercolorRenderTarget) delete mWatercolorRenderTarget;
-	if (mSmallWatercolorRenderTarget) delete mSmallWatercolorRenderTarget;
-	if (mRenderTarget) delete mRenderTarget;
-	if (mSmallRenderTarget) delete mSmallRenderTarget;
+	delete mRiftVideoScreens;
+	delete mWatercolorRenderTarget;
+	delete mSmallWatercolorRenderTarget;
+	delete mRenderTarget;
+	delete mSmallRenderTarget;
 
 	mRoot->destroySceneManager(mSceneMgr);
 
@@ -175,30 +141,24 @@ WebcamScene::~WebcamScene()
 	delete mRiftNode;
 }
 
-void WebcamScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
-{
-	mRiftNode->removeAllRenderTargets();
-	mRiftNode->addRenderTarget(renderTarget);
-	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
-}
-
 void WebcamScene::toggleNPRRenderer()
 {
+	mRiftNode->removeAllRenderTargets();
+
 	if (enabledNPRRenderer)
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-			setRenderTarget(mRenderTarget);
+			mRiftNode->addRenderTarget(mRenderTarget);
 		if (mSmallRenderTarget)
-			setRenderTarget(mSmallRenderTarget);
+			mRiftNode->addRenderTarget(mSmallRenderTarget);
 		enabledNPRRenderer = false;
 	}
 	else
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-			setRenderTarget(mWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
 		if (mSmallRenderTarget)
-			setRenderTarget(mSmallWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
 		enabledNPRRenderer = true;
 	}
 }
@@ -221,6 +181,9 @@ void WebcamScene::update(float dt)
 		rb.mqW = q[3];
 		mRiftNode->onChange(&rb);
 	}
+
+	// update video frames
+	mRiftVideoScreens->update();
 
 	// TODO: will also be handled by the tracking system?
 	/*float forward = (mKeyboard->isKeyDown( OIS::KC_W ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_S ) ? 0 : -1);

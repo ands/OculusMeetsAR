@@ -6,5 +6,6 @@
 #include "ARLib/Ogre/RiftRenderTarget.h"
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/VideoTexture.h"
+#include "ARLib/Ogre/RiftVideoScreens.h"
 
 #endif

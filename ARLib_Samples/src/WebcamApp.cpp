@@ -14,8 +14,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
     , mGroundShape(nullptr)
-	, mVideoTextureLeft(nullptr)
-	, mVideoTextureRight(nullptr)
+	, mVideoPlayerLeft(nullptr)
+	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 	//showDebugWindow = false; // for testing purposes
@@ -31,15 +31,15 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoTextureLeft  = new ARLib::VideoTexture("ARLib/Video/LeftTexture",  "ARLib/Video/UndistortionTextureLeft",  0, "calib_results_CAM1.txt", 4.0f);
-	mVideoTextureRight = new ARLib::VideoTexture("ARLib/Video/RightTexture", "ARLib/Video/UndistortionTextureRight", 1, "calib_results_CAM2.txt", 4.0f);
+	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "calib_results_CAM1.txt", 4.0f /* , "homography_CAM1.txt" */);
+	mVideoPlayerRight = new ARLib::VideoPlayer(1, "calib_results_CAM2.txt", 4.0f /* , "homography_CAM2.txt" */);
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,
 		mWindow, mSmallWindow,
 		mDynamicsWorld,
 		mMouse, mKeyboard,
-		mVideoTextureLeft, mVideoTextureRight);
+		mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
@@ -257,10 +257,6 @@ bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	// update the standard input devices
 	mKeyboard->capture();
 	mMouse->capture();
-
-	// get new video frames
-	mVideoTextureLeft->update();
-	mVideoTextureRight->update();
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
 	

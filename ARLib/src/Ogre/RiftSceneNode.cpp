@@ -77,6 +77,11 @@ void RiftSceneNode::addRenderTarget(RenderTarget *renderTarget)
 {
 	assert(renderTarget);
 	renderTarget->setCameras(cameras[0], cameras[1]);
+
+	// set visibility masks for new viewports
+	cameras[0]->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
+	cameras[1]->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+
 	renderTargets.push_back(renderTarget);
 }
 
