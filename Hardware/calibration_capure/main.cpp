@@ -46,6 +46,27 @@ static void bgr2rgb(void *data, int width, int height)
 	}
 }
 
+static void rotate(void *in, void *out)
+{
+	unsigned char *i = (unsigned char*)in;
+	unsigned char *o = (unsigned char*)out;
+
+	for (int y = 0; y < height; y++)
+	{
+		unsigned char *col = o, *row = i;
+		for (int x = 0; x < width; x++)
+		{
+			col[0] = row[0];
+			col[1] = row[1];
+			col[2] = row[2];
+			row += 3;
+			col += height * 3;
+		}
+		i += width * 3;
+		o += 3;
+	}
+}
+
 static LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
@@ -178,7 +199,7 @@ int main(int argc, char **argv)
 
 	HWND window = CreateWindowExA(
 		0, windowClass.lpszClassName, "Live Capture", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
-		CW_USEDEFAULT, CW_USEDEFAULT, 1280, 480, 0, 0, windowClass.hInstance, 0);
+		CW_USEDEFAULT, CW_USEDEFAULT, 960, 640, 0, 0, windowClass.hInstance, 0);
 
 	if (!window)
 	{
@@ -189,8 +210,8 @@ int main(int argc, char **argv)
 	// bitmap
 	BITMAPINFO bmp = {};
 	bmp.bmiHeader.biSize = sizeof(bmp.bmiHeader);
-    bmp.bmiHeader.biWidth = width;
-    bmp.bmiHeader.biHeight = height;
+    bmp.bmiHeader.biWidth = height;
+    bmp.bmiHeader.biHeight = -width;
     bmp.bmiHeader.biPlanes = 1;
     bmp.bmiHeader.biBitCount = 24;
     bmp.bmiHeader.biCompression = BI_RGB;
@@ -212,11 +233,15 @@ int main(int argc, char **argv)
 		HDC dc = GetDC(window);
 		SetStretchBltMode(dc, HALFTONE);
 		void *streamL = leftPlayer->update();
-		if (streamL)
-			StretchDIBits(dc, 0, 0, 640, 480, 0, 0, width, height, streamL, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		if (streamL) {
+			rotate(streamL, memL);
+			StretchDIBits(dc, 0, 0, 480, 640, 0, 0, height, width, memL, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		}
 		void *streamR = rightPlayer->update();
-		if (streamR)
-			StretchDIBits(dc, 640, 0, 640, 480, 0, 0, width, height, streamR, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		if (streamR) {
+			rotate(streamR, memR);
+			StretchDIBits(dc, 480, 0, 480, 640, 0, 0, height, width, memR, &bmp, DIB_RGB_COLORS, SRCCOPY);
+		}
 		ReleaseDC(window, dc);
 	}
 
