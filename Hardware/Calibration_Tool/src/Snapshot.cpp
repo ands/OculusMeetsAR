@@ -1,25 +1,34 @@
-#include <windows.h>
-#include <stdio.h>
+#include "StdAfx.h"
+#include "Snapshot.h"
 #include <conio.h>
-#include "ARLib\Webcam\VideoPlayer.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_image_write.h"
 
-static const char *destinationDir;
-static bool done = false;
-static int captureIndex = 0;
-static ARLib::VideoPlayer *leftPlayer, *rightPlayer;
-static int width, height;
-static void *memL, *memR;
+const char* Snapshot::destinationDir;
+bool Snapshot::done;
+int Snapshot::captureIndex;
+ARLib::VideoPlayer *Snapshot::leftPlayer,*Snapshot::rightPlayer;
+int Snapshot::width, Snapshot::height;
+void *Snapshot::memL, *Snapshot::memR;
 
-static bool directoryExists(const char *path)
+Snapshot::Snapshot(void)
+{
+	done = false;
+	captureIndex = 0;
+}
+
+Snapshot::~Snapshot(void)
+{
+}
+
+bool Snapshot::directoryExists(const char *path)
 {
 	DWORD attribs = GetFileAttributesA(path);
 	return (attribs != INVALID_FILE_ATTRIBUTES && (attribs & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-static int recursiveDelete(const char *path)
+int Snapshot::recursiveDelete(const char *path)
 {
     char dir[MAX_PATH + 1];
     SHFILEOPSTRUCTA fos = {0};
@@ -34,7 +43,7 @@ static int recursiveDelete(const char *path)
     return SHFileOperationA(&fos);
 }
 
-static void bgr2rgb(void *data, int width, int height)
+void Snapshot::bgr2rgb(void *data, int width, int height)
 {
 	unsigned char *p = (unsigned char*)data;
 	for (int i = 0; i < width * height; i++)
@@ -46,7 +55,7 @@ static void bgr2rgb(void *data, int width, int height)
 	}
 }
 
-static void rotate(void *in, void *out)
+void Snapshot::rotate(void *in, void *out)
 {
 	unsigned char *i = (unsigned char*)in;
 	unsigned char *o = (unsigned char*)out;
@@ -67,7 +76,7 @@ static void rotate(void *in, void *out)
 	}
 }
 
-static LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
+LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM lparam)
 {
 	switch (msg)
 	{
@@ -139,16 +148,9 @@ static LRESULT CALLBACK WindowProc(HWND window, UINT msg, WPARAM wparam, LPARAM 
 	}
 }
 
-int main(int argc, char **argv)
+int Snapshot::startCapture()
 {
-	destinationDir = argv[1];
-
-	if (argc < 2)
-	{
-		printf("usage: %s <destination dir>\n", argv[0]);
-		printf("using default destination directory \"calibration\"\n", argv[0]);
-		destinationDir = "calibration";
-	}
+	destinationDir = "images";
 
 	if (directoryExists(destinationDir))
 	{
