@@ -109,6 +109,7 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 {
 	int width = getVideoWidth();
 	int height = getVideoHeight();
+	float *test;
 
 	// ocam undistortion
 	if (ocamModel)
@@ -125,22 +126,80 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				*localXYmap++ = x * invMaxX;
-				*localXYmap++ = y * invMaxY;
+				*localXYmap++ = x;// * invMaxX;
+				*localXYmap++ = y;// * invMaxY;
 			}
 		}
 	}
 
-	// homography "undistortion"
-	float *localXYmap = xyMap;
+	float *localXYm = xyMap;
+	double **xMapTemp = new double*[height];
+	for(int i = 0; i < height; ++i) {
+		xMapTemp[i] = new double[width];
+	}
+	double **yMapTemp = new double*[height];
+	for(int i = 0; i < height; ++i) {
+		yMapTemp[i] = new double[width];
+	}
 	for (int y = 0; y < height; y++)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			float mapX = localXYmap[0], mapY = localXYmap[1];
-			float inverseZ =    1.0f / (mapX * homographyMatrix[6] + mapY * homographyMatrix[7] + homographyMatrix[8]);
-			*localXYmap++ = inverseZ * (mapX * homographyMatrix[0] + mapY * homographyMatrix[1] + homographyMatrix[2]);
-			*localXYmap++ = inverseZ * (mapX * homographyMatrix[3] + mapY * homographyMatrix[4] + homographyMatrix[5]);
+			xMapTemp[y][x]=*localXYm++;
+			yMapTemp[y][x]=*localXYm++;
+		}
+	}
+
+	// homography "undistortion"
+	double **xMapTempHom = new double*[height];
+	for(int i = 0; i < height; ++i) {
+		xMapTempHom[i] = new double[width];
+	}
+	double **yMapTempHom = new double*[height];
+	for(int i = 0; i < height; ++i) {
+		yMapTempHom[i] = new double[width];
+	}
+
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			float inverseZ =    1.0f / ((height-1-y) * homographyMatrix[6] + x * homographyMatrix[7] + homographyMatrix[8]);
+			yMapTempHom[y][x] = height-1-inverseZ * ((height-1-y) * homographyMatrix[0] + x * homographyMatrix[1] + homographyMatrix[2]);
+			xMapTempHom[y][x] = inverseZ * ((height-1-y) * homographyMatrix[3] + x * homographyMatrix[4] + homographyMatrix[5]);
+		}
+	}
+
+	
+	float *localXYm2=xyMap;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int ycoord = (int)(yMapTempHom[y][x]+0.5);
+			int xcoord = (int)(xMapTempHom[y][x]+0.5);
+			if(0<=ycoord&&ycoord<height && 0<=xcoord&&xcoord<width){
+				*localXYm2++ = xMapTemp[ycoord][xcoord];
+				*localXYm2++ = yMapTemp[ycoord][xcoord];
+			}
+			else{
+				*localXYm2++=0;
+				*localXYm2++=0;
+			}
+		}
+	}
+
+	//Normalization
+	float *normXYmap = xyMap;
+	float invMaxX = 1.0f / (float)(width - 1);
+	float invMaxY = 1.0f / (float)(height - 1);
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			float mapX = normXYmap[0], mapY = normXYmap[1];
+			*normXYmap++ =mapX*invMaxX;
+			*normXYmap++ =mapY*invMaxY;
 		}
 	}
 }

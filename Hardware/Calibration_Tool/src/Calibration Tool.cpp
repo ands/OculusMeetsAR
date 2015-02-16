@@ -67,6 +67,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	int input=0;
 	cout<<"Oculus Rift meets AR - Calibration Tool"<<"\n"<<"\n";
 	while(true){
+		input=0;
 		cout<<"\n1 - Take snapshots \n2 - Load images \n3 - Keypoint extraction and matching \n4 - Approximating the epipolar geometry \n5 - Visualize epipolar geometry \n";
 		cin>>input;
 		if(input==1){

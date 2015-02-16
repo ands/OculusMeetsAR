@@ -155,9 +155,10 @@ int Snapshot::startCapture()
 	if (directoryExists(destinationDir))
 	{
 		printf("the destination directory does already exist\n");
-		printf("do you want to overwrite the contents? y/n\n");
-		char c = getchar();
-		if (c != 'y')
+		printf("do you want to overwrite the contents? (1-Yes/2-No)\n");
+		int input=0;
+		std::cin>>input;
+		if (input==2)
 			return 0;
 
 		if (recursiveDelete(destinationDir))
@@ -247,6 +248,7 @@ int Snapshot::startCapture()
 		ReleaseDC(window, dc);
 	}
 
+	CloseWindow(window);
 	delete[] memL;
 	delete[] memR;
 	delete leftPlayer;
