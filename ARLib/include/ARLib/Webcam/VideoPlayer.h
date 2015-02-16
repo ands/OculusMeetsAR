@@ -28,7 +28,7 @@ private:
 	CCapture *capture;
 	float videoDistance;
 	ocam_model *ocamModel;
-	float homographyMatrix[3 * 3];
+	double homographyMatrix[3 * 3];
 };
 
 }; // ARLib namespace

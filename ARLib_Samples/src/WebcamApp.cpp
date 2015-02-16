@@ -31,8 +31,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "calib_results_CAM1.txt", 4.0f /* , "homography_CAM1.txt" */);
-	mVideoPlayerRight = new ARLib::VideoPlayer(1, "calib_results_CAM2.txt", 4.0f /* , "homography_CAM2.txt" */);
+	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "calib_results_CAM1.txt", 4.0f  , "homography_CAM1.txt" );
+	mVideoPlayerRight = new ARLib::VideoPlayer(1, "calib_results_CAM2.txt", 4.0f  , "homography_CAM2.txt" );
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,

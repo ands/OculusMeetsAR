@@ -50,12 +50,12 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 		FILE *file = fopen(homographyMatrixFilename, "r");
 		if(file)
 		{
-			int count1 = fscanf(file, "%f %f %f", &homographyMatrix[0], &homographyMatrix[1], &homographyMatrix[2]);
-			int count2 = fscanf(file, "%f %f %f", &homographyMatrix[3], &homographyMatrix[4], &homographyMatrix[5]);
-			int count3 = fscanf(file, "%f %f %f", &homographyMatrix[6], &homographyMatrix[7], &homographyMatrix[8]);
+			int count1 = fscanf(file, "%lf %lf %lf\n", &homographyMatrix[0], &homographyMatrix[1], &homographyMatrix[2]);
+			int count2 = fscanf(file, "%lf %lf %lf\n", &homographyMatrix[3], &homographyMatrix[4], &homographyMatrix[5]);
+			int count3 = fscanf(file, "%lf %lf %lf\n", &homographyMatrix[6], &homographyMatrix[7], &homographyMatrix[8]);
 			fclose(file);
 
-			if (count1 == count2 == count3 == 3)
+			if (count1 ==3 && count2 == 3 && count3 == 3)
 				homographyLoaded = true;
 			else
 				fprintf(stderr, "ERROR: Could not read homography matrix from %s\n", homographyMatrixFilename);
@@ -66,11 +66,11 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 
 	if (!homographyLoaded)
 	{
-		float identity[] =
+		double identity[] =
 		{
-			1, 0, 0, 
-			0, 1, 0, 
-			0, 0, 1
+			1.0, 0.0, 0.0, 
+			0.0, 1.0, 0.0, 
+			0.0, 0.0, 1.0
 		};
 		memcpy(homographyMatrix, identity, sizeof(identity));
 	}

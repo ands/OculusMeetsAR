@@ -215,8 +215,24 @@ bool EpiGeoEstimation::loadMatrix(const char *fileName, Mat *A){
 	return success;
 }
 
-bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile){
+bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile, bool normalized){
 	bool success=saveMatrix(fundFile, F);
+	if(success&&normalized){
+		//TODO: normalize homographies according to needed opengl coordinates..
+		leftHomography.at<double>(0,1)*=(1280.0/960.0);
+		leftHomography.at<double>(0,2)*=(1.0/960.0);
+		leftHomography.at<double>(1,0)*=(960.0/1280.0);
+		leftHomography.at<double>(1,2)*=(1.0/1280.0);
+		leftHomography.at<double>(2,0)*=960.0;
+		leftHomography.at<double>(2,1)*=1280.0;
+
+		rightHomography.at<double>(0,1)*=(1280.0/960.0);
+		rightHomography.at<double>(0,2)*=(1.0/960.0);
+		rightHomography.at<double>(1,0)*=(960.0/1280.0);
+		rightHomography.at<double>(1,2)*=(1.0/1280.0);
+		rightHomography.at<double>(2,0)*=960.0;
+		rightHomography.at<double>(2,1)*=1280.0;
+	}
 	if(success){success= saveMatrix(leftFile, leftHomography);}
 	if(success){success= saveMatrix(rightFile, rightHomography);}
 	return success;
