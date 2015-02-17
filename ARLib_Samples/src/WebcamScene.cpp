@@ -226,6 +226,41 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 		else
 			mTextArea->show();
 	}
+
+	// TODO: save the configuration in a file?
+	// video offsets
+	const float offsetStep = 0.005f;
+	bool setOffsets = false;
+	static Ogre::Vector2 offset[2] = {};
+	// left
+	if (e.key == OIS::KC_D) { offset[0].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_A) { offset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_W) { offset[0].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_S) { offset[0].y -= offsetStep; setOffsets = true; }
+	// right
+	if (e.key == OIS::KC_L) { offset[1].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_J) { offset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_I) { offset[1].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_K) { offset[1].y -= offsetStep; setOffsets = true; }
+	// IPD adjustment
+	if (e.key == OIS::KC_B) { offset[0].x += offsetStep; offset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_V) { offset[0].x -= offsetStep; offset[1].x += offsetStep; setOffsets = true; }
+
+	if (setOffsets) mRiftVideoScreens->setOffsets(offset[0], offset[1]);
+
+	// video scalings
+	const float scaleStep = 0.005f;
+	bool setScalings = false;
+	static Ogre::Vector2 scale = Ogre::Vector2(1.0f, 1.0f);
+
+	// same for both for now...?
+	if (e.key == OIS::KC_RIGHT) { scale.x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { scale.x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { scale.y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { scale.y += scaleStep; setScalings = true; }
+
+	if (setScalings) mRiftVideoScreens->setScalings(scale, scale);
+
 	return true;
 }
 bool WebcamScene::keyReleased( const OIS::KeyEvent& e )

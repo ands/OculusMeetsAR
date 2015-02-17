@@ -11,5 +11,5 @@ out vec2 oUV;
 void main(void)
 {
 	gl_Position = vertex;
-	oUV = (uv0 + offset - vec2(0.5f)) * scale + vec2(0.5f);
+	oUV = (uv0 + offset) * scale + vec2(0.5f);
 }

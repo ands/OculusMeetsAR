@@ -27,20 +27,9 @@ namespace ARLib {
 			const char *materialName[] = { "ARLib/Video/LeftEye", "ARLib/Video/RightEye" };
 			rect->setMaterial(materialName[eyeNum]);
 
-			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
-			materialPass->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
-			materialPass->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
-
-			// TODO: make these configurable!
-			//const float yOffset = 0.08f, yOffsetRight = -0.02f, xDistance = 0.02f;
-			const float yOffset = 0.0f, yOffsetRight = 0.0f, xDistance = 0.0f;
-			Ogre::Vector2 offset[] = { Ogre::Vector2(-yOffset, xDistance), Ogre::Vector2(-yOffset - yOffsetRight, -xDistance) };
-			//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
-			//Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
-			Ogre::Vector2 scale[] = { Ogre::Vector2(1.0f, 1.0f), Ogre::Vector2(1.0f, 1.0f) };
-
-			materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
-			materialPass->getVertexProgramParameters()->setNamedConstant("scale", scale[eyeNum]);
+			materialPass[eyeNum] = rect->getMaterial()->getTechnique(0)->getPass(0);
+			materialPass[eyeNum]->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
+			materialPass[eyeNum]->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
 
 			const char *nodeName[] = { "ARLib/Video/LeftScreen", "ARLib/Video/RightScreen" };
 			riftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
@@ -52,6 +41,18 @@ namespace ARLib {
 		// TODO: detach screens?
 		delete videoTexture[0];
 		delete videoTexture[1];
+	}
+
+	void RiftVideoScreens::setOffsets(Ogre::Vector2 leftOffset, Ogre::Vector2 rightOffset)
+	{
+		materialPass[0]->getVertexProgramParameters()->setNamedConstant("offset", Ogre::Vector2(leftOffset.y - 0.5f, leftOffset.x - 0.5f));
+		materialPass[1]->getVertexProgramParameters()->setNamedConstant("offset", Ogre::Vector2(rightOffset.y - 0.5f, rightOffset.x - 0.5f));
+	}
+
+	void RiftVideoScreens::setScalings(Ogre::Vector2 leftScale, Ogre::Vector2 rightScale)
+	{
+		materialPass[0]->getVertexProgramParameters()->setNamedConstant("scale", Ogre::Vector2(leftScale.y, leftScale.x));
+		materialPass[1]->getVertexProgramParameters()->setNamedConstant("scale", Ogre::Vector2(rightScale.y, rightScale.x));
 	}
 
 	void RiftVideoScreens::update()
