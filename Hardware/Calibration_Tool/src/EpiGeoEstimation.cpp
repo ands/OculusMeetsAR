@@ -195,7 +195,7 @@ bool EpiGeoEstimation::loadMatrices(const char *fundFile, const char *leftFile, 
 	}
 	if(success){
 		success= loadMatrix(rightFile, &rightHomography);
-		leftHomography=leftHomography.inv();
+		rightHomography=rightHomography.inv();
 	}
 	return success;
 }
@@ -221,26 +221,14 @@ bool EpiGeoEstimation::loadMatrix(const char *fileName, Mat *A){
 	return success;
 }
 
-bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile, bool normalized){
+bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile){
 	bool success=saveMatrix(fundFile, F);
-	if(success&&normalized){
-		leftHomography.at<double>(0,1)*=(1280.0/960.0);
-		leftHomography.at<double>(0,2)*=(1.0/960.0);
-		leftHomography.at<double>(1,0)*=(960.0/1280.0);
-		leftHomography.at<double>(1,2)*=(1.0/1280.0);
-		leftHomography.at<double>(2,0)*=960.0;
-		leftHomography.at<double>(2,1)*=1280.0;
-
-		rightHomography.at<double>(0,1)*=(1280.0/960.0);
-		rightHomography.at<double>(0,2)*=(1.0/960.0);
-		rightHomography.at<double>(1,0)*=(960.0/1280.0);
-		rightHomography.at<double>(1,2)*=(1.0/1280.0);
-		rightHomography.at<double>(2,0)*=960.0;
-		rightHomography.at<double>(2,1)*=1280.0;
+	if(success){
+		success= saveMatrix(leftFile, leftHomography.inv());
 	}
 	if(success){
-		success= saveMatrix(leftFile, leftHomography.inv());}
-	if(success){success= saveMatrix(rightFile, rightHomography.inv());}
+		success= saveMatrix(rightFile, rightHomography.inv());
+	}
 	return success;
 }
 

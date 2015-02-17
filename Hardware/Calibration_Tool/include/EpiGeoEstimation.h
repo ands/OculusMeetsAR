@@ -15,7 +15,7 @@ public:
 
 	bool EpiGeoEstimation::loadMatrices(const char *fundFile, const char *leftFile, const char *rightFile);
 	bool EpiGeoEstimation::loadMatrix(const char *file, Mat *A);
-	bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile, bool normalized);
+	bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile);
 	bool EpiGeoEstimation::saveMatrix(const char *fileName, Mat A);
 
 	Mat F;

@@ -16,7 +16,7 @@ public:
 	void ImageHandler::visualize();
 	void ImageHandler::saveMatches();
 	void ImageHandler::loadMatches();
-	void ImageHandler::saveEpiGeo(bool normalized);
+	void ImageHandler::saveEpiGeo();
 	void ImageHandler::loadEpiGeo();
 
 	int numOfImages;

@@ -203,6 +203,7 @@ int Snapshot::startCapture()
 	HWND window = CreateWindowExA(
 		0, windowClass.lpszClassName, "Live Capture", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		CW_USEDEFAULT, CW_USEDEFAULT, 980, 680, 0, 0, windowClass.hInstance, 0);
+	SetWindowPos(window,NULL,520,100,0,0,SWP_NOSIZE);
 
 	if (!window)
 	{

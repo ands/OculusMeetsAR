@@ -174,8 +174,8 @@ void ImageHandler::loadMatches(){
 	std::cin.get();
 }
 
-void ImageHandler::saveEpiGeo(bool normalized){
-	if(epigeo.saveMatrices("./Fundamental.txt","./homography_CAM1.txt","./homography_CAM2.txt",normalized)){
+void ImageHandler::saveEpiGeo(){
+	if(epigeo.saveMatrices("./Fundamental.txt","./homography_CAM1.txt","./homography_CAM2.txt")){
 		std::cout<<"\nFiles successfully saved.";
 	}
 }

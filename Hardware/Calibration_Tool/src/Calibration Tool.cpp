@@ -168,14 +168,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 			}
 			else if(input==3){
-				cout<<"\nNormalize homographies? (1-Yes/2-No)\n";
-				cin>>input;
-				if(input==1){
-					hand.saveEpiGeo(true);
-				}
-				else if(input==2){
-					hand.saveEpiGeo(false);
-				}
+				hand.saveEpiGeo();
 			}
 			cout<<"\nPress Enter\n";
 			cin.ignore();
