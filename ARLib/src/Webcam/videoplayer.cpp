@@ -119,19 +119,19 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	else
 	{
 		// calculates the identity xy map
-		float invMaxX = 1.0f / (float)(width - 1);
-		float invMaxY = 1.0f / (float)(height - 1);
 		float *localXYmap = xyMap;
 		for (int y = 0; y < height; y++)
 		{
 			for (int x = 0; x < width; x++)
 			{
-				*localXYmap++ = x;// * invMaxX;
-				*localXYmap++ = y;// * invMaxY;
+				*localXYmap++ = x;
+				*localXYmap++ = y;
 			}
 		}
 	}
 
+
+	//create double array copy of xyMap
 	float *localXYm = xyMap;
 	double **xMapTemp = new double*[height];
 	for(int i = 0; i < height; ++i) {
@@ -145,7 +145,7 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			xMapTemp[y][x]=*localXYm++;
+			xMapTemp[y][width-1-x]=(double)(width-1.0)-*localXYm++;
 			yMapTemp[y][x]=*localXYm++;
 		}
 	}
@@ -164,9 +164,9 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	{
 		for (int x = 0; x < width; x++)
 		{
-			float inverseZ =    1.0f / ((height-1-y) * homographyMatrix[6] + x * homographyMatrix[7] + homographyMatrix[8]);
-			yMapTempHom[y][x] = height-1-inverseZ * ((height-1-y) * homographyMatrix[0] + x * homographyMatrix[1] + homographyMatrix[2]);
-			xMapTempHom[y][x] = inverseZ * ((height-1-y) * homographyMatrix[3] + x * homographyMatrix[4] + homographyMatrix[5]);
+			double inverseZ =    1.0 / ((double)(y) * homographyMatrix[6] + (double)(width-1.0-x) * homographyMatrix[7] + homographyMatrix[8]);
+			yMapTempHom[y][x] = inverseZ * ((double)(y) * homographyMatrix[0] + (double)(width-1.0-x) * homographyMatrix[1] + homographyMatrix[2]);
+			xMapTempHom[y][x] = (double)(width-1.0)-inverseZ * ((double)(y) * homographyMatrix[3] + (double)(width-1.0-x) * homographyMatrix[4] + homographyMatrix[5]);
 		}
 	}
 
@@ -176,6 +176,7 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	{
 		for (int x = 0; x < width; x++)
 		{
+			//TODO: bilinear interpolation?
 			int ycoord = (int)(yMapTempHom[y][x]+0.5);
 			int xcoord = (int)(xMapTempHom[y][x]+0.5);
 			if(0<=ycoord&&ycoord<height && 0<=xcoord&&xcoord<width){

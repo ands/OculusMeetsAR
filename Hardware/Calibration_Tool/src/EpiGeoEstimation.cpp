@@ -189,8 +189,14 @@ bool EpiGeoEstimation::loadMatrices(const char *fundFile, const char *leftFile, 
 	leftHomography = Mat(3,3,CV_64FC1);
 	rightHomography = Mat(3,3,CV_64FC1);
 	bool success=loadMatrix(fundFile, &F);
-	if(success){success= loadMatrix(leftFile, &leftHomography);}
-	if(success){success= loadMatrix(rightFile, &rightHomography);}
+	if(success){
+		success= loadMatrix(leftFile, &leftHomography);
+		leftHomography=leftHomography.inv();
+	}
+	if(success){
+		success= loadMatrix(rightFile, &rightHomography);
+		leftHomography=leftHomography.inv();
+	}
 	return success;
 }
 
@@ -218,7 +224,6 @@ bool EpiGeoEstimation::loadMatrix(const char *fileName, Mat *A){
 bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, const char *rightFile, bool normalized){
 	bool success=saveMatrix(fundFile, F);
 	if(success&&normalized){
-		//TODO: normalize homographies according to needed opengl coordinates..
 		leftHomography.at<double>(0,1)*=(1280.0/960.0);
 		leftHomography.at<double>(0,2)*=(1.0/960.0);
 		leftHomography.at<double>(1,0)*=(960.0/1280.0);
@@ -233,8 +238,9 @@ bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, 
 		rightHomography.at<double>(2,0)*=960.0;
 		rightHomography.at<double>(2,1)*=1280.0;
 	}
-	if(success){success= saveMatrix(leftFile, leftHomography);}
-	if(success){success= saveMatrix(rightFile, rightHomography);}
+	if(success){
+		success= saveMatrix(leftFile, leftHomography.inv());}
+	if(success){success= saveMatrix(rightFile, rightHomography.inv());}
 	return success;
 }
 
