@@ -110,8 +110,6 @@ void ocam_create_perspecive_undistortion_map(const ocam_model *m, float *mapxy, 
 			world[1] = (j - Nyc);
 			double cam[2];
 			ocam_world2cam(m, world, cam);
-			//*mapxy++ = (float)cam[1] / (float)(width - 1);
-			//*mapxy++ = (float)cam[0] / (float)(height - 1);
 			*mapxy++ = (float)cam[1];
 			*mapxy++ = (float)cam[0];
 		}

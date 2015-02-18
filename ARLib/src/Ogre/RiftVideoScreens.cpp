@@ -34,6 +34,9 @@ namespace ARLib {
 			const char *nodeName[] = { "ARLib/Video/LeftScreen", "ARLib/Video/RightScreen" };
 			riftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
 		}
+
+		setOffsets(Ogre::Vector2::ZERO, Ogre::Vector2::ZERO);
+		setScalings(Ogre::Vector2::UNIT_SCALE, Ogre::Vector2::UNIT_SCALE);
 	}
 
 	RiftVideoScreens::~RiftVideoScreens()
