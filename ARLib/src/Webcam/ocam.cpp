@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cmath>
+#include <malloc.h>
 
 #define CMV_MAX_BUF 1024
 #define MAX_POL_LENGTH 64
@@ -26,7 +27,7 @@ ocam_model * ocam_get_model(const char *filename)
 		return NULL;
 	}
 
-	ocam_model *m = new ocam_model;
+	ocam_model *m = (ocam_model*)malloc(sizeof(ocam_model));
 
 	//Read polynomial coefficients // NOTE: ignored
 	fgets(buf,CMV_MAX_BUF,f);
