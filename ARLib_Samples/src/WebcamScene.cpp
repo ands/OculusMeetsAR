@@ -6,9 +6,6 @@
 #include "OGRE/Overlay/OgreOverlayContainer.h"
 #include "OGRE/Overlay/OgreFontManager.h"
 
-Ogre::Vector2 WebcamScene::offset[2] = {};
-Ogre::Vector2 WebcamScene::scale = Ogre::Vector2(1.0f, 1.0f);
-
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
@@ -42,14 +39,14 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
 		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
-        mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
+        mRiftNode->addRenderTarget(mRenderTarget);
 	}
 
 	if (smallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
 		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
-        mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
+        mRiftNode->addRenderTarget(mSmallRenderTarget);
 	}
 
 	// attach video screens
@@ -118,8 +115,13 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	overlay->show();
 	mTextArea->hide(); // hide by default
 
-	mRiftVideoScreens->setOffsets(offset[0], offset[1]);
-	mRiftVideoScreens->setScalings(scale, scale);
+	// TODO: save the configuration in a file?
+	// default video configuration
+	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
+	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
+	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 }
 
 WebcamScene::~WebcamScene()
@@ -233,36 +235,43 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 			mTextArea->show();
 	}
 
-	// TODO: save the configuration in a file?
 	// video offsets
-	const float offsetStep = 0.005f;
+	const float offsetStep = 0.004f;
 	bool setOffsets = false;
 	// left
-	if (e.key == OIS::KC_D) { offset[0].x -= offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_A) { offset[0].x += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_W) { offset[0].y += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_S) { offset[0].y -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_D) { mVideoOffset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_A) { mVideoOffset[0].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_W) { mVideoOffset[0].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_S) { mVideoOffset[0].y -= offsetStep; setOffsets = true; }
 	// right
-	if (e.key == OIS::KC_L) { offset[1].x -= offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_J) { offset[1].x += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_I) { offset[1].y += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_K) { offset[1].y -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_L) { mVideoOffset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_J) { mVideoOffset[1].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_I) { mVideoOffset[1].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_K) { mVideoOffset[1].y -= offsetStep; setOffsets = true; }
 	// IPD adjustment
-	if (e.key == OIS::KC_B) { offset[0].x += offsetStep; offset[1].x -= offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_V) { offset[0].x -= offsetStep; offset[1].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_B) { mVideoOffset[0].x += 0.5f * offsetStep; mVideoOffset[1].x -= 0.5f * offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_V) { mVideoOffset[0].x -= 0.5f * offsetStep; mVideoOffset[1].x += 0.5f * offsetStep; setOffsets = true; }
 
-	if (setOffsets) mRiftVideoScreens->setOffsets(offset[0], offset[1]);
+	if (setOffsets)
+	{
+		mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+		printf("offset L: %02f x %02f\tR: %02f x %02f\n", mVideoOffset[0].x, mVideoOffset[0].y, mVideoOffset[1].x, mVideoOffset[1].y);
+	}
+
 	// video scalings
-	const float scaleStep = 0.005f;
+	const float scaleStep = 0.01f;
 	bool setScalings = false;
-
 	// same for both for now...?
-	if (e.key == OIS::KC_RIGHT) { scale.x -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_LEFT ) { scale.x += scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_UP   ) { scale.y -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_DOWN ) { scale.y += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_RIGHT) { mVideoScale.x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { mVideoScale.x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { mVideoScale.y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { mVideoScale.y += scaleStep; setScalings = true; }
 
-	if (setScalings) mRiftVideoScreens->setScalings(scale, scale);
+	if (setScalings)
+	{
+		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
+	}
 
 	return true;
 }

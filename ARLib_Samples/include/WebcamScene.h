@@ -56,8 +56,8 @@ class WebcamScene
 		ARLib::RiftVideoScreens* mRiftVideoScreens;
 		bool enabledNPRRenderer;
 
-		static Ogre::Vector2 offset[2];
-		static Ogre::Vector2 scale;
+		Ogre::Vector2 mVideoOffset[2];
+		Ogre::Vector2 mVideoScale;
 };
 
 #endif
