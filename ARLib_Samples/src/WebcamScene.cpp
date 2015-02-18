@@ -6,6 +6,9 @@
 #include "OGRE/Overlay/OgreOverlayContainer.h"
 #include "OGRE/Overlay/OgreFontManager.h"
 
+Ogre::Vector2 WebcamScene::offset[2] = {};
+Ogre::Vector2 WebcamScene::scale = Ogre::Vector2(1.0f, 1.0f);
+
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
@@ -114,6 +117,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	panel->addChild(mTextArea);
 	overlay->show();
 	mTextArea->hide(); // hide by default
+
+	mRiftVideoScreens->setOffsets(offset[0], offset[1]);
+	mRiftVideoScreens->setScalings(scale, scale);
 }
 
 WebcamScene::~WebcamScene()
@@ -231,15 +237,14 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 	// video offsets
 	const float offsetStep = 0.005f;
 	bool setOffsets = false;
-	static Ogre::Vector2 offset[2] = {};
 	// left
-	if (e.key == OIS::KC_D) { offset[0].x += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_A) { offset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_D) { offset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_A) { offset[0].x += offsetStep; setOffsets = true; }
 	if (e.key == OIS::KC_W) { offset[0].y += offsetStep; setOffsets = true; }
 	if (e.key == OIS::KC_S) { offset[0].y -= offsetStep; setOffsets = true; }
 	// right
-	if (e.key == OIS::KC_L) { offset[1].x += offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_J) { offset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_L) { offset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_J) { offset[1].x += offsetStep; setOffsets = true; }
 	if (e.key == OIS::KC_I) { offset[1].y += offsetStep; setOffsets = true; }
 	if (e.key == OIS::KC_K) { offset[1].y -= offsetStep; setOffsets = true; }
 	// IPD adjustment
@@ -247,11 +252,9 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 	if (e.key == OIS::KC_V) { offset[0].x -= offsetStep; offset[1].x += offsetStep; setOffsets = true; }
 
 	if (setOffsets) mRiftVideoScreens->setOffsets(offset[0], offset[1]);
-
 	// video scalings
 	const float scaleStep = 0.005f;
 	bool setScalings = false;
-	static Ogre::Vector2 scale = Ogre::Vector2(1.0f, 1.0f);
 
 	// same for both for now...?
 	if (e.key == OIS::KC_RIGHT) { scale.x -= scaleStep; setScalings = true; }

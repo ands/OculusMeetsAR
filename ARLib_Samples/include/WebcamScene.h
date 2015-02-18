@@ -55,6 +55,9 @@ class WebcamScene
 		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
 		ARLib::RiftVideoScreens* mRiftVideoScreens;
 		bool enabledNPRRenderer;
+
+		static Ogre::Vector2 offset[2];
+		static Ogre::Vector2 scale;
 };
 
 #endif
