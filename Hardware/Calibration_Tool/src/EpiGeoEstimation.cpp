@@ -4,6 +4,7 @@
 
 EpiGeoEstimation::EpiGeoEstimation(void)
 {
+	calculatedByZMEK=false;
 }
 
 
@@ -11,7 +12,7 @@ EpiGeoEstimation::~EpiGeoEstimation(void)
 {
 }
 
-void EpiGeoEstimation::homographyHartley(vector<Point2f> leftmatch, vector<Point2f> rightmatch){
+void EpiGeoEstimation::fundamentalHartley(vector<Point2f> leftmatch, vector<Point2f> rightmatch){
 	vector<DMatch> finalmatches;
 	vector<Point2f> finalpointsL,finalpointsR;
 	std::vector<uchar> inliers(leftmatch.size(),0);
@@ -30,13 +31,14 @@ void EpiGeoEstimation::homographyHartley(vector<Point2f> leftmatch, vector<Point
 
 	Size size(960,1280);
 	stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
+	calculatedByZMEK=false;
 }
 
-void EpiGeoEstimation::homographyZMEK(vector<Point2f> leftmatch, vector<Point2f> rightmatch){
+void EpiGeoEstimation::fundamentalZMEK(vector<Point2f> leftmatch, vector<Point2f> rightmatch){
 	//Ransac
-	int ransacCycles = 2000;
+	int ransacCycles = 5000;
 	int bestConsensSize = 0;
-	double threshold = 5;
+	double threshold = 4;
 	Mat bestF;
 	int bestRound=0;
 
@@ -91,40 +93,60 @@ void EpiGeoEstimation::homographyZMEK(vector<Point2f> leftmatch, vector<Point2f>
 	}
 
 	F=linearSolution(leftConsensus,rightConsensus);
-
-	//Calculate homographies
-	Mat hom1(3,3,CV_64FC1);
-	Mat hom2(3,3,CV_64FC1);
-	double f = sqrt(F.at<double>(2,2)/F.at<double>(1,1));
-
-	hom1.at<double>(0,0)=1.0;
-	hom1.at<double>(0,1)=0.0-F.at<double>(2,0);
-	hom1.at<double>(0,2)=f*f*F.at<double>(1,0);
-	hom1.at<double>(1,0)=F.at<double>(2,0);
-	hom1.at<double>(1,1)=1.0;
-	hom1.at<double>(1,2)=0.0;
-	hom1.at<double>(2,0)=0.0-F.at<double>(1,0);
-	hom1.at<double>(2,1)=0.0;
-	hom1.at<double>(2,2)=1.0;
-
-	hom2.at<double>(0,0)=0.0-F.at<double>(1,2);
-	hom2.at<double>(0,1)=F.at<double>(0,2);
-	hom2.at<double>(0,2)=0.0;//f*f*F.at<double>(0,1); //horizontal offset
-	hom2.at<double>(1,0)=0.0-F.at<double>(0,2);
-	hom2.at<double>(1,1)=0.0-F.at<double>(1,2);
-	hom2.at<double>(1,2)=F.at<double>(2,2);
-	hom2.at<double>(2,0)=F.at<double>(0,1);
-	hom2.at<double>(2,1)=F.at<double>(1,1);
-	hom2.at<double>(2,2)=1.0;
-
-	leftHomography=hom1;
-	rightHomography=hom2;
-
-	//Size size(960,1280);
-	//stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
-
-	F/=F.at<double>(2,2); //norm F according to its last component
+	calculatedByZMEK=true;
 }
+
+
+void EpiGeoEstimation::homographyEstimation(vector<Point2f> leftmatch,vector<Point2f> rightmatch){
+	if(leftHomography.rows==0){
+		std::cout<<"\nERROR: Fundamental Matrix has not been estimated yet.";
+	}
+	else{
+		if(calculatedByZMEK){
+			std::cout<<"\nChoose a method for homography calculation\n1 - Hartley (recommended)\n2 - ZMEK11\n";
+			int input;
+			std::cin>>input;
+			if(input==1){
+				Size size(960,1280);
+				stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
+			}
+			else{
+				Mat hom1(3,3,CV_64FC1);
+				Mat hom2(3,3,CV_64FC1);
+				double ff = F.at<double>(2,2)/F.at<double>(1,1);
+
+				hom1.at<double>(0,0)=1.0;
+				hom1.at<double>(0,1)=0.0-F.at<double>(2,0);
+				hom1.at<double>(0,2)=ff*F.at<double>(1,0);
+				hom1.at<double>(1,0)=F.at<double>(2,0);
+				hom1.at<double>(1,1)=1.0;
+				hom1.at<double>(1,2)=0.0;
+				hom1.at<double>(2,0)=0.0-F.at<double>(1,0);
+				hom1.at<double>(2,1)=0.0;
+				hom1.at<double>(2,2)=1.0;
+
+				hom2.at<double>(0,0)=0.0-F.at<double>(1,2);
+				hom2.at<double>(0,1)=F.at<double>(0,2);
+				hom2.at<double>(0,2)=ff*F.at<double>(0,1); //horizontal offset
+				hom2.at<double>(1,0)=0.0-F.at<double>(0,2);
+				hom2.at<double>(1,1)=0.0-F.at<double>(1,2);
+				hom2.at<double>(1,2)=F.at<double>(2,2);
+				hom2.at<double>(2,0)=F.at<double>(0,1);
+				hom2.at<double>(2,1)=F.at<double>(1,1);
+				hom2.at<double>(2,2)=1.0;
+
+				leftHomography=hom1;
+				rightHomography=hom2;
+			}
+		}
+		else{
+			Size size(960,1280);
+			stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
+		}
+	}
+}
+
+
 
 double EpiGeoEstimation::transformDistance(Mat curF, Point2f left, Point2f right){
 	Mat leftV = Mat(3,1,CV_64FC1);

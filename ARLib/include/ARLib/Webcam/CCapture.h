@@ -36,6 +36,7 @@ public:
 class CCapture : public IMFSourceReaderCallback
 {
 public:
+
     static HRESULT CreateInstance(
         CCapture **ppPlayer
     );
@@ -80,6 +81,7 @@ protected:
 
     HRESULT OpenMediaSource(IMFMediaSource *pSource);
     HRESULT EndCaptureInternal();
+	HRESULT setParams(IMFMediaSource *vd_pSource);
 
     long                    m_nRefCount;        // Reference count.
     CRITICAL_SECTION        m_critsec;

@@ -160,7 +160,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 				else{
 					int method;
-					cout<<"\nChoose a method for estimation of the fundamental matrix and rectifing homographies:\n"<<"1 - Hartley (8 Point/RANSAC)\n"<<"2 - ZMEK 2011 (using RANSAC)\n";
+					cout<<"\nChoose a method for estimation of the fundamental matrix\n"<<"1 - Hartley (8 Point/RANSAC)\n"<<"2 - ZMEK 2011 (using RANSAC)\n";
 					cin>>method;
 					if(method==1||method==2){
 						hand.estimateGeometry(method);

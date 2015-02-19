@@ -78,12 +78,14 @@ double ImageHandler::dist(Point2f p, Point2f q){
 //TODO: HOMOGRAPHIEN NORMALISIEREN
 void ImageHandler::estimateGeometry(int method){
 	if(method==2){//method after Zilly, Müller, Eisert, Kauff
-		epigeo.homographyZMEK(leftMatch,rightMatch);
+		epigeo.fundamentalZMEK(leftMatch,rightMatch);
 	}
 	else if(method==1){//opencv estimation using Hartley's work 8-point/ransac
-		epigeo.homographyHartley(leftMatch,rightMatch);
+		epigeo.fundamentalHartley(leftMatch,rightMatch);
 	}
-	std::cout<<"\nEstimation successful.";
+	std::cout<<"\nFundamental matrix estimation successful.";
+	epigeo.homographyEstimation(leftMatch,rightMatch);
+	std::cout<<"\nHomography estimation successful.";
 	epigeo.homographyError(leftMatch,rightMatch);
 }
 
