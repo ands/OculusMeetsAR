@@ -1,6 +1,5 @@
-// RemoteRelief2 genrated by blender2ogre 0.5.9
-
-material RemoteRelief2 
+import diffuse_template from "diffuse.material"
+material RemoteRelief2 : diffuse_template
 {
     receive_shadows on 
 

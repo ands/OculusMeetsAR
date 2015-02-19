@@ -1,5 +1,6 @@
 #include <cstdio>
 #include <cmath>
+#include <malloc.h>
 
 #define CMV_MAX_BUF 1024
 #define MAX_POL_LENGTH 64
@@ -26,7 +27,7 @@ ocam_model * ocam_get_model(const char *filename)
 		return NULL;
 	}
 
-	ocam_model *m = new ocam_model;
+	ocam_model *m = (ocam_model*)malloc(sizeof(ocam_model));
 
 	//Read polynomial coefficients // NOTE: ignored
 	fgets(buf,CMV_MAX_BUF,f);
@@ -110,8 +111,6 @@ void ocam_create_perspecive_undistortion_map(const ocam_model *m, float *mapxy, 
 			world[1] = (j - Nyc);
 			double cam[2];
 			ocam_world2cam(m, world, cam);
-			//*mapxy++ = (float)cam[1] / (float)(width - 1);
-			//*mapxy++ = (float)cam[0] / (float)(height - 1);
 			*mapxy++ = (float)cam[1];
 			*mapxy++ = (float)cam[0];
 		}

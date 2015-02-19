@@ -9,16 +9,17 @@ float4 GlowX_fp( float2 uv: TEXCOORD0,
 	float4 color = float4(0);
 	float blurSize = BLUR_RADIUS * invTexSize.x;
 	
-	//change to 1D Gaussian Blur
-	color += tex2D(scene, float2(uv.x - 4.0*blurSize, uv.y)) * 1.0/25.0;
-	color += tex2D(scene, float2(uv.x - 3.0*blurSize, uv.y)) * 2.0/25.0;
-	color += tex2D(scene, float2(uv.x - 2.0*blurSize, uv.y)) * 3.0/25.0;
-	color += tex2D(scene, float2(uv.x - blurSize, uv.y)) * 4.0/25.0;
-	color += tex2D(scene, float2(uv.x, uv.y)) * 5.0/25.0;
-	color += tex2D(scene, float2(uv.x + blurSize, uv.y)) * 4.0/25.0;
-	color += tex2D(scene, float2(uv.x + 2.0*blurSize, uv.y)) * 3.0/25.0;
-	color += tex2D(scene, float2(uv.x + 3.0*blurSize, uv.y)) * 2.0/25.0;
-	color += tex2D(scene, float2(uv.x + 4.0*blurSize, uv.y)) * 1.0/25.0;
+	color += tex2D(scene, float2(uv.x - 5.0*blurSize, uv.y)) * 0.01222447;
+	color += tex2D(scene, float2(uv.x - 4.0*blurSize, uv.y)) * 0.02783468;
+	color += tex2D(scene, float2(uv.x - 3.0*blurSize, uv.y)) * 0.06559061;
+	color += tex2D(scene, float2(uv.x - 2.0*blurSize, uv.y)) * 0.12097757;
+	color += tex2D(scene, float2(uv.x - blurSize, uv.y)) * 0.17466632;
+	color += tex2D(scene, float2(uv.x, uv.y)) * 0.19741265;
+	color += tex2D(scene, float2(uv.x + blurSize, uv.y)) * 0.17466632;
+	color += tex2D(scene, float2(uv.x + 2.0*blurSize, uv.y)) * 0.12097757;
+	color += tex2D(scene, float2(uv.x + 3.0*blurSize, uv.y)) * 0.06559061;
+	color += tex2D(scene, float2(uv.x + 4.0*blurSize, uv.y)) * 0.02783468;
+	color += tex2D(scene, float2(uv.x + 5.0*blurSize, uv.y)) * 0.01222447;
 	
 	return color;
 }
@@ -32,15 +33,17 @@ float4 GlowY_fp( float2 uv: TEXCOORD0,
 	float blurSize = BLUR_RADIUS * invTexSize.y;
 	
 	//change to 1D Gaussian Blur should look far better
-	color += tex2D(blurX, float2(uv.x, uv.y - 4.0*blurSize)) * 1.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y - 3.0*blurSize)) * 2.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y - 2.0*blurSize)) * 3.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y - blurSize)) * 4.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y)) * 5.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y + blurSize)) * 4.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y + 2.0*blurSize)) * 3.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y + 3.0*blurSize)) * 2.0/25.0;
-	color += tex2D(blurX, float2(uv.x, uv.y + 4.0*blurSize)) * 1.0/25.0;
+	color += tex2D(blurX, float2(uv.x, uv.y - 5.0*blurSize)) * 0.01222447;
+	color += tex2D(blurX, float2(uv.x, uv.y - 4.0*blurSize)) * 0.02783468;
+	color += tex2D(blurX, float2(uv.x, uv.y - 3.0*blurSize)) * 0.06559061;
+	color += tex2D(blurX, float2(uv.x, uv.y - 2.0*blurSize)) * 0.12097757;
+	color += tex2D(blurX, float2(uv.x, uv.y - blurSize)) * 0.17466632;
+	color += tex2D(blurX, float2(uv.x, uv.y)) * 0.19741265;
+	color += tex2D(blurX, float2(uv.x, uv.y + blurSize)) * 0.17466632;
+	color += tex2D(blurX, float2(uv.x, uv.y + 2.0*blurSize)) * 0.12097757;
+	color += tex2D(blurX, float2(uv.x, uv.y + 3.0*blurSize)) * 0.06559061;
+	color += tex2D(blurX, float2(uv.x, uv.y + 4.0*blurSize)) * 0.02783468;
+	color += tex2D(blurX, float2(uv.x, uv.y + 5.0*blurSize)) * 0.01222447;
 	
 	return 
 #if RENDER_SCENE

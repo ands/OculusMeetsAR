@@ -1,6 +1,5 @@
-// SmallRelief1 genrated by blender2ogre 0.5.9
-
-material SmallRelief1 
+import diffuse_template from "diffuse.material"
+material SmallRelief1 : diffuse_template
 {
     receive_shadows on 
 

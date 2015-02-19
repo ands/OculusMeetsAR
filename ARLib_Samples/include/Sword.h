@@ -3,16 +3,27 @@
 
 #include "OGRE/Ogre.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsConvexHullShape.h"
 
 class StarWarsLightSaber{
 public:
-    StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr);
+    StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld * dynamicsWorl);
     ~StarWarsLightSaber();
 
     void draw();
+    void update(float dt);
 private:
+    OgreBulletCollisions::BoxCollisionShape *mNoShape;
+    OgreBulletCollisions::ConvexHullCollisionShape *mSwordShape;
+    OgreBulletDynamics::RigidBody *mSwordBody;
+    OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
+
     Ogre::SceneNode *mSceneNode;
+    float mAccumTime;
     bool mDrawn;
+    bool mDrawing;
 };
 
 #endif

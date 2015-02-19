@@ -1,16 +1,18 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "OGRE/Ogre.h"
-#include "OIS/OIS.h"
-#include "RemotePuppet.h"
+#include "Sword.h"
 #include "Remote.h"
+#include "OIS/OIS.h"
+#include "PFXSSAO.h"
+#include "OGRE/Ogre.h"
+#include "RemotePuppet.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
 
 class BulletScene
 {
@@ -42,6 +44,7 @@ class BulletScene
         bool mToggle;
         StarWarsRemotePuppet *mRemotePuppet;
         StarWarsRemote* mRemote;
+        StarWarsLightSaber* mSword;
 
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
@@ -49,6 +52,11 @@ class BulletScene
 		Ogre::SceneManager* mSceneMgr;
 		Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
+        
+        PFXSSAO *mDebugLeftSSAO;
+        PFXSSAO *mDebugRightSSAO;
+        PFXSSAO *mLeftSSAO;
+        PFXSSAO *mRightSSAO;
 
         Ogre::CompositorInstance *mGlow[2];
 

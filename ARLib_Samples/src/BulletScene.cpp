@@ -1,6 +1,6 @@
 #include "BulletScene.h"
-#include "Sword.h"
 #include "RigidListenerNode.h"
+#include "LaserBulletManager.h"
 #include "GlowMaterialListener.h"
 
 #define VISIBILITY_FLAG_LEFT  (1 << 0)
@@ -14,6 +14,8 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     , mSmallRenderTarget(nullptr)
     , mToggle(true)
 {
+    LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
+
     mGlow[0] = nullptr;
     mGlow[1] = nullptr;
 	mRoot = root;
@@ -92,12 +94,12 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletDynamics::RigidBody *defaultBody = new OgreBulletDynamics::RigidBody("defaultBox3",mDynamicsWorld);
     defaultBody->setShape(cubeNode1, sceneBoxShape, 0.6f, 0.6f, 1.0f, Ogre::Vector3(-1.0, 0.0, 0.0));
 
-    mRemote = new StarWarsRemote(mRoomNode, mSceneMgr, mDynamicsWorld, Ogre::Vector3(-1,0,0),5.0f);
+    mRemote = new StarWarsRemote(mRoomNode, mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),5.0f);
     mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 10.0f);
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
 
     RigidListenerNode *mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 1);
-    StarWarsLightSaber* sword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr);
+    mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
     if(tracker){
         tracker->addRigidBodyEventListener(mSwordParentNode);
     }
@@ -110,6 +112,12 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setSpecularColour( .25f, .25f, .25f );
 	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
 	mRiftNode->getBodyNode()->attachObject(light);
+
+    //Add Screenspace Ambient Occlusion
+    mDebugLeftSSAO = new PFXSSAO(smallWindow, mRiftNode->getLeftCamera());
+    mDebugRightSSAO = new PFXSSAO(smallWindow, mRiftNode->getRightCamera());
+    mLeftSSAO = new PFXSSAO(window, mRiftNode->getLeftCamera());
+    mRightSSAO = new PFXSSAO(window, mRiftNode->getRightCamera());
 }
 
 BulletScene::~BulletScene()
@@ -154,6 +162,8 @@ void BulletScene::update(float dt)
 	ARLib::Rift *rift = mRiftNode->getRift();
     mRemotePuppet->update(dt);
 	mRemote->update(dt);
+    mSword->update(dt);
+    LaserBulletManager::getSingleton().update(dt);
 }
 
 //////////////////////////////////////////////////////////////
@@ -164,9 +174,12 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 {
     if(e.key == OIS::KC_C){
         mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
-    }
-    if(e.key == OIS::KC_N){
+    }if(e.key == OIS::KC_V){
+        mSword->draw();
+    }if(e.key == OIS::KC_N){
         toggleGlow();
+    }if(e.key == OIS::KC_D){
+        mDynamicsWorld->setShowDebugShapes(!mDynamicsWorld->getShowDebugShapes());
     }
 	return true;
 }

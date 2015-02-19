@@ -8,7 +8,7 @@
 
 class StarWarsRemote{
 public:
-    StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::Vector3 normalDirection, float radius);
+    StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::SceneNode* player, float radius);
     ~StarWarsRemote();
 		
     void update(float dt);
@@ -36,9 +36,10 @@ private:
     float mMaxVelo;
     Ogre::Vector3 mTravelDest;
 
-    Ogre::Vector3 mNormalDirection;
+    Ogre::SceneNode *mPlayer;
     float mRadius;
     float mAccumTime;
+    float mAccumRot;
     bool mShotsFired;
 };
 
