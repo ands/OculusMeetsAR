@@ -7,8 +7,8 @@ namespace ARLib {
 
 	// loads camera undistortion parameters
 	ocam_model * ocam_get_model(const char *filename);
-	// creates a lookup table to undistort camera images
-	void ocam_create_perspecive_undistortion_map(const ocam_model *m, float *mapxy, int width, int height, float sf);
+	// single undistortion conversion
+	void ocam_world2cam(const ocam_model *m, const double point3D[3], double point2D[2]);
 
 }; // ARLib namespace
 
