@@ -84,6 +84,7 @@ void ImageHandler::estimateGeometry(int method){
 		epigeo.homographyHartley(leftMatch,rightMatch);
 	}
 	std::cout<<"\nEstimation successful.";
+	epigeo.homographyError(leftMatch,rightMatch);
 }
 
 void ImageHandler::visualize(){

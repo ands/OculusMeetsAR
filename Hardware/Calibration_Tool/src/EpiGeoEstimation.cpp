@@ -34,7 +34,7 @@ void EpiGeoEstimation::homographyHartley(vector<Point2f> leftmatch, vector<Point
 
 void EpiGeoEstimation::homographyZMEK(vector<Point2f> leftmatch, vector<Point2f> rightmatch){
 	//Ransac
-	int ransacCycles = 1000;
+	int ransacCycles = 2000;
 	int bestConsensSize = 0;
 	double threshold = 5;
 	Mat bestF;
@@ -95,35 +95,35 @@ void EpiGeoEstimation::homographyZMEK(vector<Point2f> leftmatch, vector<Point2f>
 	//Calculate homographies
 	Mat hom1(3,3,CV_64FC1);
 	Mat hom2(3,3,CV_64FC1);
-	float f = sqrt(F.at<double>(2,2)/F.at<double>(1,1));
+	double f = sqrt(F.at<double>(2,2)/F.at<double>(1,1));
 
-	hom1.at<double>(0,0)=1;
-	hom1.at<double>(0,1)=-F.at<double>(2,0);
+	hom1.at<double>(0,0)=1.0;
+	hom1.at<double>(0,1)=0.0-F.at<double>(2,0);
 	hom1.at<double>(0,2)=f*f*F.at<double>(1,0);
 	hom1.at<double>(1,0)=F.at<double>(2,0);
-	hom1.at<double>(1,1)=1;
-	hom1.at<double>(1,2)=0;
-	hom1.at<double>(2,0)=-F.at<double>(1,0);
-	hom1.at<double>(2,1)=0;
-	hom1.at<double>(2,2)=1;
+	hom1.at<double>(1,1)=1.0;
+	hom1.at<double>(1,2)=0.0;
+	hom1.at<double>(2,0)=0.0-F.at<double>(1,0);
+	hom1.at<double>(2,1)=0.0;
+	hom1.at<double>(2,2)=1.0;
 
-	hom2.at<double>(0,0)=1;//-F.at<float>(1,2);
+	hom2.at<double>(0,0)=0.0-F.at<double>(1,2);
 	hom2.at<double>(0,1)=F.at<double>(0,2);
-	hom2.at<double>(0,2)=0;//-f*f*F.at<float>(0,1); //horizontal offset
-	hom2.at<double>(1,0)=-F.at<double>(0,2);
-	hom2.at<double>(1,1)=1;//-F.at<float>(1,2);
+	hom2.at<double>(0,2)=0.0;//f*f*F.at<double>(0,1); //horizontal offset
+	hom2.at<double>(1,0)=0.0-F.at<double>(0,2);
+	hom2.at<double>(1,1)=0.0-F.at<double>(1,2);
 	hom2.at<double>(1,2)=F.at<double>(2,2);
 	hom2.at<double>(2,0)=F.at<double>(0,1);
 	hom2.at<double>(2,1)=F.at<double>(1,1);
-	hom2.at<double>(2,2)=1;
+	hom2.at<double>(2,2)=1.0;
 
-	leftHomography=hom2;
-	rightHomography=hom1;
-	F/=F.at<double>(2,2); //norm F according to its last component
+	leftHomography=hom1;
+	rightHomography=hom2;
 
 	//Size size(960,1280);
 	//stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
 
+	F/=F.at<double>(2,2); //norm F according to its last component
 }
 
 double EpiGeoEstimation::transformDistance(Mat curF, Point2f left, Point2f right){
@@ -143,6 +143,33 @@ double EpiGeoEstimation::transformDistance(Mat curF, Point2f left, Point2f right
 	double denom = Fv.at<double>(0,0)*Fv.at<double>(0,0)+Fv.at<double>(1,0)*Fv.at<double>(1,0)+Fw.at<double>(0,0)*Fw.at<double>(0,0)+Fw.at<double>(1,0)*Fw.at<double>(1,0);
 
 	return sampson/denom;
+}
+
+void EpiGeoEstimation::homographyError(vector<Point2f> leftMatches, vector<Point2f> rightMatches){
+	double result;
+	if(leftHomography.cols==0){
+		std::cout<<"\nERROR: Homographies have not been calculated yet.\n";
+	}
+	else{
+		result=0.0;
+		Mat A = leftHomography.inv();
+		Mat B = rightHomography.inv();
+		for(int i=0;i<leftMatches.size();i++){
+			Mat leftV = Mat(3,1,CV_64FC1);
+			leftV.at<double>(0,0)=leftMatches[i].x;
+			leftV.at<double>(1,0)=leftMatches[i].y;
+			leftV.at<double>(2,0)=1.0f;
+			Mat rightV = Mat(3,1,CV_64FC1);
+			rightV.at<double>(0,0)=rightMatches[i].x;
+			rightV.at<double>(1,0)=rightMatches[i].y;
+			rightV.at<double>(2,0)=1.0f;
+			Mat Av = A*leftV;
+			Mat Bw = B*rightV;
+			result+=abs(Av.at<double>(1,0)/Av.at<double>(2,0)-Bw.at<double>(1,0)/Bw.at<double>(2,0));
+		}
+		result/=(double)leftMatches.size();
+		std::cout<<"\nHomography error (rectification precision): "<<result<<"\n";
+	}
 }
 
 Mat EpiGeoEstimation::linearSolution(vector<Point2f> left, vector<Point2f> right){
