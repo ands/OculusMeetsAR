@@ -86,7 +86,7 @@ namespace ARLib {
 				// look up rift pose at captureTimeStamp and position the screen there
 				if (trackingManager)
 				{
-					RigidBody *rigidBody = trackingManager->evaluateRift(captureTimeStamp);
+					RigidBody *rigidBody = trackingManager->evaluateRift(captureTimeStamp.QuadPart);
 					if (rigidBody)
 					{
 						Ogre::Vector3 position(rigidBody->mX, rigidBody->mY, rigidBody->mZ);

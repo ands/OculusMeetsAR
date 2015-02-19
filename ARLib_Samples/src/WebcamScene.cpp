@@ -30,7 +30,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	// rift node:
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
-	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
+	//mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
 
@@ -50,7 +50,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	}
 
 	// attach video screens
-	mRiftVideoScreens = new ARLib::RiftVideoScreens(mRiftNode, videoPlayerLeft, videoPlayerRight);
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, videoPlayerLeft, videoPlayerRight, tracker);
 
 	// other stuff in the scene
 	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 0);

@@ -1,4 +1,5 @@
 #include "WebcamApp.h"
+#include "NatNetTypes.h"
 
 WebcamApp::WebcamApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -238,6 +239,8 @@ void WebcamApp::initTracking()
 		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
 		mTrackingAvailable = false;
 		mTracker->uninitialize();
+		delete mTracker;
+		mTracker = nullptr;
 	}else{
 		mTrackingAvailable = true;	
 	}

@@ -6,7 +6,6 @@ This class manages the client application, which communicates with the Motive st
 and the Oculus Rift Handle
 ***************************************************/
 #include <string>
-#include <windows.h>
 
 typedef enum ConnectionType ConnectionType;
 
@@ -27,7 +26,7 @@ namespace ARLib{
 		ARLIB_TRACKING_NO_DEVICE_ERROR = 0x08
 	}TRACKING_ERROR_CODE;
 
-	struct RigidBody;
+	typedef struct _RigidBody RigidBody;
 	class RigidBodyEventListener;
 	class NatNetHandler;
 	class Rift;
