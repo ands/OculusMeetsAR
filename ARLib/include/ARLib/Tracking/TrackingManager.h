@@ -5,12 +5,14 @@
 This class manages the client application, which communicates with the Motive stream server,
 and the Oculus Rift Handle
 ***************************************************/
+#include <string>
+#include <windows.h>
 
-#include "ARLib/Tracking/NatNetHandler.h"
-#include "ARLib/Tracking/FrameEvaluator.h"
-#include "ARLib/Oculus/Rift.h"
+typedef enum ConnectionType ConnectionType;
 
 namespace ARLib{
+
+	typedef enum FRAME_EVALUATION_METHOD;
 
 	typedef enum{
 		ARLIB_NATNET = 0x01,
@@ -25,7 +27,11 @@ namespace ARLib{
 		ARLIB_TRACKING_NO_DEVICE_ERROR = 0x08
 	}TRACKING_ERROR_CODE;
 
+	struct RigidBody;
 	class RigidBodyEventListener;
+	class NatNetHandler;
+	class Rift;
+	class FrameEvaluator;
 
 	class TrackingManager{
 	public:

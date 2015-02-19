@@ -41,10 +41,14 @@ namespace ARLib {
 		// TODO: release textures?
 	}
 
-	void VideoTexture::update()
+	bool VideoTexture::update(LARGE_INTEGER *captureTimeStamp)
 	{
-		void *data = player->update();
+		void *data = player->update(captureTimeStamp);
 		if(data)
+		{
 			texture->getBuffer()->blitFromMemory(Ogre::PixelBox(player->getVideoWidth(), player->getVideoHeight(), 1, Ogre::PF_BYTE_BGR, data));
+			return true;
+		}
+		return false;
 	}
 }; // ARLib namespace

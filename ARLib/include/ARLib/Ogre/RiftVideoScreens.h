@@ -5,18 +5,23 @@
 
 namespace Ogre {
 class Pass;
+class SceneNode;
 }
 
 namespace ARLib {
 
 class RiftSceneNode;
+class TrackingManager;
 class VideoPlayer;
 class VideoTexture;
 
 class RiftVideoScreens
 {
 public:
-    RiftVideoScreens(RiftSceneNode *riftNode, VideoPlayer *videoPlayerLeft, VideoPlayer *videoPlayerRight);
+    RiftVideoScreens(
+		Ogre::SceneManager *sceneManager, RiftSceneNode *riftNode,
+		VideoPlayer *videoPlayerLeft, VideoPlayer *videoPlayerRight,
+		TrackingManager *trackingManager = NULL);
 	~RiftVideoScreens();
 
 	void setOffsets(Ogre::Vector2 leftOffset, Ogre::Vector2 rightOffset);
@@ -25,7 +30,10 @@ public:
 	void update();
 
 private:
+	RiftSceneNode *riftNode;
+	TrackingManager *trackingManager;
 	VideoTexture *videoTexture[2];
+	Ogre::SceneNode *screenNode[2];
 	Ogre::Pass *materialPass[2];
 };
 

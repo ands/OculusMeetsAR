@@ -22,7 +22,9 @@ public:
 	// The coordinate mapping table for undistortion
 	Ogre::TexturePtr getUndistortionMapTexture() { return undistortionMapTexture; }
 	// Updates the video texture in case of a new frame
-	void update();
+	// Returns true if there was a new frame, otherwise false
+	// captureTimeStamp is set to the value of QueryPerformanceCounter() during arrival
+	bool update(LARGE_INTEGER *captureTimeStamp = NULL);
 
 private:
 	VideoPlayer *player;

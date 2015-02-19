@@ -1,5 +1,8 @@
 #include "ARLib/Tracking/TrackingManager.h"
+#include "ARLib/Tracking/FrameEvaluator.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+#include "ARLib/Tracking/NatNetHandler.h"
+#include "ARLib/Oculus/Rift.h"
 
 namespace ARLib{
 	

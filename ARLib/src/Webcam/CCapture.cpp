@@ -222,6 +222,7 @@ HRESULT CCapture::OnReadSample(
 
 		if(SUCCEEDED(check))
 		{
+			QueryPerformanceCounter(&bufferCaptureTimeStamp[currentbuffer]);
 			currentbuffer = (currentbuffer + 1) % numBuffers;
 			if(currentbuffer == someBuffers)
 				somebufferexist = true;
@@ -477,7 +478,7 @@ HRESULT CCapture::EndCaptureInternal()
 }
 
 //get last image sample
-BYTE* CCapture::getLastImagesample(HRESULT *res)
+BYTE* CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp)
 {
 	EnterCriticalSection(&m_critsec);
 	BYTE *returndata = NULL;
@@ -488,6 +489,8 @@ BYTE* CCapture::getLastImagesample(HRESULT *res)
 		bufferlist[curbuf]->Unlock(); // ??
 		DWORD len = 0;
 		*res = bufferlist[curbuf]->Lock(&returndata, NULL, &len);
+		if (captureTimeStamp)
+			*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
 		bufferlist[curbuf]->Unlock(); // TODO: must be unlocked after use, not here!
 	}
 	LeaveCriticalSection(&m_critsec);

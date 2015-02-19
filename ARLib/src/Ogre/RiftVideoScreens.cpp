@@ -2,10 +2,13 @@
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/VideoTexture.h"
 #include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Tracking/TrackingManager.h"
 #include "OGRE/OgreRectangle2D.h"
 
 namespace ARLib {
-	RiftVideoScreens::RiftVideoScreens(RiftSceneNode *riftNode, VideoPlayer *videoPlayerLeft, VideoPlayer *videoPlayerRight)
+	RiftVideoScreens::RiftVideoScreens(Ogre::SceneManager *sceneManager, RiftSceneNode *_riftNode, VideoPlayer *videoPlayerLeft, VideoPlayer *videoPlayerRight, TrackingManager *_trackingManager)
+		: riftNode(_riftNode)
+		, trackingManager(_trackingManager)
 	{
 		VideoPlayer *videoPlayer[] = { videoPlayerLeft, videoPlayerRight };
 		Ogre::Camera *camera[] = { riftNode->getLeftCamera(), riftNode->getRightCamera() };
@@ -26,13 +29,21 @@ namespace ARLib {
 			rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
 			const char *materialName[] = { "ARLib/Video/LeftEye", "ARLib/Video/RightEye" };
 			rect->setMaterial(materialName[eyeNum]);
-
+			
 			materialPass[eyeNum] = rect->getMaterial()->getTechnique(0)->getPass(0);
 			materialPass[eyeNum]->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
 			materialPass[eyeNum]->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
 
 			const char *nodeName[] = { "ARLib/Video/LeftScreen", "ARLib/Video/RightScreen" };
-			riftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
+			if (trackingManager)
+			{
+				screenNode[eyeNum] = sceneManager->createSceneNode(nodeName[eyeNum]);
+				screenNode[eyeNum]->setPosition(riftNode->getBodyNode()->getPosition());
+				screenNode[eyeNum]->setOrientation(riftNode->getHeadNode()->getOrientation());
+			}
+			else
+				screenNode[eyeNum] = riftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum]);
+			screenNode[eyeNum]->attachObject(rect);
 		}
 
 		setOffsets(Ogre::Vector2::ZERO, Ogre::Vector2::ZERO);
@@ -41,7 +52,8 @@ namespace ARLib {
 
 	RiftVideoScreens::~RiftVideoScreens()
 	{
-		// TODO: detach screens?
+		screenNode[0]->getParent()->removeChild(screenNode[0]);
+		screenNode[1]->getParent()->removeChild(screenNode[1]);
 		delete videoTexture[0];
 		delete videoTexture[1];
 	}
@@ -60,7 +72,31 @@ namespace ARLib {
 
 	void RiftVideoScreens::update()
 	{
-		videoTexture[0]->update();
-		videoTexture[1]->update();
+		LARGE_INTEGER captureTimeStamp;//, currentTimeStamp, frequency;
+		//QueryPerformanceFrequency(&frequency);
+
+		for (int eyeNum = 0; eyeNum < 2; eyeNum++)
+		{
+			if (videoTexture[eyeNum]->update(&captureTimeStamp))
+			{
+				/*QueryPerformanceCounter(&currentTimeStamp);
+				double latency = (double)(currentTimeStamp.QuadPart - captureTimeStamp.QuadPart) / (double)frequency.QuadPart;
+				printf("video latency: >%02lfms\n", latency * 1000.0);*/
+
+				// look up rift pose at captureTimeStamp and position the screen there
+				if (trackingManager)
+				{
+					RigidBody *rigidBody = trackingManager->evaluateRift(captureTimeStamp);
+					if (rigidBody)
+					{
+						Ogre::Vector3 position(rigidBody->mX, rigidBody->mY, rigidBody->mZ);
+						Ogre::Quaternion orientation(rigidBody->mqW, rigidBody->mqX, rigidBody->mqY, rigidBody->mqZ);
+
+						screenNode[eyeNum]->setPosition(position);
+						screenNode[eyeNum]->setOrientation(orientation);
+					}
+				}
+			}
+		}
 	}
 }; // ARLib namespace

@@ -109,7 +109,7 @@ void RiftSceneNode::removeAllRenderTargets()
 void RiftSceneNode::onChange(const RigidBody *rb)
 {
 	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
-	headNode->setPosition(rb->mX, rb->mY, rb->mZ);
+	bodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 
 	/*if (rift && renderTargets.size())
 	{

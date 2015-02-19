@@ -67,7 +67,7 @@ public:
     HRESULT     StartCapture(IMFActivate *pActivate);
     HRESULT     EndCaptureSession();
     HRESULT     CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost);
-	BYTE*       CCapture::getLastImagesample(HRESULT *res);
+	BYTE*       CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp = NULL);
 	bool somebufferexist;
 
 protected:
@@ -90,6 +90,7 @@ protected:
 	static const int someBuffers = 3;
 	static const int numBuffers = 10;
 	IMFMediaBuffer *bufferlist[numBuffers];
+	LARGE_INTEGER bufferCaptureTimeStamp[numBuffers];
 	int currentbuffer;
 	bool allbuffersexist;
 };

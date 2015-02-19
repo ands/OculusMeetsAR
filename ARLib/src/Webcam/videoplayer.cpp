@@ -9,6 +9,8 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 	: videoDistance(_videoDistance)
 	, ocamModel(NULL)
 {
+	additionalLatency.QuadPart = 0;
+
 	if (FAILED(CCapture::CreateInstance(&capture)))
 		capture = NULL;
 
@@ -84,14 +86,17 @@ VideoPlayer::~VideoPlayer()
 	free(ocamModel);
 }
 
-void * VideoPlayer::update()
+void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
 {
 	HRESULT check = E_FAIL;
 	if(capture && capture->somebufferexist)
 	{
-		BYTE* sample = capture->getLastImagesample(&check);
+		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
 		if(SUCCEEDED(check))
+		{
+			captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
 			return sample;
+		}
 	}
 	return NULL;
 }
