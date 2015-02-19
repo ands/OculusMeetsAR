@@ -18,11 +18,15 @@ public:
         if(schemeName == "glow"){
             return mBlackMat->getTechnique(0);
         }
+        if(schemeName == "geom"){
+            return mBlackMat->getTechnique(0);
+        }
         return nullptr;
     }
 
 protected:
     Ogre::MaterialPtr mBlackMat;
+    Ogre::MaterialPtr mWhiteMat;
 };
 
 #endif

@@ -1,6 +1,5 @@
-// RemoteDarkGray2 genrated by blender2ogre 0.5.9
-
-material RemoteDarkGray2 
+import diffuse_template from "diffuse.material"
+material RemoteDarkGray2 : diffuse_template
 {
     receive_shadows on 
 

@@ -1,6 +1,5 @@
-// Room genrated by blender2ogre 0.6.0
-
-material Room 
+import diffuse_template from "diffuse.material"
+material Room : diffuse_template
 {
     receive_shadows on 
 

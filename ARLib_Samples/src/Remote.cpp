@@ -1,12 +1,12 @@
 #include "Remote.h"
 
 
-StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::Vector3 normalDirection, float radius)
+StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::SceneNode *player, float radius)
     : mSceneNode(nullptr)
     , mRemoteSphere(nullptr)
     , mRemoteBody(nullptr)
     , mRadius(radius)
-    , mNormalDirection(normalDirection)
+    , mPlayer(player)
     , mShotsFired(false)
     , mAngularAccel(1.0f)
     , mAngularVelo(0.0f)
@@ -60,11 +60,12 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mThrusterLowPass = materialManager->getByName("Thruster_low")->getTechnique(0)->getPass(0);
     mThrusterIntermediatePass = materialManager->getByName("Thruster_intermediate")->getTechnique(0)->getPass(0);
 
-    mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.5f);
-    mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
-    mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, 0.0f, 0.0f));
+    //mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.05f);
+    //mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
+    //mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, 0.0f, 0.0f));
 
     mAccumTime = 0.0f;
+    mAccumRot = 0.0f;
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -77,15 +78,22 @@ void StarWarsRemote::update(float dt){
         //animate remote and shoot lazors
     }
     mAccumTime += dt;
+    mAccumRot += dt/10.0f;
+    //mSpinNode->setOrientation(Ogre::Quaternion(Ogre::Radian(mAccumRot), Ogre::Vector3::UNIT_Y));
     if(mAccumTime >= 2.0f){
         mAccumTime = 0.0f;
         changeMaterial(0.0f);
+        //this delays stuff :(
+        mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO);
     }
     if(mAccumTime >= 1.0f){
         changeMaterial(1.0f - mAccumTime);
     }else{
         changeMaterial(mAccumTime);
     }
+
+    //update Cannons
+    mCannons->update(dt);
 }
 
 void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){

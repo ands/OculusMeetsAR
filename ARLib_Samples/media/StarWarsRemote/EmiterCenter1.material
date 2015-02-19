@@ -1,6 +1,5 @@
-// EmiterCenter1 genrated by blender2ogre 0.5.9
-
-material EmiterCenter1 
+import diffuse_template from "diffuse.material"
+material EmiterCenter1 : diffuse_template
 {
     receive_shadows on 
 
