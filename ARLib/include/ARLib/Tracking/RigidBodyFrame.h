@@ -1,18 +1,19 @@
 #ifndef ARLIB_RIGID_BODY_FRAME_H
 #define ARLIB_RIGID_BODY_FRAME_H
 
+#include <math.h>
 
 namespace ARLib{
 
-typedef struct Marker{
+typedef struct _Marker{
 	int mMarkerID;
 	float mMarkerSize;
 	float mX, mY, mZ;
 }Marker;
 
-typedef struct RigidBody{
-	RigidBody(unsigned int nMarker = 0);
-	~RigidBody();
+typedef struct _RigidBody{
+	_RigidBody(unsigned int nMarker = 0);
+	~_RigidBody();
 	bool mVisible;
 	int mID;
 	float mError;
@@ -24,10 +25,9 @@ typedef struct RigidBody{
 }RigidBody;
 
 
-typedef struct RBFrame{
-	RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool Ownership = false);
-    RBFrame(const RBFrame& lFrame, const RBFrame& rFrame, float weight);
-	~RBFrame();
+typedef struct _RBFrame{
+	_RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool Ownership = false);
+	~_RBFrame();
 
 	void addRigidBody(unsigned int index, RigidBody* rb);
 
@@ -40,6 +40,9 @@ typedef struct RBFrame{
     bool mValid;
     bool mOwnership;
 } RBFrame;
+
+
+RigidBody *interpolateRigidBodies(RigidBody *lRigidBody, RigidBody *rRigidBody, float weight);
 
 };
 #endif

@@ -42,7 +42,7 @@ namespace ARLib{
 		void uninitialize();
 		TRACKING_ERROR_CODE reinitialize(); 
 
-        RigidBody *evaluateRift(const LARGE_INTEGER& retroActiveQuery);
+        RigidBody *evaluateRift(const long long& retroActiveQuery);
 		void update();
 
 		void setNatNetConnectionType(ConnectionType cType);

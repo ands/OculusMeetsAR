@@ -8,7 +8,6 @@ and the Oculus Rift Handle
 
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 #include "tinythread.h"
-#include <Windows.h>
 #include <vector>
 
 
@@ -24,9 +23,8 @@ namespace ARLib{
 
     const unsigned int RIFT_BODY_ID = 1;
 
-    
     typedef struct _TimedFrame{
-        LARGE_INTEGER mTimestamp;
+        long long mTimestamp;
         RigidBody* mBody;
     } TimedFrame;
 
@@ -35,7 +33,7 @@ namespace ARLib{
 		FrameEvaluator(unsigned int frameBufferSize = 0);
 		~FrameEvaluator();
 
-		RigidBody* evaluateRift(const LARGE_INTEGER& retroActiveQueryTime);
+		RigidBody* evaluateRift(const long long& retroActiveQueryTime);
         void evaluate();
 		void updateFrame(RBFrame *frame);
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
@@ -43,7 +41,7 @@ namespace ARLib{
 	private:
         unsigned int mFrameBufferSize;
 
-        LARGE_INTEGER mFreq;
+        long long mFreq;
         TimedFrame *mRiftFrames;
 		std::vector<RigidBodyEventListener*> mRigidBodies;
         FRAME_EVALUATION_METHOD mEval;

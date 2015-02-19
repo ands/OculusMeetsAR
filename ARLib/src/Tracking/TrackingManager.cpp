@@ -62,7 +62,7 @@ TRACKING_ERROR_CODE TrackingManager::reinitialize(){
     return initialize();
 }
 		
-RigidBody *TrackingManager::evaluateRift(const LARGE_INTEGER& retroActiveQueryTime){
+RigidBody *TrackingManager::evaluateRift(const long long& retroActiveQueryTime){
 	if(mInitialized){
         return mEvaluator->evaluateRift(retroActiveQueryTime);
 	}
