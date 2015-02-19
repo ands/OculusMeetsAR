@@ -35,7 +35,9 @@ namespace ARLib{
 		TRACKING_ERROR_CODE initialize(); 
 		void uninitialize();
 		TRACKING_ERROR_CODE reinitialize(); 
-		void update(float retroActiveQueryTime = 0);
+
+        RigidBody *evaluateRift(const LARGE_INTEGER& retroActiveQuery);
+		void update();
 
 		void setNatNetConnectionType(ConnectionType cType);
 		void setNatNetServerIP(const std::string& sIP = "");

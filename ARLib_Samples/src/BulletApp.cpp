@@ -203,15 +203,19 @@ void BulletApp::initTracking()
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP(); //local machine
-	mTracker->setNatNetServerIP(); //local machine
+	mTracker->setNatNetClientIP("10.68.11.67"); //local machine
+	mTracker->setNatNetServerIP("10.68.11.67"); //local machine
+    mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
 	if(error != ARLib::ARLIB_TRACKING_OK){
 		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
 		mTrackingAvailable = false;
 		mTracker->uninitialize();
+        delete mTracker;
+        mTracker = false;
 	}else{
+        std::cout<<"Tracking initialized"<<std::endl;
 		mTrackingAvailable = true;	
 	}
 }
@@ -233,7 +237,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
 	
-    if (mTracker)
+    if (mTrackingAvailable)
 		mTracker->update(); //right place?
 	
     mScene->update(evt.timeSinceLastFrame);

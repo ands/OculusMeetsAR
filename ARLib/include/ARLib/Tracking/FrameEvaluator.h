@@ -22,25 +22,34 @@ namespace ARLib{
         FRAME_FLOOR = 0x05
     };
 
+    const unsigned int RIFT_BODY_ID = 1;
 
-    //TODO write a Mutex for Framebuffer!
     
+    typedef struct _TimedFrame{
+        LARGE_INTEGER mTimestamp;
+        RigidBody* mBody;
+    } TimedFrame;
+
     class FrameEvaluator{
 	public:
 		FrameEvaluator(unsigned int frameBufferSize = 0);
 		~FrameEvaluator();
-		void evaluate(float retroActiveQueryTime);
+
+		RigidBody* evaluateRift(const LARGE_INTEGER& retroActiveQueryTime);
+        void evaluate();
 		void updateFrame(RBFrame *frame);
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
         void setEvaluationMethod(FRAME_EVALUATION_METHOD evalMethod);
 	private:
         unsigned int mFrameBufferSize;
-        RBFrame **mFrames;
+
+        LARGE_INTEGER mFreq;
+        TimedFrame *mRiftFrames;
 		std::vector<RigidBodyEventListener*> mRigidBodies;
         FRAME_EVALUATION_METHOD mEval;
 
-        LARGE_INTEGER mStarttime;
-        LARGE_INTEGER mFreq;
+        RBFrame *mFrame;
+
         tthread::mutex mMutex;
 	};
 };

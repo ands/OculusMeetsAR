@@ -12,7 +12,7 @@ public:
 	};
 	void onChange(const ARLib::RigidBody* rb){
 		mRigidBodyNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
-        //mRigidBodyNode->setPosition()
+        mRigidBodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 		//do other interresting stuff
 	};
     Ogre::SceneNode *getSceneNode(){

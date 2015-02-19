@@ -59,9 +59,16 @@ TRACKING_ERROR_CODE TrackingManager::reinitialize(){
     return initialize();
 }
 		
-void TrackingManager::update(float retroActiveQueryTime){
+RigidBody *TrackingManager::evaluateRift(const LARGE_INTEGER& retroActiveQueryTime){
 	if(mInitialized){
-		mEvaluator->evaluate(retroActiveQueryTime);
+        return mEvaluator->evaluateRift(retroActiveQueryTime);
+	}
+    return nullptr;
+}
+
+void TrackingManager::update(){
+	if(mInitialized){
+		mEvaluator->evaluate();
 	}
 }
 

@@ -29,12 +29,10 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mSceneMgr->setShadowFarDistance(30);
 
 	//rift node
-	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
+	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1); // TODO: set correct rigid body id!
 	mRiftNode->getBodyNode()->setPosition(3.0f, 1.5f, 3.0f);
-	
-    //mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
-	//if (tracker)
-	//	tracker->addRigidBodyEventListener(mRiftNode);
+	if (tracker)
+		tracker->addRigidBodyEventListener(mRiftNode);
     
     //create viewports
     if(window && rift){
@@ -98,7 +96,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 10.0f);
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
 
-    RigidListenerNode *mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 1);
+    RigidListenerNode *mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 2);
     mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
     if(tracker){
         tracker->addRigidBodyEventListener(mSwordParentNode);
