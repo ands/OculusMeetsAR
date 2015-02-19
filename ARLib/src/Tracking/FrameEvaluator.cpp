@@ -1,4 +1,5 @@
 #include "ARLib/Tracking/FrameEvaluator.h"
+#include <algorithm>
 #include <math.h>
 
 namespace ARLib{
@@ -6,12 +7,15 @@ namespace ARLib{
 FrameEvaluator::FrameEvaluator(unsigned int frameBufferSize)
     : mFrameBufferSize(frameBufferSize + 2)
     , mEval(FRAME_ROUND){
-    QueryPerformanceFrequency(&mFreq);
+    LARGE_INTEGER temp;
+    QueryPerformanceFrequency(&temp);
+    mFreq = temp.QuadPart;
 
     mRiftFrames = new TimedFrame[mFrameBufferSize];
     for(unsigned int i = 0; i < mFrameBufferSize ; i++){
         mRiftFrames[i].mBody = new RigidBody();
-        QueryPerformanceCounter(&mRiftFrames[i].mTimestamp);
+        QueryPerformanceCounter(&temp);
+        mRiftFrames[i].mTimestamp = temp.QuadPart;
     }
 }
 
@@ -22,16 +26,15 @@ FrameEvaluator::~FrameEvaluator(){
     delete [] mRiftFrames;
 }
 
-RigidBody* FrameEvaluator::evaluateRift(const LARGE_INTEGER& retroActiveQueryTime){
+RigidBody* FrameEvaluator::evaluateRift(const long long& retroActiveQueryTime){
     tthread::lock_guard<tthread::mutex> guard(mMutex);
-    LARGE_INTEGER currentTime;
-    currentTime.QuadPart = 0;
+    long long currentTime = 0;
 
     unsigned int index = 1;
-    for( ; currentTime.QuadPart < retroActiveQueryTime.QuadPart && index < mFrameBufferSize - 1; index++){
-        currentTime.QuadPart += mRiftFrames[index-1].mTimestamp.QuadPart - mRiftFrames[index].mTimestamp.QuadPart;
+    for( ; currentTime < retroActiveQueryTime && index < mFrameBufferSize - 1; index++){
+        currentTime += mRiftFrames[index-1].mTimestamp - mRiftFrames[index].mTimestamp;
     }
-    double weight =  static_cast<double>(retroActiveQueryTime.QuadPart - mRiftFrames[index].mTimestamp.QuadPart) / static_cast<double>(mRiftFrames[index-1].mTimestamp.QuadPart - mRiftFrames[index].mTimestamp.QuadPart);
+    double weight =  static_cast<double>(retroActiveQueryTime - mRiftFrames[index].mTimestamp) / static_cast<double>(mRiftFrames[index-1].mTimestamp - mRiftFrames[index].mTimestamp);
 
     RigidBody *lowerBody = mRiftFrames[index-1].mBody;
     RigidBody *higherBody = mRiftFrames[index].mBody;
@@ -51,8 +54,7 @@ RigidBody* FrameEvaluator::evaluateRift(const LARGE_INTEGER& retroActiveQueryTim
         return higherBody;
         break;
     case FRAME_INTERPOLATE_LINEAR:
-        //todo
-        return nullptr; //not implemented yet
+        return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
         break;
     default:
         printf("Frame Evaluation Method unknown! Nothing will happen!");
@@ -81,7 +83,9 @@ void FrameEvaluator::updateFrame(RBFrame *frame){
     for(unsigned int i = 0; i < frame->mNRigidBodys; i++){
         if(frame->mRbs[i]->mID == RIFT_BODY_ID){
             mRiftFrames[0].mBody = new RigidBody(*frame->mRbs[i]);
-            QueryPerformanceCounter(&mRiftFrames[0].mTimestamp);
+            LARGE_INTEGER temp;
+            QueryPerformanceCounter(&temp);
+            mRiftFrames[0].mTimestamp = temp.QuadPart;
         }
     }
     mFrame = frame;

@@ -203,9 +203,9 @@ void BulletApp::initTracking()
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("10.68.11.67"); //local machine
-	mTracker->setNatNetServerIP("10.68.11.67"); //local machine
-    mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
+	mTracker->setNatNetClientIP("10.68.11.247"); //local machine
+	mTracker->setNatNetServerIP("10.68.11.247"); //local machine
+    mTracker->setFrameEvaluationMethod(ARLib::FRAME_ROUND);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
 	if(error != ARLib::ARLIB_TRACKING_OK){
