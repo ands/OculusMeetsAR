@@ -111,29 +111,14 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	int width = getVideoWidth();
 	int height = getVideoHeight();
 
-	// ocam undistortion
-	if (ocamModel)
-	{
-		ocam_create_perspecive_undistortion_map(ocamModel, xyMap, width, height, videoDistance);
-	}
-	else
-	{
-		// calculates the identity xy map
-		float *localXYmap = xyMap;
-		for (int y = 0; y < height; y++)
-		{
-			for (int x = 0; x < width; x++)
-			{
-				*localXYmap++ = (float)x;
-				*localXYmap++ = (float)y;
-			}
-		}
-	}
+	float Nxc = height / 2.0f;
+	float Nyc = width / 2.0f;
+	float Nz  = -width / videoDistance;
 
-	// homography "undistortion" + normalization
-	float *xyMapTemp = new float[width * height * 2];
-	memcpy(xyMapTemp, xyMap, width * height * 2 * sizeof(float));
+	double world[3], cam[2];
+	world[2] = Nz;
 
+	// ocam + homography "undistortion" and normalization
 	float *localXYmap = xyMap;
 	float invMaxX = 1.0f / (float)(width - 1);
 	float invMaxY = 1.0f / (float)(height - 1);
@@ -141,27 +126,28 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 	{
 		for (int x = 0; x < width; x++)
 		{
+			// homography undistortion
 			float inverseZ =   1.0f / (y * homographyMatrix[6] + x * homographyMatrix[7] + homographyMatrix[8]);
-			float ycoord = inverseZ * (y * homographyMatrix[0] + x * homographyMatrix[1] + homographyMatrix[2]) + 0.5f;
-			float xcoord = inverseZ * (y * homographyMatrix[3] + x * homographyMatrix[4] + homographyMatrix[5]) + 0.5f;
+			float ycoord = inverseZ * (y * homographyMatrix[0] + x * homographyMatrix[1] + homographyMatrix[2]);
+			float xcoord = inverseZ * (y * homographyMatrix[3] + x * homographyMatrix[4] + homographyMatrix[5]);
 
-			if(ycoord >= 0 && ycoord < height - 1 && xcoord >= 0 && xcoord < width - 1)
+			// ocam undistortion
+			if (ocamModel)
 			{
-				// bilinear interpolation coefficients
-				int hx = (int)xcoord;
-				int hy = (int)ycoord;
-				float fx = xcoord - hx, fnx = 1.0f - fx;
-				float fy = ycoord - hy, fny = 1.0f - fy;
+				world[0] = (ycoord - Nxc);
+				world[1] = (xcoord - Nyc);
+				ocam_world2cam(ocamModel, world, cam);
+			}
+			else
+			{
+				cam[1] = xcoord;
+				cam[0] = ycoord;
+			}
 
-				// interpolation corners
-				float *p00 = xyMapTemp + ((int)hy * width + (int)hx) * 2;
-				float *p01 = xyMapTemp + (((int)hy + 1) * width + (int)hx + 1) * 2;
-				float *p11 = xyMapTemp + (((int)hy + 1) * width + (int)hx + 1) * 2;
-				float *p10 = xyMapTemp + ((int)hy * width + (int)hx) * 2;
-
-				// the interpolation
-				*localXYmap++ = ((p00[0] * fnx + p01[0] * fx) * fny + (p10[0] * fnx + p11[0] * fx) * fy) * invMaxX;
-				*localXYmap++ = ((p00[1] * fnx + p01[1] * fx) * fny + (p10[1] * fnx + p11[1] * fx) * fy) * invMaxY;
+			if(cam[0] >= 0 && cam[0] < height && cam[1] >= 0 && cam[1] < width)
+			{
+				*localXYmap++ = (float)cam[1] * invMaxX;
+				*localXYmap++ = (float)cam[0] * invMaxY;
 			}
 			else
 			{
@@ -171,8 +157,6 @@ void VideoPlayer::calculateUndistortionMap(float *xyMap)
 			}
 		}
 	}
-
-	delete[] xyMapTemp;
 }
 
 }; // ARLib namespace

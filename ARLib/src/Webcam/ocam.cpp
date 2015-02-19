@@ -66,7 +66,7 @@ ocam_model * ocam_get_model(const char *filename)
 	return m;
 }
 
-static inline void ocam_world2cam(const ocam_model *m, const double point3D[3], double point2D[2])
+void ocam_world2cam(const ocam_model *m, const double point3D[3], double point2D[2])
 {
 	double norm_square = point3D[0] * point3D[0] + point3D[1] * point3D[1];
 	if (norm_square != 0) 
@@ -92,28 +92,6 @@ static inline void ocam_world2cam(const ocam_model *m, const double point3D[3], 
 	{
 		point2D[0] = m->xc;
 		point2D[1] = m->yc;
-	}
-}
-
-void ocam_create_perspecive_undistortion_map(const ocam_model *m, float *mapxy, int width, int height, float sf)
-{
-	float Nxc = height / 2.0;
-	float Nyc = width / 2.0;
-	float Nz  = -width / sf;
-	double world[3];
-	
-	world[2] = Nz;
-	for (int i = 0; i < height; i++)
-	{
-		world[0] = (i - Nxc);
-		for (int j = 0; j < width; j++)
-		{   
-			world[1] = (j - Nyc);
-			double cam[2];
-			ocam_world2cam(m, world, cam);
-			*mapxy++ = (float)cam[1];
-			*mapxy++ = (float)cam[0];
-		}
 	}
 }
 
