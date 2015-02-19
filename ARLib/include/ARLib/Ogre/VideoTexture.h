@@ -2,9 +2,10 @@
 #define ARLIB_VIDEOTEXTURE_H
 
 #include "OGRE/OgreTexture.h"
-#include "ARLib/Webcam/VideoPlayer.h"
 
 namespace ARLib {
+
+class VideoPlayer;
 
 /**
   *  Plays a video on an Ogre texture.
@@ -13,7 +14,7 @@ class VideoTexture
 {
 public:
 	// Opens the video device, creates textures and undistortion mapping
-    VideoTexture(const Ogre::String& textureName, const Ogre::String& undistortionMapTextureName, int cameraNumber, const char *ocamModelParametersFilename, float distance);
+    VideoTexture(VideoPlayer *player, const Ogre::String& textureName, const Ogre::String& undistortionMapTextureName);
 	// Closes the video device
 	~VideoTexture();
 	// The video texture
@@ -24,7 +25,7 @@ public:
 	void update();
 
 private:
-	VideoPlayer player;
+	VideoPlayer *player;
 	Ogre::TexturePtr texture;
 	Ogre::TexturePtr undistortionMapTexture;
 };

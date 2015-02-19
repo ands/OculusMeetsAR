@@ -7,6 +7,11 @@
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 
 namespace ARLib {
+
+// eye visibility masks
+const unsigned int VISIBILITY_FLAG_LEFT  (1 << 0);
+const unsigned int VISIBILITY_FLAG_RIGHT (1 << 1);
+
 class RenderTarget;
 
 class RiftSceneNode : public RigidBodyEventListener

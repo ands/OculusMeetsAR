@@ -36,13 +36,13 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
 		// create render target textures
-		const char *renderTextureNames[] = { "RiftRenderTextureLeft", "RiftRenderTextureRight" };
+		const char *renderTextureNames[] = { "ARLib/Oculus/RenderTextureLeft", "ARLib/Oculus/RenderTextureRight" };
 		renderTexture[eyeNum] = textureManager->createManual(renderTextureNames[eyeNum],
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D,
 			recommendedTexSize[eyeNum][0], recommendedTexSize[eyeNum][1], 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
 
 		// load materials and set shader parameters
-		const char *materialNames[] = { "Oculus/LeftEye", "Oculus/RightEye" };
+		const char *materialNames[] = { "ARLib/Oculus/LeftEye", "ARLib/Oculus/RightEye" };
 		material[eyeNum] = materialManager->getByName(materialNames[eyeNum]);
 		Ogre::Pass *materialPass = material[eyeNum]->getTechnique(0)->getPass(0);
 		materialPass->getTextureUnitState(0)->setTexture(renderTexture[eyeNum]);
@@ -53,7 +53,7 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 		params->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
 		
 		// create the distortion meshes:
-		const char *objectNames[] = { "RiftRenderObjectLeft", "RiftRenderObjectRight" };
+		const char *objectNames[] = { "ARLib/Oculus/DistortionMeshLeft", "ARLib/Oculus/DistortionMeshRight" };
 		Ogre::ManualObject* manual = riftSceneManager->createManualObject(objectNames[eyeNum]);
 		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
@@ -77,7 +77,7 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 	}
 
 	// create a camera in the rift scene so the mesh can be rendered onto it:
-	Ogre::Camera *combinedCamera = riftSceneManager->createCamera("OculusRiftExternalCamera");
+	Ogre::Camera *combinedCamera = riftSceneManager->createCamera("ARLib/Oculus/CombinedCamera");
 	combinedCamera->setFarClipDistance(2);
 	combinedCamera->setNearClipDistance(0.1f);
 	combinedCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);

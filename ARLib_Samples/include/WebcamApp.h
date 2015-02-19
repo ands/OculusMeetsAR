@@ -6,6 +6,7 @@
 #include "OIS/OIS.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/ARLibOgre.h"
 #include "WebcamScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
@@ -29,8 +30,6 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		bool update();
 
 	private:
-		ARLib::VideoTexture *mVideoTextureLeft;
-		ARLib::VideoTexture *mVideoTextureRight;
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
         void initBullet(bool enableDebugDrawing);
@@ -52,7 +51,10 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		Ogre::RenderWindow* mWindow;
 		Ogre::RenderWindow* mSmallWindow;
 
-		Ogre::OverlaySystem *mOverlaySystem;
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
+
+		Ogre::OverlaySystem* mOverlaySystem;
 
 		bool mShutdown;
 

@@ -9,7 +9,10 @@ struct ocam_model;
 class VideoPlayer
 {
 public:
-    VideoPlayer(int cameraNumber = 0, const char *ocamModelParametersFilename = NULL, float videoDistance = 4.0f);
+    VideoPlayer(
+		int cameraNumber = 0,
+		const char *ocamModelParametersFilename = NULL, float videoDistance = 4.0f,
+		const char *homographyMatrixFilename = NULL);
     ~VideoPlayer();
 	/// Returns the width of the video image
 	int getVideoWidth();
@@ -25,6 +28,7 @@ private:
 	CCapture *capture;
 	float videoDistance;
 	ocam_model *ocamModel;
+	float homographyMatrix[3 * 3];
 };
 
 }; // ARLib namespace

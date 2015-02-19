@@ -24,7 +24,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	}
 	
 
-	ARLib::Sound* sound = ARLib::SoundManager::instance().getSound("hum1.wav");
+	ARLib::Sound* sound = ARLib::SoundManager::instance().getSound("../../media/hum1.wav");
 	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 	alListener3f(AL_POSITION, 0, 0, 1.0f);
 	alListener3f(AL_VELOCITY, 0, 0, 0);
