@@ -485,7 +485,7 @@ done:
 	}
 
 	//get last image sample
-	BYTE* CCapture::getLastImagesample(HRESULT *res)
+	BYTE* CCapture::getLastImagesample(HRESULT *res,LARGE_INTEGER *captureTimeStamp)
 	{
 		EnterCriticalSection(&m_critsec);
 		BYTE *returndata = NULL;
