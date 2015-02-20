@@ -69,7 +69,6 @@ public:
     HRESULT     EndCaptureSession();
     HRESULT     CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost);
 	BYTE*       CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp = NULL);
-	bool somebufferexist;
 
 protected:
 
@@ -89,10 +88,10 @@ protected:
     WCHAR                   *m_pwszSymbolicLink;
 
 	//capturesamples
-	static const int someBuffers = 1;
 	static const int numBuffers = 3;
 	IMFMediaBuffer *bufferlist[numBuffers];
 	LARGE_INTEGER bufferCaptureTimeStamp[numBuffers];
+	unsigned int buffersWithNewFramesBitfield;
 	int currentbuffer;
 	bool allbuffersexist;
 };

@@ -89,7 +89,7 @@ VideoPlayer::~VideoPlayer()
 void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
 {
 	HRESULT check = E_FAIL;
-	if(capture && capture->somebufferexist)
+	if(capture)
 	{
 		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
 		if(SUCCEEDED(check))
