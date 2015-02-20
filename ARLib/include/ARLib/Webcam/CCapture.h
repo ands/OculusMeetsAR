@@ -89,8 +89,8 @@ protected:
     WCHAR                   *m_pwszSymbolicLink;
 
 	//capturesamples
-	static const int someBuffers = 3;
-	static const int numBuffers = 10;
+	static const int someBuffers = 1;
+	static const int numBuffers = 3;
 	IMFMediaBuffer *bufferlist[numBuffers];
 	LARGE_INTEGER bufferCaptureTimeStamp[numBuffers];
 	int currentbuffer;

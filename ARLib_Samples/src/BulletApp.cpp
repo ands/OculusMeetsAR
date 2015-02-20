@@ -55,7 +55,7 @@ BulletApp::~BulletApp()
 void BulletApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-	mRoot = new Ogre::Root("../../media/plugins.cfg");
+	mRoot = new Ogre::Root("plugins.cfg");
 	cf.load("../../media/resources.cfg");
 	mRoot->addFrameListener(this);
  

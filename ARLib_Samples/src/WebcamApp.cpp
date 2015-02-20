@@ -62,7 +62,7 @@ WebcamApp::~WebcamApp()
 void WebcamApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-	mRoot = new Ogre::Root("../../media/plugins.cfg");
+	mRoot = new Ogre::Root("plugins.cfg");
 	cf.load("../../media/resources.cfg");
 	mOverlaySystem = new Ogre::OverlaySystem();
 	mRoot->addFrameListener(this);
@@ -98,14 +98,14 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	if (mRiftAvailable)
 	{
 		Ogre::NameValuePairList miscParams;
-		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1 /*oculusRiftMonitorId*/);
+		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1);
 		miscParams["border"] = "none";
 		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
 		Ogre::NameValuePairList miscParamsSmall;
-		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0 /*debugMonitorId*/);
+		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0);
 		mSmallWindow = mRoot->createRenderWindow("ARLib Example (debug window)", 1920 / 2, 1080 / 2, false, &miscParamsSmall);
 		if (!mWindow)
 			mWindow = mSmallWindow;

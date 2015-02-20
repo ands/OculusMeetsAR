@@ -199,10 +199,13 @@ namespace ARLib {
 		HRESULT hrStatus,
 		DWORD /*dwStreamIndex*/,
 		DWORD /*dwStreamFlags*/,
-		LONGLONG llTimeStamp,
+		LONGLONG /*llTimeStamp*/,
 		IMFSample *pSample      // Can be NULL
 		)
 	{
+		LARGE_INTEGER captureTimeStamp;
+		QueryPerformanceCounter(&captureTimeStamp); // this is executed <0.1ms after llTimeStamp. should we use llTimeStamp instead?
+
 		EnterCriticalSection(&m_critsec);
 
 		HRESULT hr = S_OK;
@@ -223,7 +226,7 @@ namespace ARLib {
 
 			if(SUCCEEDED(check))
 			{
-			QueryPerformanceCounter(&bufferCaptureTimeStamp[currentbuffer]);
+				bufferCaptureTimeStamp[currentbuffer] = captureTimeStamp;
 				currentbuffer = (currentbuffer + 1) % numBuffers;
 				if(currentbuffer == someBuffers)
 					somebufferexist = true;
@@ -485,7 +488,7 @@ done:
 	}
 
 	//get last image sample
-	BYTE* CCapture::getLastImagesample(HRESULT *res,LARGE_INTEGER *captureTimeStamp)
+	BYTE* CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp)
 	{
 		EnterCriticalSection(&m_critsec);
 		BYTE *returndata = NULL;
@@ -496,8 +499,8 @@ done:
 			bufferlist[curbuf]->Unlock(); // ??
 			DWORD len = 0;
 			*res = bufferlist[curbuf]->Lock(&returndata, NULL, &len);
-		if (captureTimeStamp)
-			*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
+			if (captureTimeStamp)
+				*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
 			bufferlist[curbuf]->Unlock(); // TODO: must be unlocked after use, not here!
 		}
 		LeaveCriticalSection(&m_critsec);
