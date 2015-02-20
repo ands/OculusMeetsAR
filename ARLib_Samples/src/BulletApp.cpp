@@ -1,4 +1,5 @@
 #include "BulletApp.h"
+#include "NatNetTypes.h"
 
 BulletApp::BulletApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -54,13 +55,8 @@ BulletApp::~BulletApp()
 void BulletApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
 	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	cf.load("../../media/resources.cfg");
 	mRoot->addFrameListener(this);
  
     // add resources

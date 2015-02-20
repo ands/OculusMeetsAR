@@ -1,4 +1,5 @@
 #include "SoundApp.h"
+#include "NatNetTypes.h"
 
 SoundApp::SoundApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -55,13 +56,8 @@ SoundApp::~SoundApp()
 void SoundApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
 	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	cf.load("../../media/resources.cfg");
 	mRoot->addFrameListener(this);
  
     // add resources

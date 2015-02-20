@@ -130,8 +130,8 @@ namespace ARLib {
 		m_nRefCount(1),
 		m_pwszSymbolicLink(NULL),
 		currentbuffer(0),
-		somebufferexist(FALSE),
-		allbuffersexist(FALSE)
+		allbuffersexist(FALSE),
+		buffersWithNewFramesBitfield(0)
 	{
 		InitializeCriticalSection(&m_critsec);
 	}
@@ -199,10 +199,13 @@ namespace ARLib {
 		HRESULT hrStatus,
 		DWORD /*dwStreamIndex*/,
 		DWORD /*dwStreamFlags*/,
-		LONGLONG llTimeStamp,
+		LONGLONG /*llTimeStamp*/,
 		IMFSample *pSample      // Can be NULL
 		)
 	{
+		LARGE_INTEGER captureTimeStamp;
+		QueryPerformanceCounter(&captureTimeStamp); // this is executed <0.1ms after llTimeStamp. should we use llTimeStamp instead?
+
 		EnterCriticalSection(&m_critsec);
 
 		HRESULT hr = S_OK;
@@ -215,18 +218,17 @@ namespace ARLib {
 
 		if (pSample)
 		{
-			if(currentbuffer == 0 && somebufferexist)
-				allbuffersexist = true;
 			if(allbuffersexist)
 				bufferlist[currentbuffer]->Release();
 			HRESULT check = pSample->ConvertToContiguousBuffer(&bufferlist[currentbuffer]);
 
 			if(SUCCEEDED(check))
 			{
-			QueryPerformanceCounter(&bufferCaptureTimeStamp[currentbuffer]);
+				bufferCaptureTimeStamp[currentbuffer] = captureTimeStamp;
+				buffersWithNewFramesBitfield |= 1 << currentbuffer; // flag this buffer to contain a new frame
 				currentbuffer = (currentbuffer + 1) % numBuffers;
-				if(currentbuffer == someBuffers)
-					somebufferexist = true;
+				if(currentbuffer == 0)
+					allbuffersexist = true;
 			}
 
 			if (FAILED(hr)) { goto done; }
@@ -485,19 +487,21 @@ done:
 	}
 
 	//get last image sample
-	BYTE* CCapture::getLastImagesample(HRESULT *res,LARGE_INTEGER *captureTimeStamp)
+	BYTE* CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp)
 	{
-		EnterCriticalSection(&m_critsec);
 		BYTE *returndata = NULL;
 		*res = E_FAIL;
-		if(somebufferexist)
+
+		EnterCriticalSection(&m_critsec);
+		int curbuf = currentbuffer == 0 ? numBuffers - 1 : currentbuffer - 1;
+		if (buffersWithNewFramesBitfield & (1 << curbuf)) // does the last received buffer contain a new frame?
 		{
-			int curbuf = currentbuffer == 0 ? numBuffers - 1 : currentbuffer - 1;
+			buffersWithNewFramesBitfield &= ~(1 << curbuf); // consume the buffer
 			bufferlist[curbuf]->Unlock(); // ??
 			DWORD len = 0;
 			*res = bufferlist[curbuf]->Lock(&returndata, NULL, &len);
-		if (captureTimeStamp)
-			*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
+			if (captureTimeStamp)
+				*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
 			bufferlist[curbuf]->Unlock(); // TODO: must be unlocked after use, not here!
 		}
 		LeaveCriticalSection(&m_critsec);
