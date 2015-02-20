@@ -13,4 +13,7 @@ call SET_ENV.bat
 cd ..\OpenAL
 call SET_ENV.bat
 
+cd ..\OpenCV
+call SET_ENV.bat
+
 pause

@@ -1,0 +1,1 @@
+SETX OPENCV %CD%
