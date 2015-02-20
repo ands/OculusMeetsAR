@@ -1,10 +1,20 @@
 vertex_program ARLib/Video/UndistortionVertex glsl
 {
     source ARLibVideoUndistortionVertex.glsl
+	default_params
+	{
+		param_named offset float2 0 0
+		param_named scale float2 1 1
+	}
 }
 fragment_program ARLib/Video/UndistortionFragment glsl
 {
     source ARLibVideoUndistortionFragment.glsl
+	default_params
+	{
+		param_named coordinateMap int 0
+		param_named videoTexture int 1
+	}
 }
 
 material ARLib/Video/LeftEye
@@ -23,14 +33,10 @@ material ARLib/Video/LeftEye
 		
 			vertex_program_ref ARLib/Video/UndistortionVertex
 			{
-				param_named offset float2 0 0
-				param_named scale float2 1 1
 			}
 
 			fragment_program_ref ARLib/Video/UndistortionFragment
 			{
-				param_named coordinateMap int 0
-				param_named videoTexture int 1
 			}
 
 			texture_unit
@@ -40,7 +46,7 @@ material ARLib/Video/LeftEye
             }
 			texture_unit
             {
-				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_border_colour -1.0 -1.0 0.0 1.0
 				tex_address_mode border
             }
         }
@@ -63,14 +69,10 @@ material ARLib/Video/RightEye
 		
 			vertex_program_ref ARLib/Video/UndistortionVertex
 			{
-				param_named offset float2 0 0
-				param_named scale float2 1 1
 			}
 
 			fragment_program_ref ARLib/Video/UndistortionFragment
 			{
-				param_named coordinateMap int 0
-				param_named videoTexture int 1
 			}
 
 			texture_unit
@@ -80,7 +82,7 @@ material ARLib/Video/RightEye
             }
 			texture_unit
             {
-				tex_border_colour 0.0 0.0 0.0 1.0
+				tex_border_colour -1.0 -1.0 0.0 1.0
 				tex_address_mode border
             }
         }

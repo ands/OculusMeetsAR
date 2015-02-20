@@ -30,7 +30,6 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	// rift node:
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
-	//mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
 
@@ -61,18 +60,18 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt3->getSubEntity(0)->setMaterialName( "CubeMaterialWhite" );
 	cubeNode3->attachObject( cubeEnt3 );
-	cubeNode3->setPosition( -1.0, 0.0, 0.0 );
-	cubeNode3->setScale( 0.5, 0.5, 0.5 );
+	cubeNode3->setPosition(-0.2f, 0.0f, 0.0f);
+	cubeNode3->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* roomLight = mSceneMgr->createLight();
 	roomLight->setType(Ogre::Light::LT_POINT);
-	roomLight->setCastShadows( true );
-	roomLight->setShadowFarDistance( 30 );
-	roomLight->setAttenuation( 65, 1.0f, 0.07f, 0.017f );
-	roomLight->setSpecularColour( .25f, .25f, .25f );
-	roomLight->setDiffuseColour( 0.85f, 0.76f, 0.7f );
+	roomLight->setCastShadows(true);
+	roomLight->setShadowFarDistance(30.0f);
+	roomLight->setAttenuation(65.0f, 1.0f, 0.07f, 0.017f);
+	roomLight->setSpecularColour(0.25f, 0.25f, 0.25f);
+	roomLight->setDiffuseColour(0.85f, 0.76f, 0.7f);
 
-	roomLight->setPosition( 5, 5, 5 );
+	roomLight->setPosition(5.0f, 5.0f, 5.0f);
 
 	mSceneMgr->getRootSceneNode()->attachObject( roomLight );
 
@@ -80,19 +79,19 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition( 3.0f, 0.0f, 0.0f );
-	cubeNode2->setScale( 0.5f, 0.5f, 0.5f );
+	cubeNode2->setPosition(0.6f, 0.0f, 0.0f);
+	cubeNode2->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
-	light->setCastShadows( false );
-	light->setAttenuation( 65, 1.0f, 0.07f, 0.017f );
-	light->setSpecularColour( .25f, .25f, .25f );
-	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
+	light->setCastShadows(false);
+	light->setAttenuation(65.0f, 1.0f, 0.07f, 0.017f);
+	light->setSpecularColour(0.25f, 0.25f, 0.25f);
+	light->setDiffuseColour(0.35f, 0.27f, 0.23f);
 	mRiftNode->getBodyNode()->attachObject(light);
 
 	// Overlay stuff
-	Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
+	/*Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
 	// Create a panel
 	Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
 		overlayManager->createOverlayElement("Panel", "TextPanel"));
@@ -102,7 +101,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	// Create a text area
 	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "Text"));
 	mTextArea->setMetricsMode(Ogre::GMM_RELATIVE);
-	mTextArea->setPosition(0, 0);
+	mTextArea->setPosition(0.0f, 0.0f);
 	mTextArea->setDimensions(0.5f, 0.2f);
 	mTextArea->setCaption("Time: ? ms");
 	mTextArea->setCharHeight(0.1f);
@@ -113,7 +112,8 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	overlay->add2D(panel);
 	panel->addChild(mTextArea);
 	overlay->show();
-	mTextArea->hide(); // hide by default
+	//mTextArea->hide(); // hide by default
+	mTextArea->show();*/
 
 	// TODO: save the configuration in a file?
 	// default video configuration
@@ -182,41 +182,27 @@ void WebcamScene::update(float dt)
 
 		// TODO: this needs to be done by the tracking system!
 		static ARLib::RigidBody rb; float q[4]; float p[3];
-		rift->getPose(p, q);
-		rb.mqX = q[0];
-		rb.mqY = q[1];
-		rb.mqZ = q[2];
-		rb.mqW = q[3];
+		Ogre::Vector3 riftPosition = mRiftNode->getBodyNode()->getPosition();
+		rift->getPose(p, q); // get the head tracking data relative to the body position
+		rb.mX = 0.8f + p[0];
+		rb.mY = 0.3f + p[1];
+		rb.mZ = 0.8f + p[2];
+		rb.mqX = q[0]; rb.mqY = q[1]; rb.mqZ = q[2]; rb.mqW = q[3];
 		mRiftNode->onChange(&rb);
 	}
 
 	// update video frames
 	mRiftVideoScreens->update();
-
-	// TODO: will also be handled by the tracking system?
-	/*float forward = (mKeyboard->isKeyDown( OIS::KC_W ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_S ) ? 0 : -1);
-	float leftRight = (mKeyboard->isKeyDown( OIS::KC_A ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_D ) ? 0 : -1);
-
-	if( mKeyboard->isKeyDown( OIS::KC_LSHIFT ) )
-	{
-		forward *= 3;
-		leftRight *= 3;
-	}
-	
-	Ogre::Vector3 dirX = mBodyTiltNode->_getDerivedOrientation()*Ogre::Vector3::UNIT_X;
-	Ogre::Vector3 dirZ = mBodyTiltNode->_getDerivedOrientation()*Ogre::Vector3::UNIT_Z;
-
-	mBodyNode->setPosition( mBodyNode->getPosition() + dirZ*forward*dt + dirX*leftRight*dt );*/
 	
 	// update text box time
-	static Ogre::Timer timer;
+	/*static Ogre::Timer timer;
 	if (mTextArea->isVisible())
 	{
 		char buf[256];
 		unsigned long time = timer.getMilliseconds();
 		_snprintf(buf, 256, "Time: %lu ms", time);
 		mTextArea->setCaption(buf);
-	}
+	}*/
 }
 
 //////////////////////////////////////////////////////////////
@@ -227,13 +213,13 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
 	if (e.key == OIS::KC_N)
 		toggleNPRRenderer();
-	if (e.key == OIS::KC_T)
+	/*if (e.key == OIS::KC_T)
 	{
 		if (mTextArea->isVisible())
 			mTextArea->hide();
 		else
 			mTextArea->show();
-	}
+	}*/
 
 	// video offsets
 	const float offsetStep = 0.004f;

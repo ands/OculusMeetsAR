@@ -46,11 +46,13 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 		material[eyeNum] = materialManager->getByName(materialNames[eyeNum]);
 		Ogre::Pass *materialPass = material[eyeNum]->getTechnique(0)->getPass(0);
 		materialPass->getTextureUnitState(0)->setTexture(renderTexture[eyeNum]);
-		Ogre::GpuProgramParametersSharedPtr params = materialPass->getVertexProgramParameters();
-		params->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(uvScale[eyeNum][0], uvScale[eyeNum][1]));
-		params->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(uvOffset[eyeNum][0], uvOffset[eyeNum][1]));
-		/*params->setNamedConstant("eyeRotationStart", Ogre::Matrix4::IDENTITY);
-		params->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
+		//Ogre::GpuProgramParametersSharedPtr fragmentParams = materialPass->getFragmentProgramParameters();
+		//fragmentParams->setNamedConstant("undistorted", 0);
+		Ogre::GpuProgramParametersSharedPtr vertexParams = materialPass->getVertexProgramParameters();
+		vertexParams->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(uvScale[eyeNum][0], uvScale[eyeNum][1]));
+		vertexParams->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(uvOffset[eyeNum][0], uvOffset[eyeNum][1]));
+		/*vertexParams->setNamedConstant("eyeRotationStart", Ogre::Matrix4::IDENTITY);
+		vertexParams->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
 		
 		// create the distortion meshes:
 		const char *objectNames[] = { "ARLib/Oculus/DistortionMeshLeft", "ARLib/Oculus/DistortionMeshRight" };
@@ -89,7 +91,7 @@ RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderW
 	meshNode->setScale(1, 1, -1);
 
 	Ogre::Viewport *viewport = renderWindow->addViewport(combinedCamera);
-	viewport->setClearEveryFrame(true, Ogre::FBT_DEPTH);
+	viewport->setClearEveryFrame(true); // why do we need to clear the color buffer? shouldn't it always only redraw the distortion mesh?
 }
 
 RiftRenderTarget::~RiftRenderTarget()
@@ -108,7 +110,7 @@ void RiftRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 		Ogre::RenderTexture* renderTextureTarget = renderTexture[eyeNum]->getBuffer()->getRenderTarget();
 		renderTextureTarget->removeAllViewports();
 		renderTextureTarget->addViewport(cameras[eyeNum]);
-		renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
+		//renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
 		//renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
 		//renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
 	}

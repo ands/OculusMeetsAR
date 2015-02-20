@@ -33,6 +33,9 @@ namespace ARLib {
 			materialPass[eyeNum] = rect->getMaterial()->getTechnique(0)->getPass(0);
 			materialPass[eyeNum]->getTextureUnitState(0)->setTexture(videoTexture[eyeNum]->getUndistortionMapTexture());
 			materialPass[eyeNum]->getTextureUnitState(1)->setTexture(videoTexture[eyeNum]->getTexture());
+			//Ogre::GpuProgramParametersSharedPtr parameters = materialPass[eyeNum]->getFragmentProgramParameters();
+			//parameters->setNamedConstant("coordinateMap", 0);
+			//parameters->setNamedConstant("videoTexture", 1);
 
 			const char *nodeName[] = { "ARLib/Video/LeftScreen", "ARLib/Video/RightScreen" };
 			if (trackingManager)

@@ -62,13 +62,8 @@ WebcamApp::~WebcamApp()
 void WebcamApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
-	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	mRoot = new Ogre::Root("../../media/plugins.cfg");
+	cf.load("../../media/resources.cfg");
 	mOverlaySystem = new Ogre::OverlaySystem();
 	mRoot->addFrameListener(this);
  
@@ -82,24 +77,6 @@ void WebcamApp::initOgre(bool showDebugWindow)
         for (i = settings->begin(); i != settings->end(); ++i)
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(i->second, i->first, secName);
 	}
-
-
-	// choose monitor ids
-	/*int debugMonitorId = 0;
-	int oculusRiftMonitorId = 1;
-
-	int yesNoID = MessageBoxA(
-        NULL,
-        "Debug monitor id is 0, Oculus Rift monitor id is 1.\nDo you want to swap them?",
-        "Choose monitor ids",
-        MB_ICONQUESTION | MB_YESNO
-    );
-
-    if (yesNoID == IDYES)
-    {
-        oculusRiftMonitorId = 0;
-		debugMonitorId = 1;
-    }*/
 
 	// initialize render system
 	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");

@@ -13,6 +13,10 @@ vertex_program ARLib/Oculus/DistortionVertex glsl
 fragment_program ARLib/Oculus/DistortionFragment glsl
 {
     source ARLibOculusDistortionFragment.glsl
+	default_params
+	{
+		param_named undistorted int 0
+	}
 }
 
 
@@ -35,7 +39,6 @@ material ARLib/Oculus/LeftEye
 
 			fragment_program_ref ARLib/Oculus/DistortionFragment
 			{
-				param_named diffuseMap int 0
 			}
 
 			texture_unit
@@ -64,7 +67,6 @@ material ARLib/Oculus/RightEye
 
 			fragment_program_ref ARLib/Oculus/DistortionFragment
 			{
-				param_named diffuseMap int 0
 			}
 
 			texture_unit 
