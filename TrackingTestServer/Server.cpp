@@ -451,7 +451,7 @@ void BuildFrame(long FrameNumber, sDataDescriptions* pModels, sFrameOfMocapData*
             int index = pOutFrame->nRigidBodies;
             sRigidBodyData* pRB = &pOutFrame->RigidBodies[index];
 
-            pRB->ID = 0;
+            pRB->ID = 1;
             pRB->x = 0.0f;
             pRB->y = 0.0f;
             pRB->z = 0.0f;

@@ -13,6 +13,7 @@ typedef struct _Marker{
 
 typedef struct _RigidBody{
 	_RigidBody(unsigned int nMarker = 0);
+	_RigidBody(unsigned int nMarker, float x, float y, float z, float qx, float qy, float qz, float qw);
 	~_RigidBody();
 	bool mVisible;
 	int mID;

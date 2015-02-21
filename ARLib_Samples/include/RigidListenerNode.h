@@ -7,7 +7,7 @@
 class RigidListenerNode : public ARLib::RigidBodyEventListener{
 public:
 	RigidListenerNode(Ogre::SceneNode *parent, Ogre::SceneManager *sceneManager, unsigned int rigidBodyID) 
-        : ARLib::RigidBodyEventListener(rigidBodyID){
+        : ARLib::RigidBodyEventListener(rigidBodyID, false){
 		mRigidBodyNode = parent->createChildSceneNode();
 	};
 	void onChange(const ARLib::RigidBody* rb){

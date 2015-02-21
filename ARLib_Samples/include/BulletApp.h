@@ -6,6 +6,7 @@
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "ARLib/ARLibOgre.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "BulletScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 
@@ -59,6 +60,9 @@ class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		ARLib::TrackingManager* mTracker;
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;
+
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
 
         OgreBulletCollisions::DebugDrawer *mDebugDrawer;
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;

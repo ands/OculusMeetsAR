@@ -31,7 +31,14 @@ BulletApp::BulletApp(bool showDebugWindow)
 	initOIS();
 	initRift();
 	initTracking();
-    mScene = new BulletScene(mRift, mTracker, mRoot, mWindow, mSmallWindow, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard);
+	
+	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
+	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
+
+    mScene = new BulletScene(mRift, mTracker, mRoot,
+						mWindow, mSmallWindow, mSceneMgr, 
+						mDynamicsWorld, mMouse, mKeyboard,
+						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
@@ -50,6 +57,9 @@ BulletApp::~BulletApp()
     quitBullet();
 	std::cout << "Closing Ogre:" << std::endl;
 	quitOgre();
+
+	delete mVideoPlayerLeft;
+	delete mVideoPlayerRight;
 }
 
 void BulletApp::initOgre(bool showDebugWindow)
@@ -193,14 +203,15 @@ void BulletApp::quitRift()
 		
 void BulletApp::initTracking()
 {
+	
 	if(mRiftAvailable)
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("10.68.11.247"); //local machine
-	mTracker->setNatNetServerIP("10.68.11.247"); //local machine
+	mTracker->setNatNetClientIP("192.168.0.164"); //local machine
+	mTracker->setNatNetServerIP("192.168.0.164"); //local machine
     mTracker->setFrameEvaluationMethod(ARLib::FRAME_ROUND);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();

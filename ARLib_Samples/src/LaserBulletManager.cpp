@@ -1,5 +1,6 @@
 #include "LaserBulletManager.h"
 #include "OgreBullet/Collisions/Utils/OgreBulletCollisionsMeshToShapeConverter.h"
+#include "OgreBullet/Dynamics/Constraints/OgreBulletDynamicsHingeConstraint.h"
 
 LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, const Ogre::Vector3& position, const Ogre::Vector3& impulse)
     : mShape(nullptr)
@@ -27,6 +28,10 @@ LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::Dynam
     mBody->setShape(mSceneNode, mShape, 0.6f, 0.6f, 1.0f, Ogre::Vector3::ZERO, Ogre::Quaternion(Ogre::Radian(angle), axis));
     mBody->enableActiveState();
     mBody->applyImpulse(impulse, Ogre::Vector3::ZERO);
+
+	//OgreBulletDynamics::HingeConstraint *lockedYAxis;
+	//lockedYAxis = new OgreBulletDynamics::HingeConstraint(mBody, Ogre::Vector3(0,1,0), Ogre::Vector3(0,1,0));
+	//dyWorld->addConstraint(lockedYAxis);
     delete stmc;
 }
 
@@ -35,6 +40,8 @@ LaserBullet::~LaserBullet(){
         delete mBody;
     if(mShape != nullptr)
         delete mShape;
+	if(mSceneNode != nullptr)
+		delete mSceneNode;
 }
 
 bool LaserBullet::update(float dt){

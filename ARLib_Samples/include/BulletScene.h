@@ -8,6 +8,7 @@
 #include "OGRE/Ogre.h"
 #include "RemotePuppet.h"
 #include "ARLib/ARLibOgre.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
@@ -18,7 +19,8 @@ class BulletScene
 {
 	public:
 		BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
-            Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard);
+            Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+			ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer);
 		~BulletScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
@@ -59,6 +61,10 @@ class BulletScene
         PFXSSAO *mRightSSAO;
 
         Ogre::CompositorInstance *mGlow[2];
+		ARLib::RiftVideoScreens *mRiftVideoScreens;
+
+		Ogre::Vector2 mVideoOffset[2];
+		Ogre::Vector2 mVideoScale;
 
         ARLib::RenderTarget* mRenderTarget;
         ARLib::RenderTarget* mSmallRenderTarget;

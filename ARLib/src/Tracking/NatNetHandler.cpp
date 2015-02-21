@@ -69,7 +69,7 @@ const std::string& NatNetHandler::getClientIP() const{
 	return mClientIP;
 }
 
-void NatNetHandler::registerFrameEvaluator(FrameEvaluator* evaluator){
+void NatNetHandler::registerFrameEvaluator(GenericNatNetEvaluator* evaluator){
 	mEvaluator = evaluator;
 }
 

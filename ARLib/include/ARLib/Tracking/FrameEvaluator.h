@@ -7,8 +7,11 @@ and the Oculus Rift Handle
 ***************************************************/
 
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+#include "ARLib/Oculus/Rift.h"
 #include "tinythread.h"
+#include <utility>
 #include <vector>
+#include <map>
 
 
 namespace ARLib{
@@ -33,22 +36,57 @@ namespace ARLib{
 		FrameEvaluator(unsigned int frameBufferSize = 0);
 		~FrameEvaluator();
 
-		RigidBody* evaluateRift(const long long& retroActiveQueryTime);
-        void evaluate();
-		void updateFrame(RBFrame *frame);
+		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime) = 0;
+        virtual void evaluate() = 0;
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
         void setEvaluationMethod(FRAME_EVALUATION_METHOD evalMethod);
-	private:
+	protected:
         unsigned int mFrameBufferSize;
-
-        long long mFreq;
-        TimedFrame *mRiftFrames;
-		std::vector<RigidBodyEventListener*> mRigidBodies;
         FRAME_EVALUATION_METHOD mEval;
-
-        RBFrame *mFrame;
-
         tthread::mutex mMutex;
+
+		//create histories for certain rigid Bodies
+		std::map<unsigned int, TimedFrame*> mRigidBodyHistories;
+		std::vector<RigidBodyEventListener*> mRigidBodies;
+		std::vector<std::pair<Rift*, unsigned int> > mRifts;
+		RBFrame *mCurrentFrame;
+	};
+
+	class GenericNatNetEvaluator : public FrameEvaluator{
+	public:
+		GenericNatNetEvaluator(unsigned int frameBufferSize);
+		virtual void updateFrame(RBFrame *frame) = 0;
+	protected:
+	};
+
+	class NatNetRiftEvaluator : public GenericNatNetEvaluator{
+	public:
+		NatNetRiftEvaluator(unsigned int frameBufferSize = 0);
+		~NatNetRiftEvaluator();
+
+		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
+		virtual void evaluate();
+		virtual void updateFrame(RBFrame *frame);
+	};
+
+	class NatNetEvaluator : public GenericNatNetEvaluator{
+	public:
+		NatNetEvaluator(unsigned int frameBufferSize = 0);
+		~NatNetEvaluator();
+
+		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
+		virtual void evaluate();
+		virtual void updateFrame(RBFrame *frame);
+	};
+
+	class RiftEvaluator : public FrameEvaluator{
+	public:
+		RiftEvaluator(unsigned int frameBufferSize = 0);
+		~RiftEvaluator();
+
+		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
+		virtual void evaluate();
+	private:
 	};
 };
 

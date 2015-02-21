@@ -9,7 +9,8 @@
 BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
-    OIS::Mouse *mouse, OIS::Keyboard *keyboard)
+    OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+	ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer)
     : mRenderTarget(nullptr)
     , mSmallRenderTarget(nullptr)
     , mToggle(true)
@@ -52,6 +53,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mGlow[1]->setEnabled(mToggle);
     GlowMaterialListener *gml = new GlowMaterialListener();
     Ogre::MaterialManager::getSingleton().addListener(gml);
+
+
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
     //room
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
@@ -112,16 +116,23 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mRiftNode->getBodyNode()->attachObject(light);
 
     //Add Screenspace Ambient Occlusion
-    mDebugLeftSSAO = new PFXSSAO(smallWindow, mRiftNode->getLeftCamera());
-    mDebugRightSSAO = new PFXSSAO(smallWindow, mRiftNode->getRightCamera());
-    mLeftSSAO = new PFXSSAO(window, mRiftNode->getLeftCamera());
-    mRightSSAO = new PFXSSAO(window, mRiftNode->getRightCamera());
+    //mDebugLeftSSAO = new PFXSSAO(smallWindow, mRiftNode->getLeftCamera());
+    //mDebugRightSSAO = new PFXSSAO(smallWindow, mRiftNode->getRightCamera());
+    //mLeftSSAO = new PFXSSAO(window, mRiftNode->getLeftCamera());
+    //mRightSSAO = new PFXSSAO(window, mRiftNode->getRightCamera());
+	
+	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
+	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
+	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 }
 
 BulletScene::~BulletScene()
 {
     if(mRenderTarget) delete mRenderTarget;
     if(mSmallRenderTarget) delete mSmallRenderTarget;
+	delete mRiftVideoScreens;
 
 	mRoot->destroySceneManager(mSceneMgr);
 
@@ -162,6 +173,8 @@ void BulletScene::update(float dt)
 	mRemote->update(dt);
     mSword->update(dt);
     LaserBulletManager::getSingleton().update(dt);
+
+	mRiftVideoScreens->update();
 }
 
 //////////////////////////////////////////////////////////////
@@ -179,6 +192,44 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
     }if(e.key == OIS::KC_D){
         mDynamicsWorld->setShowDebugShapes(!mDynamicsWorld->getShowDebugShapes());
     }
+
+	
+	const float offsetStep = 0.004f;
+	bool setOffsets = false;
+	// left
+	if (e.key == OIS::KC_D) { mVideoOffset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_A) { mVideoOffset[0].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_W) { mVideoOffset[0].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_S) { mVideoOffset[0].y -= offsetStep; setOffsets = true; }
+	// right
+	if (e.key == OIS::KC_L) { mVideoOffset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_J) { mVideoOffset[1].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_I) { mVideoOffset[1].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_K) { mVideoOffset[1].y -= offsetStep; setOffsets = true; }
+	// IPD adjustment
+	if (e.key == OIS::KC_B) { mVideoOffset[0].x += 0.5f * offsetStep; mVideoOffset[1].x -= 0.5f * offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_V) { mVideoOffset[0].x -= 0.5f * offsetStep; mVideoOffset[1].x += 0.5f * offsetStep; setOffsets = true; }
+
+	if (setOffsets)
+	{
+		mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+		printf("offset L: %02f x %02f\tR: %02f x %02f\n", mVideoOffset[0].x, mVideoOffset[0].y, mVideoOffset[1].x, mVideoOffset[1].y);
+	}
+
+	// video scalings
+	const float scaleStep = 0.01f;
+	bool setScalings = false;
+	// same for both for now...?
+	if (e.key == OIS::KC_RIGHT) { mVideoScale.x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { mVideoScale.x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { mVideoScale.y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { mVideoScale.y += scaleStep; setScalings = true; }
+
+	if (setScalings)
+	{
+		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
+	}
 	return true;
 }
 bool BulletScene::keyReleased( const OIS::KeyEvent& e )

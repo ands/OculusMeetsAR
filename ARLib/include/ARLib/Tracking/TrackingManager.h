@@ -6,6 +6,7 @@ This class manages the client application, which communicates with the Motive st
 and the Oculus Rift Handle
 ***************************************************/
 #include <string>
+#include "FrameEvaluator.h"
 
 typedef enum ConnectionType ConnectionType;
 
@@ -41,7 +42,7 @@ namespace ARLib{
 		void uninitialize();
 		TRACKING_ERROR_CODE reinitialize(); 
 
-        RigidBody *evaluateRift(const long long& retroActiveQuery);
+        RigidBody *evaluateRigidBody(unsigned int ID, const long long& retroActiveQuery);
 		void update();
 
 		void setNatNetConnectionType(ConnectionType cType);
@@ -52,7 +53,9 @@ namespace ARLib{
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
 		bool mInitialized;
+		unsigned int mFrameBufferSize;
 
+		FRAME_EVALUATION_METHOD mEval;
 		TRACKING_METHOD mTracking;
 		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;

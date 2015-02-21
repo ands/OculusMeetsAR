@@ -6,6 +6,18 @@ namespace ARLib{
 		: mNMarker(nMarker){
 		mMarkers = new Marker[mNMarker];
 	}
+	
+	_RigidBody::_RigidBody(unsigned int nMarker, float x, float y, float z, float qx, float qy, float qz, float qw)
+		: mNMarker(nMarker)
+		, mX(x)
+		, mY(y)
+		, mZ(z)
+		, mqX(qx)
+		, mqY(qy)
+		, mqZ(qz)
+		, mqW(qw){
+		mMarkers = new Marker[mNMarker];
+	}
 
 	_RigidBody::~_RigidBody(){
 		delete [] mMarkers;

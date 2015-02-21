@@ -14,7 +14,7 @@ const unsigned int VISIBILITY_FLAG_RIGHT (1 << 1);
 
 class RenderTarget;
 
-class RiftSceneNode : public RigidBodyEventListener
+class RiftSceneNode : public RiftRigidBodyEventListener
 {
 	public:
 		RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID);
