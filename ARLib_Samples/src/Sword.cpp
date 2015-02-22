@@ -18,8 +18,10 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     mSwordShape = stmc->createConvex();
     mNoShape = new OgreBulletCollisions::BoxCollisionShape(Ogre::Vector3(0.0f, 0.0f, 0.0f));
 
-    mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld);
+    mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
     mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
+
+	mSwordBody->getBulletRigidBody()->setUserPointer(nullptr);
 
     delete stmc;
 }

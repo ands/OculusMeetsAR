@@ -132,7 +132,6 @@ BulletScene::~BulletScene()
 {
     if(mRenderTarget) delete mRenderTarget;
     if(mSmallRenderTarget) delete mSmallRenderTarget;
-	delete mRiftVideoScreens;
 
 	mRoot->destroySceneManager(mSceneMgr);
 

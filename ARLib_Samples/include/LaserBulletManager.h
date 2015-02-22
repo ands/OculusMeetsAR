@@ -9,11 +9,15 @@ public:
     LaserBullet(Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, const Ogre::Vector3& position, const Ogre::Vector3& impulse);
     ~LaserBullet();
     bool update(float dt);
+
 private:
+	static bool HandleCollision(btManifoldPoint& cp, void* body0,void* body1);
+
     OgreBulletCollisions::ConvexHullCollisionShape *mShape;
     OgreBulletDynamics::RigidBody *mBody;
     Ogre::SceneNode *mSceneNode;
     float mLifeTime;
+	bool mCollided;
 };
 
 class LaserBulletManager{
@@ -31,7 +35,7 @@ public:
         return mDynamicsWorld;
     }
     unsigned long long getBulletCounter(){
-        return mBulletCounter;
+        return mBulletCounter++;
     }
     void update(float dt);
     void addBullet(LaserBullet*);
