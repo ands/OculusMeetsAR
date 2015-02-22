@@ -12,11 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Sound\Sound.cpp" />
+    <ClCompile Include="src\Sound\SoundListener.cpp" />
     <ClCompile Include="src\Sound\SoundManager.cpp" />
+    <ClCompile Include="src\Sound\SoundSource.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ARLib\Sound\Sound.h" />
+    <ClInclude Include="include\ARLib\Sound\SoundListener.h" />
     <ClInclude Include="include\ARLib\Sound\SoundManager.h" />
+    <ClInclude Include="include\ARLib\Sound\SoundSource.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{85522A3E-BF4D-42E8-BC6B-41750D2CE369}</ProjectGuid>
@@ -56,7 +60,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_MBCS;TRACKINGDLL_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(NAT_NET)/include;$(ProjectDir)/include;$(OPEN_AL)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(OPEN_AL)/include;$(OGRE_BULLET_PACK)/include</AdditionalIncludeDirectories>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
     </ClCompile>
     <Link>
@@ -66,7 +70,7 @@
     </Link>
     <Lib>
       <AdditionalDependencies>OpenAL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OPEN_AL)/libs/Win32;%(AdditionalLibraryDirectories)$(OPEN_AL)\libs</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OPEN_AL)/libs/Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -76,7 +80,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_MBCS;TRACKINGDLL_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(NAT_NET)/include;$(ProjectDir)/include;$(OPEN_AL)/include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/include;$(OPEN_AL)/include;$(OGRE_BULLET_PACK)/include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

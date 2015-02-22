@@ -1,8 +1,10 @@
 #include "SoundScene.h"
-#include "ARLib/Sound/SoundManager.h"
+#include "ARLib/Sound/SoundSource.h"
+#include "ARLib/Sound/SoundListener.h"
 #include "RigidListenerNode.h"
-#include "AL\al.h"
-#include "AL\alc.h"
+#include "SimpleSoundController.h"
+#include "AL/al.h"
+#include "AL/alc.h"
 
 
 SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
@@ -10,46 +12,6 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
     OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
-	ALCdevice *device;
-	ALCenum error;
-
-	device = alcOpenDevice((nullptr));
-	if(!device){
-		printf("Error opening the device\n");
-	}
-
-	ALCcontext *context = alcCreateContext(device, NULL);
-	if(!alcMakeContextCurrent(context)){
-		printf("Context Error \n");
-	}
-	
-
-	ARLib::Sound* sound = ARLib::SoundManager::instance().getSound("hum1.wav");
-	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
-	alListener3f(AL_POSITION, 0, 0, 1.0f);
-	alListener3f(AL_VELOCITY, 0, 0, 0);
-	alListenerfv(AL_ORIENTATION, listenerOri);
-
-	ALuint buffer;
-	alGenBuffers((ALuint)1, &buffer);
-
-	ALuint source;
-	alGenSources((ALuint)1, &source);
-	alBufferData(buffer, sound->getFormat(), sound->getData(), sound->getSize(), sound->getSampleRate());
-	
-	alSourcef(source, AL_PITCH, 1);
-	alSourcef(source, AL_GAIN, 1);
-	alSource3f(source, AL_POSITION, 0, 0, 0);
-	alSource3f(source, AL_VELOCITY, 0, 0, 0);
-	alSourcei(source, AL_LOOPING, AL_FALSE);
-	alSourcei(source, AL_BUFFER, buffer);
-
-	int state;
-	alGetSourcei(source, AL_SOURCE_STATE, &state);
-	if(state != AL_PLAYING){
-		alSourcePlay(source);
-	}
-
 	mRoot = root;
 	mMouse = mouse;
 	mKeyboard = keyboard;
@@ -116,6 +78,20 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	//mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
 		tracker->registerRigidBodyEventListener(mRiftNode);
+
+	//----------------------------
+	ARLib::SoundManager::instance(); //initialize SoundManager
+	
+	ARLib::SoundListener::instance().attachToNode(mRiftNode->getHeadNode()); //head body node? wtf?
+	mRoot->addFrameListener(&ARLib::SoundListener::instance());
+
+	SimpleSoundController *soundController = new SimpleSoundController(0.5f, "Hum 1.wav","coolsaber.wav");
+	soundController->addSecSound("5clash2.wav");
+	soundController->addSecSound("5clash2.wav");
+	soundController->addSecSound("5clash2.wav");
+	mRoot->addFrameListener(soundController);
+	//----------------------------
+
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
