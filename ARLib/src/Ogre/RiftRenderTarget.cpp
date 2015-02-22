@@ -3,10 +3,10 @@
 
 namespace ARLib {
 
-RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow)
-	: rift(rift)
-	, root(root)
-	, riftSceneManager(NULL)
+RiftRenderTarget::RiftRenderTarget(Rift *_rift, Ogre::Root *_root, Ogre::RenderWindow *renderWindow)
+	: rift(_rift)
+	, root(_root)
+	, riftSceneManager(nullptr)
 {
 	// get rift parameters for both eyes
 	int recommendedTexSize[2][2];
@@ -36,24 +36,26 @@ RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWin
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
 		// create render target textures
-		const char *renderTextureNames[] = { "RiftRenderTextureLeft", "RiftRenderTextureRight" };
+		const char *renderTextureNames[] = { "ARLib/Oculus/RenderTextureLeft", "ARLib/Oculus/RenderTextureRight" };
 		renderTexture[eyeNum] = textureManager->createManual(renderTextureNames[eyeNum],
 			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, Ogre::TEX_TYPE_2D,
 			recommendedTexSize[eyeNum][0], recommendedTexSize[eyeNum][1], 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET);
 
 		// load materials and set shader parameters
-		const char *materialNames[] = { "Oculus/LeftEye", "Oculus/RightEye" };
+		const char *materialNames[] = { "ARLib/Oculus/LeftEye", "ARLib/Oculus/RightEye" };
 		material[eyeNum] = materialManager->getByName(materialNames[eyeNum]);
 		Ogre::Pass *materialPass = material[eyeNum]->getTechnique(0)->getPass(0);
 		materialPass->getTextureUnitState(0)->setTexture(renderTexture[eyeNum]);
-		Ogre::GpuProgramParametersSharedPtr params = materialPass->getVertexProgramParameters();
-		params->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(uvScale[eyeNum][0], uvScale[eyeNum][1]));
-		params->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(uvOffset[eyeNum][0], uvOffset[eyeNum][1]));
-		/*params->setNamedConstant("eyeRotationStart", Ogre::Matrix4::IDENTITY);
-		params->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
+		//Ogre::GpuProgramParametersSharedPtr fragmentParams = materialPass->getFragmentProgramParameters();
+		//fragmentParams->setNamedConstant("undistorted", 0);
+		Ogre::GpuProgramParametersSharedPtr vertexParams = materialPass->getVertexProgramParameters();
+		vertexParams->setNamedConstant("eyeToSourceUVScale", Ogre::Vector2(uvScale[eyeNum][0], uvScale[eyeNum][1]));
+		vertexParams->setNamedConstant("eyeToSourceUVOffset", Ogre::Vector2(uvOffset[eyeNum][0], uvOffset[eyeNum][1]));
+		/*vertexParams->setNamedConstant("eyeRotationStart", Ogre::Matrix4::IDENTITY);
+		vertexParams->setNamedConstant("eyeRotationEnd", Ogre::Matrix4::IDENTITY);*/
 		
 		// create the distortion meshes:
-		const char *objectNames[] = { "RiftRenderObjectLeft", "RiftRenderObjectRight" };
+		const char *objectNames[] = { "ARLib/Oculus/DistortionMeshLeft", "ARLib/Oculus/DistortionMeshRight" };
 		Ogre::ManualObject* manual = riftSceneManager->createManualObject(objectNames[eyeNum]);
 		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
 
@@ -77,7 +79,7 @@ RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWin
 	}
 
 	// create a camera in the rift scene so the mesh can be rendered onto it:
-	Ogre::Camera *combinedCamera = riftSceneManager->createCamera("OculusRiftExternalCamera");
+	Ogre::Camera *combinedCamera = riftSceneManager->createCamera("ARLib/Oculus/CombinedCamera");
 	combinedCamera->setFarClipDistance(2);
 	combinedCamera->setNearClipDistance(0.1f);
 	combinedCamera->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
@@ -89,9 +91,7 @@ RiftRenderTarget::RiftRenderTarget(Rift *rift, Ogre::Root *root, Ogre::RenderWin
 	meshNode->setScale(1, 1, -1);
 
 	Ogre::Viewport *viewport = renderWindow->addViewport(combinedCamera);
-	viewport->setClearEveryFrame(true, Ogre::FBT_DEPTH);
-	//viewport->setBackgroundColour(Ogre::ColourValue::Black);
-	viewport->setOverlaysEnabled(false);
+	viewport->setClearEveryFrame(true); // why do we need to clear the color buffer? shouldn't it always only redraw the distortion mesh?
 }
 
 RiftRenderTarget::~RiftRenderTarget()
@@ -100,7 +100,7 @@ RiftRenderTarget::~RiftRenderTarget()
 		root->destroySceneManager(riftSceneManager);
 }
 
-void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
+void RiftRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
@@ -110,13 +110,13 @@ void RiftRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
 		Ogre::RenderTexture* renderTextureTarget = renderTexture[eyeNum]->getBuffer()->getRenderTarget();
 		renderTextureTarget->removeAllViewports();
 		renderTextureTarget->addViewport(cameras[eyeNum]);
-		renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
+		//renderTextureTarget->getViewport(0)->setClearEveryFrame(true, Ogre::FBT_DEPTH);
 		//renderTextureTarget->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Black);
-		renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
+		//renderTextureTarget->getViewport(0)->setOverlaysEnabled(false);
 	}
 }
 
-/*void RiftRenderTarget::SetTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
+/*void RiftRenderTarget::setTimewarpMatrices(Ogre::Matrix4 &leftRotationStart , Ogre::Matrix4 &leftRotationEnd,
 										   Ogre::Matrix4 &rightRotationStart, Ogre::Matrix4 &rightRotationEnd)
 {
 	Ogre::GpuProgramParametersSharedPtr params = material[0]->getTechnique(0)->getPass(0)->getVertexProgramParameters();

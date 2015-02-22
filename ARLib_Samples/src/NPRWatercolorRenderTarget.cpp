@@ -63,9 +63,9 @@ NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(
 
 		manual->begin(materialNames[eyeNum], Ogre::RenderOperation::OT_TRIANGLE_LIST);
 		int index = 0;
-		for (int y = 0; y < tilesY; y++)
+		for (unsigned int y = 0; y < tilesY; y++)
 		{
-			for (int x = 0; x < tilesX; x++)
+			for (unsigned int x = 0; x < tilesX; x++)
 			{
 				float px = ((float)x / (float)(tilesX - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusX;
 				float py = ((float)y / (float)(tilesY - 1)) + (((float)std::rand()/(float)RAND_MAX) * 2.0f - 1.0f) * randRadiusY;
@@ -146,7 +146,7 @@ NPRWatercolorRenderTarget::~NPRWatercolorRenderTarget()
 		root->destroySceneManager(watercolorSceneManager[1]);
 }
 
-void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *right)
+void NPRWatercolorRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 {
 	Ogre::Camera *cameras[2] = { left, right };
 
@@ -156,9 +156,6 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 		mrt[eyeNum]->removeAllViewports();
 		Ogre::Viewport *vp = mrt[eyeNum]->addViewport(cameras[eyeNum]);
 		vp->setMaterialScheme("MRT");
-		//vp->setClearEveryFrame(true);
-		vp->setOverlaysEnabled(false);
-		vp->setSkiesEnabled(false);
 
 		// add blur compositor
 		Ogre::CompositorInstance *blur = Ogre::CompositorManager::getSingleton().addCompositor(vp, "Blur");
@@ -176,5 +173,5 @@ void NPRWatercolorRenderTarget::SetCameras(Ogre::Camera *left, Ogre::Camera *rig
 		}
 	}
 
-	destination->SetCameras(camera[0], camera[1]);
+	destination->setCameras(camera[0], camera[1]);
 }

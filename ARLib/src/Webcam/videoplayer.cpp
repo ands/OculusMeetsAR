@@ -1,153 +1,167 @@
-#include "ARLib/Webcam/videoplayer.hpp"
+#include <stdio.h>
+#include "ARLib/Webcam/CCapture.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Webcam/ocam.h"
 
-namespace webcam
+namespace ARLib {
+
+VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilename, float _videoDistance, const char *homographyMatrixFilename)
+	: videoDistance(_videoDistance)
+	, ocamModel(NULL)
 {
-	VideoPlayer::VideoPlayer(int camNum, const char *ocamModelParametersFilename)
+	additionalLatency.QuadPart = 0;
+
+	if (FAILED(CCapture::CreateInstance(&capture)))
+		capture = NULL;
+
+	if (capture)
 	{
-		camNumber=camNum;
-		if (FAILED(CCapture::CreateInstance(&cap))){
-			cap = NULL;
-		}
-
-		mOcamModel = ocam_get_model(ocamModelParametersFilename);
-	}
-
-	VideoPlayer::~VideoPlayer()
-	{
-		close();
-
-		if (mOcamModel)
-			delete mOcamModel;
-	}
-
-	void VideoPlayer::playVideo(float videoDistance)
-	{
-		if (cap){
-			//cam selection
-			IMFActivate *temp = NULL;
-			DeviceList list = DeviceList();
-			list.EnumerateDevices();
-			int count = list.Count();
-			//todo: select the two C310 in right order
-			bool firstfound=false;
-			for(unsigned int i=0;i<list.Count();i++){
-				temp=list.m_ppDevices[i];
-				WCHAR *name=NULL;
-				temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME,&name,NULL);
-				std::wstring displayname = name;
-				std::string helpname="Logitech HD Webcam C310";
-				std::wstring loginame(helpname.begin(),helpname.end());
-				if(displayname.compare(0,19,loginame,0,19)==0 && displayname.compare(loginame)>=0){//Accepts "Logitech HD Webcam Cx" with x>=310
-					if(camNumber==0){
-						break;
-					}
-					else if(!firstfound){
-						firstfound=true;
-					}
-					else if(firstfound){
-						break;
-					}
-				}
-
-			}
-			//Start capturing
-			cap->StartCapture(temp);
-
-			// wait until we have the first picture
-			const int timeout = 500; // 5 seconds timeout
-			for (int i = 0; i < timeout; i++){
-				Sleep(10);
-				if (!mTexture.isNull() || SUCCEEDED(update())){
+		// camera selection
+		IMFActivate *temp = NULL;
+		DeviceList list = DeviceList();
+		list.EnumerateDevices();
+		int count = list.Count();
+		// todo: select the two C310 in right order
+		bool firstfound = false;
+		for(unsigned int i = 0; i < list.Count(); i++)
+		{
+			temp = list.m_ppDevices[i];
+			WCHAR *name = NULL;
+			temp->GetAllocatedString(MF_DEVSOURCE_ATTRIBUTE_FRIENDLY_NAME, &name, NULL);
+			const WCHAR *searchname = L"Logitech HD Webcam C310";
+			// Accepts "Logitech HD Webcam Cx" with x>=310
+			if (!wcsncmp(name, searchname, 20) && wcsncmp(name, searchname, sizeof(searchname)) >= 0) {
+				if(cameraNumber == 0)
 					break;
-				}
-			}
-
-			// load undistortion texture
-			if (!mTexture.isNull())
-			{
-				float *undistortionMapXY = new float[2 * 1280 * 960];
-				if (undistortionMapXY)
-				{
-					ocam_create_perspecive_undistortion_map(mOcamModel, undistortionMapXY, 1280, 960, videoDistance);
-
-					mUndistortionMapTexture = Ogre::TextureManager::getSingleton().createManual(
-						getTextureName() + "Undistortion",
-						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-						Ogre::TEX_TYPE_2D,
-						1280, 960,
-						0,
-						Ogre::PF_FLOAT16_GR,
-						Ogre::TU_STATIC_WRITE_ONLY);
-
-					Ogre::PixelBox pb(1280, 960, 1, Ogre::PF_FLOAT32_GR, undistortionMapXY);
-					mUndistortionMapTexture->getBuffer()->blitFromMemory(pb);
-
-					delete[] undistortionMapXY;
-				}
+				else if(!firstfound)
+					firstfound = true;
+				else
+					break;
 			}
 		}
+		capture->StartCapture(temp);
+
+		if (ocamModelParametersFilename)
+			ocamModel = ocam_get_model(ocamModelParametersFilename);
 	}
 
-	HRESULT VideoPlayer::update()
+	// load homography matrix from file
+	bool homographyLoaded = false;
+	if (homographyMatrixFilename)
 	{
-		HRESULT check=E_FAIL;
-		if(cap && cap->somebufferexist){
-			BYTE* sample = cap->getLastImagesample(&check);
-			if(SUCCEEDED(check)){
-				if (mTexture.isNull())
-				{
-					static int i = 0;
-					mTexture = Ogre::TextureManager::getSingleton().createManual(
-						"ARLibWebcam/VideoTexture" + Ogre::StringConverter::toString(++i),
-						Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-						Ogre::TEX_TYPE_2D,
-						1280,960,
-						0,
-						Ogre::PF_BYTE_BGR,
-						Ogre::TU_DYNAMIC_WRITE_ONLY_DISCARDABLE);
-				}
-				Ogre::PixelBox pb(1280,960, 1, Ogre::PF_BYTE_BGR, sample);
-				Ogre::HardwarePixelBufferSharedPtr buffer = mTexture->getBuffer();
-				buffer->blitFromMemory(pb);
-			}
+		FILE *file;
+		fopen_s(&file, homographyMatrixFilename, "r");
+		if(file)
+		{
+			int count1 = fscanf_s(file, "%f %f %f\n", &homographyMatrix[0], &homographyMatrix[1], &homographyMatrix[2]);
+			int count2 = fscanf_s(file, "%f %f %f\n", &homographyMatrix[3], &homographyMatrix[4], &homographyMatrix[5]);
+			int count3 = fscanf_s(file, "%f %f %f\n", &homographyMatrix[6], &homographyMatrix[7], &homographyMatrix[8]);
+			fclose(file);
+
+			if (count1 == 3 && count2 == 3 && count3 == 3)
+				homographyLoaded = true;
+			else
+				fprintf_s(stderr, "ERROR: Could not read homography matrix from %s\n", homographyMatrixFilename);
 		}
-		return check;
+		else
+			fprintf_s(stderr, "ERROR: Could not open %s\n", homographyMatrixFilename);
 	}
 
-	std::string VideoPlayer::getTextureName()
+	if (!homographyLoaded)
 	{
-		std::string name;
-		if (!mTexture.isNull())
-			name = mTexture->getName();
-		return name;
-	}
-
-	int VideoPlayer::getVideoWidth()
-	{
-		int width=0;
-		if (!mTexture.isNull())
-			width = mTexture->getWidth();
-		return width;
-	}
-
-	int VideoPlayer::getVideoHeight()
-	{
-		int height=0;
-		if (!mTexture.isNull())
-			height = mTexture->getHeight();
-		return height;
-	}
-
-	void VideoPlayer::close()
-	{
-	}
-
-	std::string VideoPlayer::getUndistortionMapTextureName()
-	{
-		std::string name;
-		if (!mUndistortionMapTexture.isNull())
-			name = mUndistortionMapTexture->getName();
-		return name;
+		float identity[] =
+		{
+			1.0, 0.0, 0.0, 
+			0.0, 1.0, 0.0, 
+			0.0, 0.0, 1.0
+		};
+		memcpy(homographyMatrix, identity, sizeof(identity));
 	}
 }
+
+VideoPlayer::~VideoPlayer()
+{
+	capture->EndCaptureSession();
+	capture->Release();
+	free(ocamModel);
+}
+
+void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
+{
+	HRESULT check = E_FAIL;
+	if(capture)
+	{
+		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
+		if(SUCCEEDED(check))
+		{
+			captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
+			return sample;
+		}
+	}
+	return NULL;
+}
+
+int VideoPlayer::getVideoWidth()
+{
+	return 1280; // TODO: request and read out actual dimensions 
+}
+
+int VideoPlayer::getVideoHeight()
+{
+	return 960; // TODO: request and read out actual dimensions 
+}
+
+void VideoPlayer::calculateUndistortionMap(float *xyMap)
+{
+	int width = getVideoWidth();
+	int height = getVideoHeight();
+
+	float Nxc = height / 2.0f;
+	float Nyc = width / 2.0f;
+	float Nz  = -width / videoDistance;
+
+	double world[3], cam[2];
+	world[2] = Nz;
+
+	// ocam + homography "undistortion" and normalization
+	float *localXYmap = xyMap;
+	float invMaxX = 1.0f / (float)(width - 1);
+	float invMaxY = 1.0f / (float)(height - 1);
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			// homography undistortion
+			float inverseZ =   1.0f / (y * homographyMatrix[6] + x * homographyMatrix[7] + homographyMatrix[8]);
+			float ycoord = inverseZ * (y * homographyMatrix[0] + x * homographyMatrix[1] + homographyMatrix[2]);
+			float xcoord = inverseZ * (y * homographyMatrix[3] + x * homographyMatrix[4] + homographyMatrix[5]);
+
+			// ocam undistortion
+			if (ocamModel)
+			{
+				world[0] = (ycoord - Nxc);
+				world[1] = (xcoord - Nyc);
+				ocam_world2cam(ocamModel, world, cam);
+			}
+			else
+			{
+				cam[1] = xcoord;
+				cam[0] = ycoord;
+			}
+
+			if(cam[0] >= 0 && cam[0] < height && cam[1] >= 0 && cam[1] < width)
+			{
+				*localXYmap++ = (float)cam[1] * invMaxX;
+				*localXYmap++ = (float)cam[0] * invMaxY;
+			}
+			else
+			{
+				// outside value. should sample the (black) border color
+				*localXYmap++ = -1.0f;
+				*localXYmap++ = -1.0f;
+			}
+		}
+	}
+}
+
+}; // ARLib namespace

@@ -1,4 +1,5 @@
 #include "WebcamApp.h"
+#include "NatNetTypes.h"
 
 WebcamApp::WebcamApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -18,7 +19,7 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
-	showDebugWindow = false; // for testing purposes
+	//showDebugWindow = false; // for testing purposes
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);
@@ -31,8 +32,8 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
-	mVideoPlayerLeft = new webcam::VideoPlayer(0, "calib_results_CAM1.txt");
-	mVideoPlayerRight = new webcam::VideoPlayer(1, "calib_results_CAM2.txt");
+	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
+	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,
@@ -61,13 +62,9 @@ WebcamApp::~WebcamApp()
 void WebcamApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
 	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	cf.load("../../media/resources.cfg");
+	mOverlaySystem = new Ogre::OverlaySystem();
 	mRoot->addFrameListener(this);
  
     // add resources
@@ -80,24 +77,6 @@ void WebcamApp::initOgre(bool showDebugWindow)
         for (i = settings->begin(); i != settings->end(); ++i)
             Ogre::ResourceGroupManager::getSingleton().addResourceLocation(i->second, i->first, secName);
 	}
-
-
-	// choose monitor ids
-	/*int debugMonitorId = 0;
-	int oculusRiftMonitorId = 1;
-
-	int yesNoID = MessageBoxA(
-        NULL,
-        "Debug monitor id is 0, Oculus Rift monitor id is 1.\nDo you want to swap them?",
-        "Choose monitor ids",
-        MB_ICONQUESTION | MB_YESNO
-    );
-
-    if (yesNoID == IDYES)
-    {
-        oculusRiftMonitorId = 0;
-		debugMonitorId = 1;
-    }*/
 
 	// initialize render system
 	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
@@ -119,28 +98,32 @@ void WebcamApp::initOgre(bool showDebugWindow)
 	if (mRiftAvailable)
 	{
 		Ogre::NameValuePairList miscParams;
-		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1 /*oculusRiftMonitorId*/);
+		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1);
 		miscParams["border"] = "none";
 		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
 		Ogre::NameValuePairList miscParamsSmall;
-		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0 /*debugMonitorId*/);
+		miscParamsSmall["monitorIndex"] = Ogre::StringConverter::toString(0);
 		mSmallWindow = mRoot->createRenderWindow("ARLib Example (debug window)", 1920 / 2, 1080 / 2, false, &miscParamsSmall);
 		if (!mWindow)
 			mWindow = mSmallWindow;
 	}
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
+
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+	mSceneMgr->addRenderQueueListener(mOverlaySystem);
 }
 void WebcamApp::quitOgre()
 {
-	if(mRoot) delete mRoot;
+	delete mOverlaySystem;
+	delete mRoot;
 }
 
 void WebcamApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
     mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
     mDebugDrawer->setDrawWireframe(true);
@@ -220,9 +203,9 @@ void WebcamApp::quitRift()
 void WebcamApp::initTracking()
 {
 	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, mRift);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET ,1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP(); //local machine
@@ -233,6 +216,8 @@ void WebcamApp::initTracking()
 		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
 		mTrackingAvailable = false;
 		mTracker->uninitialize();
+		delete mTracker;
+		mTracker = nullptr;
 	}else{
 		mTrackingAvailable = true;	
 	}
@@ -252,10 +237,6 @@ bool WebcamApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	// update the standard input devices
 	mKeyboard->capture();
 	mMouse->capture();
-
-	//Videotexturupdate
-	mVideoPlayerLeft->update();
-	mVideoPlayerRight->update();
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
 	

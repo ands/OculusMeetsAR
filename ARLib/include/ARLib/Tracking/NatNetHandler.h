@@ -36,7 +36,8 @@ namespace ARLib{
 		const std::string& getServerIP() const;
 		const std::string& getClientIP() const;
 
-		void registerFrameEvaluator(FrameEvaluator* evaluator);
+		void registerFrameEvaluator(GenericNatNetEvaluator* evaluator);
+        double getPing()const;
 	private:
 		static const std::string invalidIP;
 
@@ -49,7 +50,7 @@ namespace ARLib{
 
 		sDataDescriptions *mDataDesc;
 		NatNetClient *mClientHandle;
-		FrameEvaluator *mEvaluator;
+		GenericNatNetEvaluator *mEvaluator;
 
 		CONNECTION_STATE mConnectionState;
 	};

@@ -1,18 +1,17 @@
 #include "WebcamScene.h"
 #include "RigidListenerNode.h"
 #include "NPRWatercolorRenderTarget.h"
-#include "ARLIB/Webcam/videoplayer.hpp"
 
-// eye visibility masks
-#define VISIBILITY_FLAG_LEFT  (1 << 0)
-#define VISIBILITY_FLAG_RIGHT (1 << 1)
+#include "OGRE/Overlay/OgreOverlayManager.h"
+#include "OGRE/Overlay/OgreOverlayContainer.h"
+#include "OGRE/Overlay/OgreFontManager.h"
 
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
 	OIS::Mouse *mouse, OIS::Keyboard *keyboard,
-	webcam::VideoPlayer *videoPlayerLeft, webcam::VideoPlayer *videoPlayerRight)
+	ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight)
 	: mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
 	, enabledNPRRenderer(false)
@@ -31,83 +30,48 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	// rift node:
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0); // TODO: set correct rigid body id!
-	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(mRiftNode);
+		tracker->addRigidBodyEventListener(mRiftNode);
 
 	// create viewports
 	if (window && rift)
 	{
 		mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
 		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
-        mRiftNode->addRenderTarget(mRenderTarget /*mWatercolorRenderTarget*/);
-
-		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+        mRiftNode->addRenderTarget(mRenderTarget);
 	}
 
 	if (smallWindow)
 	{
 		mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
 		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
-        mRiftNode->addRenderTarget(mSmallRenderTarget /*mSmallWatercolorRenderTarget*/);
-
-		mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-		mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+        mRiftNode->addRenderTarget(mSmallRenderTarget);
 	}
 
-	// start background video players for the eyes
-	webcam::VideoPlayer *videoPlayer[] = { videoPlayerLeft, videoPlayerRight };
-	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
-	{
-		videoPlayer[eyeNum]->playVideo(4.0f);
-		if (!videoPlayer[eyeNum]->getTextureName().empty())
-		{
-			// video background rendering rect
-			Ogre::Rectangle2D *rect = new Ogre::Rectangle2D(true);
-			const Ogre::uint visibilityFlags[] = { VISIBILITY_FLAG_LEFT, VISIBILITY_FLAG_RIGHT };
-			rect->setVisibilityFlags(visibilityFlags[eyeNum]);
-			rect->setCorners(-1.0f, 1.0f, 1.0f, -1.0f);
-			rect->setUVs(Ogre::Vector2(1, 0), Ogre::Vector2(0, 0), Ogre::Vector2(1, 1), Ogre::Vector2(0, 1));
-			rect->setRenderQueueGroup(Ogre::RENDER_QUEUE_BACKGROUND);
-			rect->setBoundingBox(Ogre::AxisAlignedBox::BOX_INFINITE);
-			const char *materialName[] = { "Video/LeftEye", "Video/RightEye" };
-			rect->setMaterial(materialName[eyeNum]);
+	// attach video screens
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, videoPlayerLeft, videoPlayerRight, tracker);
 
-			Ogre::Pass *materialPass = rect->getMaterial()->getTechnique(0)->getPass(0);
-			materialPass->getTextureUnitState(0)->setTextureName(videoPlayer[eyeNum]->getUndistortionMapTextureName());
-			materialPass->getTextureUnitState(1)->setTextureName(videoPlayer[eyeNum]->getTextureName());
-			Ogre::Vector2 offset[] = { Ogre::Vector2(0.04f, 0.02f), Ogre::Vector2(0.0f, -0.02f) };
-			//Ogre::Vector2 scale[] = { Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f), Ogre::Vector2(1080.0f / 1280.0f, 960.0f / 960.0f) };
-			Ogre::Vector2 scale[] = { Ogre::Vector2(0.8f, 0.8f), Ogre::Vector2(0.8f, 0.8f) };
-			materialPass->getVertexProgramParameters()->setNamedConstant("offset", offset[eyeNum]);
-			materialPass->getVertexProgramParameters()->setNamedConstant("scale", scale[eyeNum]);
-
-			const char *nodeName[] = { "LeftVideo", "RightVideo" };
-			mRiftNode->getHeadNode()->createChildSceneNode(nodeName[eyeNum])->attachObject(rect);
-		}
-	}
-
-	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr);
+	// other stuff in the scene
+	RigidListenerNode* cubeNodeT = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 0);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(cubeNodeT);
+		tracker->addRigidBodyEventListener(cubeNodeT);
 	
 	Ogre::SceneNode* cubeNode3 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt3->getSubEntity(0)->setMaterialName( "CubeMaterialWhite" );
 	cubeNode3->attachObject( cubeEnt3 );
-	cubeNode3->setPosition( -1.0, 0.0, 0.0 );
-	cubeNode3->setScale( 0.5, 0.5, 0.5 );
+	cubeNode3->setPosition(-0.2f, 0.0f, 0.0f);
+	cubeNode3->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* roomLight = mSceneMgr->createLight();
 	roomLight->setType(Ogre::Light::LT_POINT);
-	roomLight->setCastShadows( true );
-	roomLight->setShadowFarDistance( 30 );
-	roomLight->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	roomLight->setSpecularColour( .25, .25, .25 );
-	roomLight->setDiffuseColour( 0.85, 0.76, 0.7 );
+	roomLight->setCastShadows(true);
+	roomLight->setShadowFarDistance(30.0f);
+	roomLight->setAttenuation(65.0f, 1.0f, 0.07f, 0.017f);
+	roomLight->setSpecularColour(0.25f, 0.25f, 0.25f);
+	roomLight->setDiffuseColour(0.85f, 0.76f, 0.7f);
 
-	roomLight->setPosition( 5, 5, 5 );
+	roomLight->setPosition(5.0f, 5.0f, 5.0f);
 
 	mSceneMgr->getRootSceneNode()->attachObject( roomLight );
 
@@ -115,24 +79,58 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition( 3.0, 0.0, 0.0 );
-	cubeNode2->setScale( 0.5, 0.5, 0.5 );
+	cubeNode2->setPosition(0.6f, 0.0f, 0.0f);
+	cubeNode2->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
-	light->setCastShadows( false );
-	light->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	light->setSpecularColour( .25, .25, .25 );
-	light->setDiffuseColour( 0.35, 0.27, 0.23 );
+	light->setCastShadows(false);
+	light->setAttenuation(65.0f, 1.0f, 0.07f, 0.017f);
+	light->setSpecularColour(0.25f, 0.25f, 0.25f);
+	light->setDiffuseColour(0.35f, 0.27f, 0.23f);
 	mRiftNode->getBodyNode()->attachObject(light);
+
+	// Overlay stuff
+	/*Ogre::OverlayManager *overlayManager = Ogre::OverlayManager::getSingletonPtr();
+	// Create a panel
+	Ogre::OverlayContainer* panel = static_cast<Ogre::OverlayContainer*>(
+		overlayManager->createOverlayElement("Panel", "TextPanel"));
+	panel->setMetricsMode(Ogre::GMM_RELATIVE);
+	panel->setPosition(0.0f, 0.2f);
+	panel->setDimensions(0.5f, 0.2f);
+	// Create a text area
+	mTextArea = static_cast<Ogre::TextAreaOverlayElement*>(overlayManager->createOverlayElement("TextArea", "Text"));
+	mTextArea->setMetricsMode(Ogre::GMM_RELATIVE);
+	mTextArea->setPosition(0.0f, 0.0f);
+	mTextArea->setDimensions(0.5f, 0.2f);
+	mTextArea->setCaption("Time: ? ms");
+	mTextArea->setCharHeight(0.1f);
+	mTextArea->setFontName("DefaultFont");
+	mTextArea->setColourBottom(Ogre::ColourValue(1.0, 0.0, 0.5));
+	mTextArea->setColourTop(Ogre::ColourValue(1.0, 0.0, 0.5));
+	Ogre::Overlay* overlay = overlayManager->create("TextOverlay");
+	overlay->add2D(panel);
+	panel->addChild(mTextArea);
+	overlay->show();
+	//mTextArea->hide(); // hide by default
+	mTextArea->show();*/
+
+	// TODO: save the configuration in a file?
+	// default video configuration
+	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
+	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
+	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 }
 
 WebcamScene::~WebcamScene()
 {
-	if (mWatercolorRenderTarget) delete mWatercolorRenderTarget;
-	if (mSmallWatercolorRenderTarget) delete mSmallWatercolorRenderTarget;
-	if (mRenderTarget) delete mRenderTarget;
-	if (mSmallRenderTarget) delete mSmallRenderTarget;
+	delete mRiftVideoScreens;
+	delete mWatercolorRenderTarget;
+	delete mSmallWatercolorRenderTarget;
+	delete mRenderTarget;
+	delete mSmallRenderTarget;
 
 	mRoot->destroySceneManager(mSceneMgr);
 
@@ -151,30 +149,24 @@ WebcamScene::~WebcamScene()
 	delete mRiftNode;
 }
 
-void WebcamScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
-{
-	mRiftNode->removeAllRenderTargets();
-	mRiftNode->addRenderTarget(renderTarget);
-	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
-}
-
 void WebcamScene::toggleNPRRenderer()
 {
+	mRiftNode->removeAllRenderTargets();
+
 	if (enabledNPRRenderer)
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-			setRenderTarget(mRenderTarget);
+			mRiftNode->addRenderTarget(mRenderTarget);
 		if (mSmallRenderTarget)
-			setRenderTarget(mSmallRenderTarget);
+			mRiftNode->addRenderTarget(mSmallRenderTarget);
 		enabledNPRRenderer = false;
 	}
 	else
 	{
 		if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-			setRenderTarget(mWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
 		if (mSmallRenderTarget)
-			setRenderTarget(mSmallWatercolorRenderTarget);
+			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
 		enabledNPRRenderer = true;
 	}
 }
@@ -190,28 +182,27 @@ void WebcamScene::update(float dt)
 
 		// TODO: this needs to be done by the tracking system!
 		static ARLib::RigidBody rb; float q[4]; float p[3];
-		rift->getPose(p, q);
-		rb.mqX = q[0];
-		rb.mqY = q[1];
-		rb.mqZ = q[2];
-		rb.mqW = q[3];
+		Ogre::Vector3 riftPosition = mRiftNode->getBodyNode()->getPosition();
+		rift->getPose(p, q); // get the head tracking data relative to the body position
+		rb.mX = 0.8f + p[0];
+		rb.mY = 0.3f + p[1];
+		rb.mZ = 0.8f + p[2];
+		rb.mqX = q[0]; rb.mqY = q[1]; rb.mqZ = q[2]; rb.mqW = q[3];
 		mRiftNode->onChange(&rb);
 	}
 
-	// TODO: will also be handled by the tracking system?
-	/*float forward = (mKeyboard->isKeyDown( OIS::KC_W ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_S ) ? 0 : -1);
-	float leftRight = (mKeyboard->isKeyDown( OIS::KC_A ) ? 0 : 1) + (mKeyboard->isKeyDown( OIS::KC_D ) ? 0 : -1);
-
-	if( mKeyboard->isKeyDown( OIS::KC_LSHIFT ) )
-	{
-		forward *= 3;
-		leftRight *= 3;
-	}
+	// update video frames
+	mRiftVideoScreens->update();
 	
-	Ogre::Vector3 dirX = mBodyTiltNode->_getDerivedOrientation()*Ogre::Vector3::UNIT_X;
-	Ogre::Vector3 dirZ = mBodyTiltNode->_getDerivedOrientation()*Ogre::Vector3::UNIT_Z;
-
-	mBodyNode->setPosition( mBodyNode->getPosition() + dirZ*forward*dt + dirX*leftRight*dt );*/
+	// update text box time
+	/*static Ogre::Timer timer;
+	if (mTextArea->isVisible())
+	{
+		char buf[256];
+		unsigned long time = timer.getMilliseconds();
+		_snprintf(buf, 256, "Time: %lu ms", time);
+		mTextArea->setCaption(buf);
+	}*/
 }
 
 //////////////////////////////////////////////////////////////
@@ -222,6 +213,52 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
 	if (e.key == OIS::KC_N)
 		toggleNPRRenderer();
+	/*if (e.key == OIS::KC_T)
+	{
+		if (mTextArea->isVisible())
+			mTextArea->hide();
+		else
+			mTextArea->show();
+	}*/
+
+	// video offsets
+	const float offsetStep = 0.004f;
+	bool setOffsets = false;
+	// left
+	if (e.key == OIS::KC_D) { mVideoOffset[0].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_A) { mVideoOffset[0].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_W) { mVideoOffset[0].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_S) { mVideoOffset[0].y -= offsetStep; setOffsets = true; }
+	// right
+	if (e.key == OIS::KC_L) { mVideoOffset[1].x -= offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_J) { mVideoOffset[1].x += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_I) { mVideoOffset[1].y += offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_K) { mVideoOffset[1].y -= offsetStep; setOffsets = true; }
+	// IPD adjustment
+	if (e.key == OIS::KC_B) { mVideoOffset[0].x += 0.5f * offsetStep; mVideoOffset[1].x -= 0.5f * offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_V) { mVideoOffset[0].x -= 0.5f * offsetStep; mVideoOffset[1].x += 0.5f * offsetStep; setOffsets = true; }
+
+	if (setOffsets)
+	{
+		mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+		printf("offset L: %02f x %02f\tR: %02f x %02f\n", mVideoOffset[0].x, mVideoOffset[0].y, mVideoOffset[1].x, mVideoOffset[1].y);
+	}
+
+	// video scalings
+	const float scaleStep = 0.01f;
+	bool setScalings = false;
+	// same for both for now...?
+	if (e.key == OIS::KC_RIGHT) { mVideoScale.x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { mVideoScale.x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { mVideoScale.y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { mVideoScale.y += scaleStep; setScalings = true; }
+
+	if (setScalings)
+	{
+		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
+	}
+
 	return true;
 }
 bool WebcamScene::keyReleased( const OIS::KeyEvent& e )
@@ -232,8 +269,8 @@ bool WebcamScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
-		mRiftNode->setYaw(Ogre::Degree(-0.3*e.state.X.rel));
-		mRiftNode->setPitch(Ogre::Degree(-0.3*e.state.Y.rel));
+		mRiftNode->setYaw(Ogre::Degree(-0.3f*e.state.X.rel));
+		mRiftNode->setPitch(Ogre::Degree(-0.3f*e.state.Y.rel));
 	}
 	return true;
 }

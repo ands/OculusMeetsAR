@@ -1,6 +1,5 @@
-// Material genrated by blender2ogre 0.6.0
-
-material CubeMaterialRed
+import diffuse_template from "diffuse.material"
+material CubeMaterialRed : diffuse_template
 {
     receive_shadows on 
 
@@ -36,7 +35,7 @@ material CubeMaterialRed
 
 // Material2 genrated by blender2ogre 0.6.0
 
-material CubeMaterialGreen 
+material CubeMaterialGreen : diffuse_template
 {
     receive_shadows on 
 
@@ -71,7 +70,7 @@ material CubeMaterialGreen
 }
 
 
-material CubeMaterialWhite
+material CubeMaterialWhite : diffuse_template
 {
     receive_shadows on 
 

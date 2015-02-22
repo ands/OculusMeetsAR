@@ -3,20 +3,20 @@
 
 namespace ARLib {
 
-RiftSceneNode::RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
-	: RigidBodyEventListener(rigidBodyID)
-	, rift(rift)
+RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID)
+	: RiftRigidBodyEventListener(_rift, rigidBodyID)
+	, rift(_rift)
 {
 	// create a virtual body node that the rift is correctly attached to
 	Ogre::SceneNode *rootNode = sceneManager->getRootSceneNode();
-	bodyNode = rootNode->createChildSceneNode("BodyNode");
+	bodyNode = rootNode->createChildSceneNode("ARLib/Oculus/BodyNode");
 	bodyNode->setFixedYawAxis(true);
 
 	bodyTiltNode = bodyNode->createChildSceneNode();
-	headNode = bodyTiltNode->createChildSceneNode("HeadNode");
+	headNode = bodyTiltNode->createChildSceneNode("ARLib/Oculus/HeadNode");
 
-	cameras[0] = sceneManager->createCamera( "LeftCamera");
-	cameras[1] = sceneManager->createCamera("RightCamera");
+	cameras[0] = sceneManager->createCamera("ARLib/Oculus/LeftCamera");
+	cameras[1] = sceneManager->createCamera("ARLib/Oculus/RightCamera");
 
 	headNode->attachObject(cameras[0]);
 	headNode->attachObject(cameras[1]);
@@ -76,7 +76,12 @@ void RiftSceneNode::setYaw(Ogre::Radian angle)
 void RiftSceneNode::addRenderTarget(RenderTarget *renderTarget)
 {
 	assert(renderTarget);
-	renderTarget->SetCameras(cameras[0], cameras[1]);
+	renderTarget->setCameras(cameras[0], cameras[1]);
+
+	// set visibility masks for new viewports
+	cameras[0]->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
+	cameras[1]->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
+
 	renderTargets.push_back(renderTarget);
 }
 
@@ -101,10 +106,10 @@ void RiftSceneNode::removeAllRenderTargets()
 	// TODO: remove cameras from renderTargets!
 }
 
-void RiftSceneNode::onChange(RigidBody *rb)
+void RiftSceneNode::onChange(const RigidBody *rb)
 {
 	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
-	headNode->setPosition(rb->mX, rb->mY, rb->mZ);
+	bodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 
 	/*if (rift && renderTargets.size())
 	{

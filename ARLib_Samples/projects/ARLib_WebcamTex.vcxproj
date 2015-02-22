@@ -88,7 +88,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\NPRWatercolorRenderTarget.cpp" />
-    <ClCompile Include="..\src\RigidListenerNode.cpp" />
     <ClCompile Include="..\src\WebcamApp.cpp" />
     <ClCompile Include="..\src\webcammain.cpp" />
     <ClCompile Include="..\src\WebcamScene.cpp" />

@@ -1,0 +1,77 @@
+vertex_program ARLib/Oculus/DistortionVertex glsl
+{
+    source ARLibOculusDistortionVertex.glsl
+	default_params
+	{
+		param_named eyeToSourceUVScale float2 1.0 1.0
+		param_named eyeToSourceUVOffset float2 0.0 0.0
+		//param_named eyeRotationStart matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		//param_named eyeRotationEnd matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		param_named_auto worldViewProj worldviewproj_matrix
+	}
+}
+fragment_program ARLib/Oculus/DistortionFragment glsl
+{
+    source ARLibOculusDistortionFragment.glsl
+	default_params
+	{
+		param_named undistorted int 0
+	}
+}
+
+
+material ARLib/Oculus/LeftEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+		
+			vertex_program_ref ARLib/Oculus/DistortionVertex
+			{
+			}
+
+			fragment_program_ref ARLib/Oculus/DistortionFragment
+			{
+			}
+
+			texture_unit
+            {
+            }
+        }
+    }
+}
+
+material ARLib/Oculus/RightEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass
+        {
+			lighting off
+			cull_hardware none
+			cull_software none
+			depth_check off
+		
+			vertex_program_ref ARLib/Oculus/DistortionVertex
+			{
+			}
+
+			fragment_program_ref ARLib/Oculus/DistortionFragment
+			{
+			}
+
+			texture_unit 
+            {
+            }
+        }
+    }
+}

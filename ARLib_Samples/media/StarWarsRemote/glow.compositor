@@ -1,0 +1,57 @@
+compositor "Glow"
+{
+	technique
+	{
+		texture rt0 target_width target_height PF_A8R8G8B8
+		texture rt1 target_width target_height PF_A8R8G8B8
+		texture rt2 target_width target_height PF_A8R8G8B8
+		
+		target rt0
+		{
+			input previous
+		}
+		
+		target rt1
+		{
+			input none 
+			material_scheme glow
+			
+			pass clear
+			{
+			
+			}
+			
+			pass render_scene
+			{
+			
+			}
+		}
+		
+		target rt2
+		{
+			input none
+			
+			pass clear
+			{
+			
+			}
+			
+			pass render_quad
+			{
+				material GlowCompositorMat/GlowX
+				input 0 rt1
+			}
+		}
+		
+		target_output
+		{
+			input none
+			pass render_quad
+			{
+				material GlowCompositorMat/GlowY
+				input 0 rt0
+				input 1 rt2
+			}
+		}
+	}
+}

@@ -1,5 +1,6 @@
 #include "ARLib/Tracking/NatNetHandler.h"
 #include "NatNetClient.h"
+#include <Windows.h>
 
 namespace ARLib{
 
@@ -27,7 +28,6 @@ int NatNetHandler::connect(const char* rClientIP, const char* rServerIP){
 	int ret = mClientHandle->Initialize(const_cast<char*>(rClientIP), const_cast<char*>(rServerIP));
 
 	if (ret != ErrorCode_OK){
-		//pNatNetInfoLog->log("Unable to connect to server. Error Code " + std::to_string((long long)ret) + "\n");
 		return ErrorCode_Internal;
 	}else{
 		mConnectionState = NATNET_CONNECTED;
@@ -42,15 +42,9 @@ int NatNetHandler::connect(const char* rClientIP, const char* rServerIP){
 	mClientHandle->GetServerDescription(&ServerDescription);
 
 	if (!ServerDescription.HostPresent){
-		//pNatNetInfoLog->log("Unable to connect to server. Host not present. Disconnecting.\n");
 		mConnectionState = NATNET_DISCONNECTED;
 		return 1;
 	}
-	//pNatNetInfoLog->log("Successfully connected to Server.\n");
-	//pNatNetInfoLog->log("Application: " + std::string(ServerDescription.szHostApp) + " (version" +
-	//	std::to_string((long long)ServerDescription.HostAppVersion[0]) + "." + std::to_string((long long)ServerDescription.HostAppVersion[1]) + "." + 
-	//	std::to_string((long long)ServerDescription.HostAppVersion[2]) + "." + std::to_string((long long)ServerDescription.HostAppVersion[3]) + ")" );
-	//pNatNetInfoLog->log("NatNet Version : ");
 	return ret;
 }
 
@@ -75,8 +69,22 @@ const std::string& NatNetHandler::getClientIP() const{
 	return mClientIP;
 }
 
-void NatNetHandler::registerFrameEvaluator(FrameEvaluator* evaluator){
+void NatNetHandler::registerFrameEvaluator(GenericNatNetEvaluator* evaluator){
 	mEvaluator = evaluator;
+}
+
+double NatNetHandler::getPing() const{
+    LARGE_INTEGER start, end, freq, elapsed;
+    QueryPerformanceFrequency(&freq);
+    QueryPerformanceCounter(&start);
+    int nbytes = 0;
+    void* response;
+    mClientHandle->SendMessageAndWait("ping", 1, 50, &response, &nbytes);
+    QueryPerformanceCounter(&end);
+    elapsed.QuadPart = (end.QuadPart - start.QuadPart)*1000000;
+    elapsed.QuadPart /= freq.QuadPart;
+    double time = static_cast<double>(elapsed.QuadPart)/1000.0;
+    return time;
 }
 
 void NatNetHandler::MessageHandler(int iId, char* pMsg){
@@ -85,12 +93,13 @@ void NatNetHandler::MessageHandler(int iId, char* pMsg){
 
 void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 	NatNetHandler *pHandler = (NatNetHandler*) pClient;
-
+    double serverLatency = pHandler->getPing();
+   
 	bool change = true;//(bool)(pFrame->params & 0x02);
 	if(!change){
 		return;
 	}
-	RBFrame *frame = new RBFrame(pFrame->nRigidBodies, pFrame->iFrame, pFrame->fTimestamp, pFrame->fLatency);
+	RBFrame *frame = new RBFrame(pFrame->nRigidBodies, pFrame->iFrame, pFrame->fTimestamp, pFrame->fLatency, true, true);
 	frame->mChange = change;
 
 	for(int i = 0; i < pFrame->nRigidBodies; i++){
@@ -106,7 +115,7 @@ void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 		rb->mqY = pRB.qy;
 		rb->mqZ = pRB.qz;
 		rb->mqW = pRB.qw;
-		for(int j = 0; j < rb->mNMarker; j++){
+		for(unsigned int j = 0; j < rb->mNMarker; j++){
 			int markerID = pRB.MarkerIDs ? pRB.MarkerIDs[j] : -1;
 			float markerSize = pRB.MarkerSizes ? pRB.MarkerSizes[j] : 0.0f;
 			float x = pRB.Markers ? pRB.Markers[j][0] : 0.0f;

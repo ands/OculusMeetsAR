@@ -1,15 +1,19 @@
 #include "ARLib/Tracking/TrackingManager.h"
+#include "ARLib/Tracking/FrameEvaluator.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+#include "ARLib/Tracking/NatNetHandler.h"
+#include "ARLib/Oculus/Rift.h"
 
 namespace ARLib{
 	
-TrackingManager::TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD)
+TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD)
 	: mTracking(tracking)
 	, mRiftHandle(oculusHMD)
 	, mEvaluator(nullptr)
 	, mNatNetHandler(nullptr)
+	, mFrameBufferSize(frameBufferSize)
 	, mInitialized(false){
-	mEvaluator = new FrameEvaluator();
+
 }
 
 TrackingManager::~TrackingManager(){
@@ -20,22 +24,28 @@ TrackingManager::~TrackingManager(){
 
 TRACKING_ERROR_CODE TrackingManager::initialize(){
 	TRACKING_ERROR_CODE errorCode = NONE;
-	if(!(mTracking & (ARLIB_NATNET | ARLIB_RIFT))){
-		errorCode = errorCode | ARLIB_TRACKING_NO_DEVICE_ERROR;
-	}
-	if(mTracking & ARLIB_NATNET){
+	if((mTracking == (ARLIB_NATNET | ARLIB_RIFT))){
+		delete mEvaluator;
+		mEvaluator = new NatNetRiftEvaluator(mFrameBufferSize);
+	}else if(mTracking & ARLIB_NATNET){
+		delete mEvaluator;
+		mEvaluator = new NatNetEvaluator(mFrameBufferSize);
 		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
-		mNatNetHandler->registerFrameEvaluator(mEvaluator);
+		mNatNetHandler->registerFrameEvaluator(dynamic_cast<GenericNatNetEvaluator*>(mEvaluator));
 		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str());
 		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
 			mNatNetHandler->connected() & NATNET_PENDING){
 				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
 		}
-	}
-	if(mTracking & ARLIB_RIFT){
+	}else if(mTracking & ARLIB_RIFT){
+		delete mEvaluator;
+		mEvaluator = new RiftEvaluator(mFrameBufferSize);
 		if(!mRiftHandle){
 			errorCode = errorCode | ARLIB_TRACKING_RIFT_ERROR;
 		}
+	}
+	if(mEvaluator != nullptr){
+		mEvaluator->setEvaluationMethod(mEval);
 	}
 	if(errorCode == NONE){
 		mInitialized = true;
@@ -53,7 +63,19 @@ void TrackingManager::uninitialize(){
 	}
 	mInitialized = false;
 }
+
+TRACKING_ERROR_CODE TrackingManager::reinitialize(){
+    uninitialize();
+    return initialize();
+}
 		
+RigidBody *TrackingManager::evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime){
+	if(mInitialized){
+        return mEvaluator->evaluateRigidBody(ID, retroActiveQueryTime);
+	}
+    return nullptr;
+}
+
 void TrackingManager::update(){
 	if(mInitialized){
 		mEvaluator->evaluate();
@@ -72,8 +94,14 @@ void TrackingManager::setNatNetClientIP(const std::string& cIP){
 	mNatNetClientIP = cIP;
 }
 
-void TrackingManager::registerRigidBodyEventListener(RigidBodyEventListener* listener){
-	mEvaluator->registerRigidBodyEventListener(listener);
+void TrackingManager::setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval){
+	if(mEvaluator != nullptr)
+		mEvaluator->setEvaluationMethod(eval);
+	mEval = eval;
+}
+
+void TrackingManager::addRigidBodyEventListener(RigidBodyEventListener* listener){
+	mEvaluator->addRigidBodyEventListener(listener);
 }
 
 };

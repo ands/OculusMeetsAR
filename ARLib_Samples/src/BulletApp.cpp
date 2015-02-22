@@ -1,4 +1,5 @@
 #include "BulletApp.h"
+#include "NatNetTypes.h"
 
 BulletApp::BulletApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -30,8 +31,14 @@ BulletApp::BulletApp(bool showDebugWindow)
 	initOIS();
 	initRift();
 	initTracking();
-    mScene = new BulletScene(mRift, mTracker, mRoot, mSceneMgr, mDynamicsWorld, mMouse, mKeyboard);
-	createViewports();
+	
+	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
+	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
+
+    mScene = new BulletScene(mRift, mTracker, mRoot,
+						mWindow, mSmallWindow, mSceneMgr, 
+						mDynamicsWorld, mMouse, mKeyboard,
+						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
@@ -50,18 +57,16 @@ BulletApp::~BulletApp()
     quitBullet();
 	std::cout << "Closing Ogre:" << std::endl;
 	quitOgre();
+
+	delete mVideoPlayerLeft;
+	delete mVideoPlayerRight;
 }
 
 void BulletApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
 	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	cf.load("../../media/resources.cfg");
 	mRoot->addFrameListener(this);
  
     // add resources
@@ -116,17 +121,20 @@ void BulletApp::quitOgre()
 }
 
 void BulletApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
-    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0));
-    mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
-    mDebugDrawer->setDrawWireframe(true);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
+    mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
+   
+    if(enableDebugDrawing == true){
+        mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
+        mDebugDrawer->setDrawWireframe(true);
 
-    mDynamicsWorld->setDebugDrawer(mDebugDrawer);
-    mDynamicsWorld->setShowDebugShapes(true);
-    
-    Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
-    node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
-    //and other stuff!
+        mDynamicsWorld->setDebugDrawer(mDebugDrawer);
+        mDynamicsWorld->setShowDebugShapes(true);
+
+        Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
+        node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
+    }
+
 }
 
 void BulletApp::quitBullet(){
@@ -195,21 +203,26 @@ void BulletApp::quitRift()
 		
 void BulletApp::initTracking()
 {
+	
 	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, mRift);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP(); //local machine
-	mTracker->setNatNetServerIP(); //local machine
+	mTracker->setNatNetClientIP("192.168.0.164"); //local machine
+	mTracker->setNatNetServerIP("192.168.0.164"); //local machine
+    mTracker->setFrameEvaluationMethod(ARLib::FRAME_ROUND);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
 	if(error != ARLib::ARLIB_TRACKING_OK){
 		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
 		mTrackingAvailable = false;
 		mTracker->uninitialize();
+        delete mTracker;
+        mTracker = false;
 	}else{
+        std::cout<<"Tracking initialized"<<std::endl;
 		mTrackingAvailable = true;	
 	}
 }
@@ -221,21 +234,6 @@ void BulletApp::quitTracking()
 	if(mTracker) delete mTracker;
 }
 
-void BulletApp::createViewports()
-{
-	if (mWindow && mRift)
-	{
-		mRenderTarget = new ARLib::RiftRenderTarget(mRift, mRoot, mWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mRenderTarget);
-	}
-
-	if (mSmallWindow)
-	{
-		mSmallRenderTarget = new ARLib::DebugRenderTarget(mSmallWindow);
-        mScene->getRiftSceneNode()->addRenderTarget(mSmallRenderTarget);
-	}
-}
-
 bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
@@ -244,9 +242,9 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 10);
+    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
 	
-    if (mTracker)
+    if (mTrackingAvailable)
 		mTracker->update(); //right place?
 	
     mScene->update(evt.timeSinceLastFrame);

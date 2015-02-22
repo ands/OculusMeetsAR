@@ -7,9 +7,14 @@
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 
 namespace ARLib {
+
+// eye visibility masks
+const unsigned int VISIBILITY_FLAG_LEFT  (1 << 0);
+const unsigned int VISIBILITY_FLAG_RIGHT (1 << 1);
+
 class RenderTarget;
 
-class RiftSceneNode : public RigidBodyEventListener
+class RiftSceneNode : public RiftRigidBodyEventListener
 {
 	public:
 		RiftSceneNode(Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID);
@@ -28,7 +33,7 @@ class RiftSceneNode : public RigidBodyEventListener
 		void removeRenderTarget(RenderTarget *renderTarget);
 		void removeAllRenderTargets();
 
-		virtual void onChange(RigidBody *rb);
+		virtual void onChange(const RigidBody *rb);
 
 	private:
 		Rift *rift;

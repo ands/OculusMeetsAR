@@ -12,6 +12,46 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
     OIS::Mouse *mouse, OIS::Keyboard *keyboard)
 {
+	ALCdevice *device;
+	//ALCenum error;
+
+	device = alcOpenDevice((nullptr));
+	if(!device){
+		printf("Error opening the device\n");
+	}
+
+	ALCcontext *context = alcCreateContext(device, NULL);
+	if(!alcMakeContextCurrent(context)){
+		printf("Context Error \n");
+	}
+	
+
+	ARLib::Sound* sound = ARLib::SoundManager::instance().getSound("../../media/hum1.wav");
+	ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
+	alListener3f(AL_POSITION, 0, 0, 1.0f);
+	alListener3f(AL_VELOCITY, 0, 0, 0);
+	alListenerfv(AL_ORIENTATION, listenerOri);
+
+	ALuint buffer;
+	alGenBuffers((ALuint)1, &buffer);
+
+	ALuint source;
+	alGenSources((ALuint)1, &source);
+	alBufferData(buffer, sound->getFormat(), sound->getData(), sound->getSize(), sound->getSampleRate());
+	
+	alSourcef(source, AL_PITCH, 1);
+	alSourcef(source, AL_GAIN, 1);
+	alSource3f(source, AL_POSITION, 0, 0, 0);
+	alSource3f(source, AL_VELOCITY, 0, 0, 0);
+	alSourcei(source, AL_LOOPING, AL_FALSE);
+	alSourcei(source, AL_BUFFER, buffer);
+
+	int state;
+	alGetSourcei(source, AL_SOURCE_STATE, &state);
+	if(state != AL_PLAYING){
+		alSourcePlay(source);
+	}
+
 	mRoot = root;
 	mMouse = mouse;
 	mKeyboard = keyboard;
@@ -24,9 +64,9 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	
 	mRoomNode = mSceneMgr->getRootSceneNode()->createChildSceneNode("RoomNode");
 
-	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr);
+	RigidListenerNode* cubeNodeT = new RigidListenerNode(mRoomNode, mSceneMgr, 0);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(cubeNodeT);
+		tracker->addRigidBodyEventListener(cubeNodeT);
 
 	Ogre::SceneNode* cubeNode2 = mRoomNode->createChildSceneNode();
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
@@ -38,7 +78,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0,1,0), -5);
     mShapes.push_back(shape);
     OgreBulletDynamics::RigidBody *planeBody = new OgreBulletDynamics::RigidBody("GroundPlane", mDynamicsWorld);
-    planeBody->setStaticShape(shape, 0.1, 0.8);
+    planeBody->setStaticShape(shape, 0.1f, 0.8f);
     mRigidBodies.push_back(planeBody);
 	
 	Ogre::SceneNode* cubeNode3 = mRoomNode->createChildSceneNode();
@@ -63,12 +103,12 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Light* roomLight = mSceneMgr->createLight();
 	roomLight->setType(Ogre::Light::LT_POINT);
 	roomLight->setCastShadows( true );
-	roomLight->setShadowFarDistance( 30 );
-	roomLight->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	roomLight->setSpecularColour( .25, .25, .25 );
-	roomLight->setDiffuseColour( 0.85, 0.76, 0.7 );
+	roomLight->setShadowFarDistance( 30.f );
+	roomLight->setAttenuation( 65.f, 1.0f, 0.07f, 0.017f );
+	roomLight->setSpecularColour( .25f, .25f, .25f );
+	roomLight->setDiffuseColour( 0.85f, 0.76f, 0.7f );
 
-	roomLight->setPosition( 5, 5, 5 );
+	roomLight->setPosition( 5.f, 5.f, 5.f );
 
 	mRoomNode->attachObject( roomLight );
 
@@ -77,7 +117,7 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mRiftNode->getBodyNode()->setPosition(4.0f, 1.5f, 4.0f);
 	//mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
-		tracker->registerRigidBodyEventListener(mRiftNode);
+		tracker->addRigidBodyEventListener(mRiftNode);
 
 	//----------------------------
 	ARLib::SoundManager::instance(); //initialize SoundManager
@@ -96,9 +136,9 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
-	light->setAttenuation( 65, 1.0, 0.07, 0.017 );
-	light->setSpecularColour( .25, .25, .25 );
-	light->setDiffuseColour( 0.35, 0.27, 0.23 );
+	light->setAttenuation( 65.f, 1.0f, 0.07f, 0.017f );
+	light->setSpecularColour( .25f, .25f, .25f );
+	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
 	mRiftNode->getBodyNode()->attachObject(light);
 }
 
@@ -172,8 +212,8 @@ bool SoundScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
-		mRiftNode->setYaw(Ogre::Degree(-0.3*e.state.X.rel));
-		mRiftNode->setPitch(Ogre::Degree(-0.3*e.state.Y.rel));
+		mRiftNode->setYaw(Ogre::Degree(-0.3f*e.state.X.rel));
+		mRiftNode->setPitch(Ogre::Degree(-0.3f*e.state.Y.rel));
 	}
 	return true;
 }

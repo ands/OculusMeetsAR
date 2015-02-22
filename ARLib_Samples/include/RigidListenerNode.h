@@ -6,18 +6,18 @@
 
 class RigidListenerNode : public ARLib::RigidBodyEventListener{
 public:
-	RigidListenerNode(Ogre::SceneNode *parent, Ogre::SceneManager *sceneManager) : ARLib::RigidBodyEventListener(0){
+	RigidListenerNode(Ogre::SceneNode *parent, Ogre::SceneManager *sceneManager, unsigned int rigidBodyID) 
+        : ARLib::RigidBodyEventListener(rigidBodyID, false){
 		mRigidBodyNode = parent->createChildSceneNode();
-		Ogre::Entity* cubeEnt = sceneManager->createEntity( "Cube.mesh" );
-		cubeEnt->getSubEntity(0)->setMaterialName( "CubeMaterialRed" );
-		mRigidBodyNode->attachObject( cubeEnt );
-		mRigidBodyNode->setPosition( 1.0, 0.0, 0.0 );
-		mRigidBodyNode->setScale( 0.5, 0.5, 0.5 );
 	};
-	void onChange(ARLib::RigidBody* rb){
+	void onChange(const ARLib::RigidBody* rb){
 		mRigidBodyNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
+        mRigidBodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 		//do other interresting stuff
 	};
+    Ogre::SceneNode *getSceneNode(){
+        return mRigidBodyNode;
+    }
 private:
 	Ogre::SceneNode *mRigidBodyNode;
 };

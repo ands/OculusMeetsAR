@@ -2,26 +2,33 @@
 #define REMOTE_H
 
 #include "OGRE/Ogre.h"
+#include "Cannon.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 
-class StarWarsRemote : public Ogre::FrameListener{
+class StarWarsRemote{
 public:
-    StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::Vector3 normalDirection, float radius);
+    StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::SceneNode* player, float radius);
     ~StarWarsRemote();
-    
-    bool frameStarted(const Ogre::FrameEvent& evt);
 		
-    bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
-    bool frameEnded(const Ogre::FrameEvent& evt);
+    void update(float dt);
+    void changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat);
+    void changeMaterial(float interp);
 
     void fire(const Ogre::Vector3& target);
     void pickNewDestination();
 private:
     Ogre::SceneNode *mSceneNode;
+    Ogre::SceneNode *mSpinNode;
     OgreBulletCollisions::SphereCollisionShape *mRemoteSphere;
     OgreBulletDynamics::RigidBody *mRemoteBody;
+
+    Ogre::SceneNode *mThrusterNode;
+    Ogre::Pass *mThrusterHighPass;
+    Ogre::Pass *mThrusterLowPass;
+    Ogre::Pass *mThrusterIntermediatePass;
+
+    StarWarsLaserCannon *mCannons;
 
     Ogre::Vector3 mSphericalPos;
     Ogre::Vector3 mAngularAccel;
@@ -29,8 +36,10 @@ private:
     float mMaxVelo;
     Ogre::Vector3 mTravelDest;
 
-    Ogre::Vector3 mNormalDirection;
+    Ogre::SceneNode *mPlayer;
     float mRadius;
+    float mAccumTime;
+    float mAccumRot;
     bool mShotsFired;
 };
 

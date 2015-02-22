@@ -1,4 +1,5 @@
 #include "SoundApp.h"
+#include "NatNetTypes.h"
 
 SoundApp::SoundApp(bool showDebugWindow)
 	: mRoot(nullptr)
@@ -55,13 +56,8 @@ SoundApp::~SoundApp()
 void SoundApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
-#ifdef _DEBUG
-	mRoot = new Ogre::Root("plugins_d.cfg");
-	cf.load("resources_d.cfg");
-#else
 	mRoot = new Ogre::Root("plugins.cfg");
-	cf.load("resources.cfg");
-#endif
+	cf.load("../../media/resources.cfg");
 	mRoot->addFrameListener(this);
  
     // add resources
@@ -116,7 +112,7 @@ void SoundApp::quitOgre()
 }
 
 void SoundApp::initBullet(bool enableDebugDrawing){
-    mSceneMgr = mRoot->createSceneManager(Ogre::SceneType::ST_GENERIC);
+    mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,-2,0));
     mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
     mDebugDrawer->setDrawWireframe(true);
@@ -196,9 +192,9 @@ void SoundApp::quitRift()
 void SoundApp::initTracking()
 {
 	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, mRift);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP(); //local machine

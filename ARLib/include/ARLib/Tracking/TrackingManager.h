@@ -5,12 +5,14 @@
 This class manages the client application, which communicates with the Motive stream server,
 and the Oculus Rift Handle
 ***************************************************/
+#include <string>
+#include "FrameEvaluator.h"
 
-#include "ARLib/Tracking/NatNetHandler.h"
-#include "ARLib/Tracking/FrameEvaluator.h"
-#include "ARLib/Oculus/Rift.h"
+typedef enum ConnectionType ConnectionType;
 
 namespace ARLib{
+
+	typedef enum FRAME_EVALUATION_METHOD;
 
 	typedef enum{
 		ARLIB_NATNET = 0x01,
@@ -25,25 +27,35 @@ namespace ARLib{
 		ARLIB_TRACKING_NO_DEVICE_ERROR = 0x08
 	}TRACKING_ERROR_CODE;
 
+	typedef struct _RigidBody RigidBody;
 	class RigidBodyEventListener;
+	class NatNetHandler;
+	class Rift;
+	class FrameEvaluator;
 
 	class TrackingManager{
 	public:
-		TrackingManager(TRACKING_METHOD tracking, Rift *oculusHMD = nullptr);
+		TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD = nullptr);
 		~TrackingManager();
-
+        
 		TRACKING_ERROR_CODE initialize(); 
 		void uninitialize();
+		TRACKING_ERROR_CODE reinitialize(); 
+
+        RigidBody *evaluateRigidBody(unsigned int ID, const long long& retroActiveQuery);
 		void update();
 
 		void setNatNetConnectionType(ConnectionType cType);
 		void setNatNetServerIP(const std::string& sIP = "");
 		void setNatNetClientIP(const std::string& cIP = "");
+        void setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval);
 
-		void registerRigidBodyEventListener(RigidBodyEventListener* listener);
+		void addRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
 		bool mInitialized;
+		unsigned int mFrameBufferSize;
 
+		FRAME_EVALUATION_METHOD mEval;
 		TRACKING_METHOD mTracking;
 		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;
