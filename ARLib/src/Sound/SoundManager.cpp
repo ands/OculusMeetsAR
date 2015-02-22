@@ -1,7 +1,20 @@
 #include "ARLib/Sound/SoundManager.h"
 
 namespace ARLib{
+	
+SoundManager::SoundManager(){
+	ALCdevice *device;
 
+	device = alcOpenDevice((nullptr));
+	if(!device){
+		printf("Error opening the device\n");
+	}
+
+	ALCcontext *context = alcCreateContext(device, NULL);
+	if(!alcMakeContextCurrent(context)){
+		printf("Context Error \n");
+	}
+}
 SoundManager::~SoundManager(){
 	//clean up mSounds
 }
@@ -102,6 +115,8 @@ bool SoundManager::loadSound(const char* filename){
 	unsigned int subChunk2Size;
 	fread(&subChunk2Size, 1, sizeof(unsigned int), fp);
 	void *data = new unsigned char[subChunk2Size];
+	memset(data, 0, subChunk2Size); 
+
 	fread(data, subChunk2Size, sizeof(unsigned char), fp);
 	fclose(fp);
 

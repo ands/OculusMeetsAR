@@ -1,8 +1,10 @@
 #include "SoundScene.h"
-#include "ARLib/Sound/SoundManager.h"
+#include "ARLib/Sound/SoundSource.h"
+#include "ARLib/Sound/SoundListener.h"
 #include "RigidListenerNode.h"
-#include "AL\al.h"
-#include "AL\alc.h"
+#include "SimpleSoundController.h"
+#include "AL/al.h"
+#include "AL/alc.h"
 
 
 SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
@@ -116,6 +118,20 @@ SoundScene::SoundScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	//mRiftNode->getBodyNode()->lookAt(Ogre::Vector3::ZERO, Ogre::SceneNode::TS_WORLD);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
+
+	//----------------------------
+	ARLib::SoundManager::instance(); //initialize SoundManager
+	
+	ARLib::SoundListener::instance().attachToNode(mRiftNode->getHeadNode()); //head body node? wtf?
+	mRoot->addFrameListener(&ARLib::SoundListener::instance());
+
+	SimpleSoundController *soundController = new SimpleSoundController(0.5f, "Hum 1.wav","coolsaber.wav");
+	soundController->addSecSound("5clash2.wav");
+	soundController->addSecSound("5clash2.wav");
+	soundController->addSecSound("5clash2.wav");
+	mRoot->addFrameListener(soundController);
+	//----------------------------
+
 
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);

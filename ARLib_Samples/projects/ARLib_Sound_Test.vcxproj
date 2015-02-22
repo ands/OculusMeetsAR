@@ -11,11 +11,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\SimpleSoundController.cpp" />
     <ClCompile Include="..\src\SoundApp.cpp" />
     <ClCompile Include="..\src\soundmain.cpp" />
     <ClCompile Include="..\src\SoundScene.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\SimpleSoundController.h" />
     <ClInclude Include="..\include\SoundApp.h" />
     <ClInclude Include="..\include\SoundScene.h" />
   </ItemGroup>
