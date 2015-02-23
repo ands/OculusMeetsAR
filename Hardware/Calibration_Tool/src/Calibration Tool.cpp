@@ -76,8 +76,8 @@ int _tmain(int argc, _TCHAR* argv[])
 			snap.startCapture();
 		}
 		else if(input==2){
-			cout<<"\nSearching for images in ./images \n";
-			vector<string> filenames = getFileNames(L".\\images\\*.*");
+			cout<<"\nSearching for images in ../media/images \n";
+			vector<string> filenames = getFileNames(L"..\\media\\images\\*.*");
 			cout<<filenames.size()/2<<" image pairs found: \n";
 			if(filenames.size()!=0){
 				for(int i=0;i<filenames.size();i++){
@@ -85,16 +85,23 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 				cout<<"\n\nChoose image pairs for calibration ([]=all or e.g. 1-5,7,11-17) \n";
 				string selection;
-				cin>>selection;
-				vector<int> selected = getSelectedNumbers(selection, filenames.size()/2);
+				vector<int> selected;
+				cin.clear();
+				cin.ignore(numeric_limits<streamsize>::max(), '\n');
+				if(cin.peek() == '\n'){
+					for(int i=0;i<filenames.size()/2;i++){
+						selected.push_back(i+1);
+					}
+				}
+				else if(cin>>selection){
+					selected = getSelectedNumbers(selection, filenames.size()/2);
+				}
+				
 				cout<<"\nLoading selected images...";
-				vector<const char*> leftPaths, rightPaths;
 				for(int i=0;i<selected.size();i++){
-					string pathleft = "./images/"+filenames[2*(selected[i]-1)];
-					string pathright = "./images/"+filenames[2*selected[i]-1];
-					leftPaths.push_back(pathleft.c_str());
-					rightPaths.push_back(pathright.c_str());
-					hand.loadImagePairs(leftPaths,rightPaths);
+					string pathleft = "../media/images/"+filenames[2*(selected[i]-1)];
+					string pathright = "../media/images/"+filenames[2*selected[i]-1];
+					hand.loadImagePair(pathleft,pathright);
 				}
 				cout<<"  done.\n"<<"Undistort the selected images according to the intrinsic calibration parameters in calib_results_CAM*.txt...";
 				hand.undistortAndRotate();
@@ -110,7 +117,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		else if(input==3){
 			int method;
-			cout<<"\n1 - Load matches\n2 - Find new keypoints and matches\n";
+			cout<<"\n1 - Load matches\n2 - Find new keypoints and matches\n3 - Save matches\n";
 			cin>>method;
 			if(method==1){
 				hand.loadMatches();
@@ -128,24 +135,22 @@ int _tmain(int argc, _TCHAR* argv[])
 						cout<<"\nDo you want to check the matches manually? (1=Yes,2=No)\n";
 						cin>>method;
 						if(method==1){
-							hand.calculateMatches(3);
+							hand.calculateMatches(1);
 						}
 						else if(method==2){
 							hand.calculateMatches(2);
 						}
 					}
 					else if(method==2){
-						hand.calculateMatches(1);
-					}
-					cout<<"\n"<<"Do you want to save these matches? (1=Yes,2=No)\n";
-					cin>>method;
-					if(method==1){
-						hand.saveMatches();
-						cout<<"Matches saved.\nPress Enter\n";
-						cin.ignore();
-						cin.get();
+						hand.calculateMatches(3);
 					}
 				}
+			}
+			else if(method==3){
+				hand.saveMatches();
+				cout<<"Matches saved.\nPress Enter\n";
+				cin.ignore();
+				cin.get();
 			}
 		}
 		else if(input==4){

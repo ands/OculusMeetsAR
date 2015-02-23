@@ -39,7 +39,10 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 					break;
 			}
 		}
-		capture->StartCapture(temp);
+		if (temp)
+			capture->StartCapture(temp);
+		else
+			fprintf_s(stderr, "WARNING: Camera number %d not connected!\n", cameraNumber);
 
 		if (ocamModelParametersFilename)
 			ocamModel = ocam_get_model(ocamModelParametersFilename);
@@ -94,7 +97,9 @@ void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
 		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
 		if(SUCCEEDED(check))
 		{
-			captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
+			if(captureTimeStamp){
+				captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
+			}
 			return sample;
 		}
 	}

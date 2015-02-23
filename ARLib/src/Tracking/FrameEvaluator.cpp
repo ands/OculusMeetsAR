@@ -50,7 +50,9 @@ RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& r
         return higherBody;
         break;
     case FRAME_INTERPOLATE_LINEAR:
-        return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+		if(higherBody != nullptr && lowerBody != nullptr){
+			return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+		}
         break;
     default:
         printf("Frame Evaluation Method unknown! Nothing will happen!");
@@ -61,16 +63,29 @@ RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& r
 
 void FrameEvaluator::addRigidBodyEventListener(RigidBodyEventListener* listener){
 	if(listener != nullptr){
-		if(listener->isRiftListener() && mRigidBodyHistories.find(listener->getRigidBodyID()) == mRigidBodyHistories.end()){
-			TimedFrame *t = new TimedFrame[mFrameBufferSize];
-			LARGE_INTEGER current;
-			QueryPerformanceCounter(&current);
-			mRigidBodyHistories[listener->getRigidBodyID()] = t;
-			for(unsigned int i = 0; i < mFrameBufferSize; i++){
-				t[i].mTimestamp = current.QuadPart;
-				t[i].mBody = nullptr;
+		if(listener->isRiftListener()){
+			if(mRigidBodyHistories.find(listener->getRigidBodyID()) == mRigidBodyHistories.end()){
+				TimedFrame *t = new TimedFrame[mFrameBufferSize];
+				LARGE_INTEGER current;
+				QueryPerformanceCounter(&current);
+				mRigidBodyHistories[listener->getRigidBodyID()] = t;
+				for(unsigned int i = 0; i < mFrameBufferSize; i++){
+					t[i].mTimestamp = current.QuadPart;
+					t[i].mBody = nullptr;
+				}
+			}
+			bool unregistered = true;
+			for(int i = 0; i < mRifts.size();i++){
+				if(listener->getRigidBodyID() == mRifts[i].second){
+					unregistered = false;
+					break;
+				}
+			}
+			if(unregistered){
+				mRifts.push_back(std::make_pair<Rift*, unsigned int>(reinterpret_cast<RiftRigidBodyEventListener*>(listener)->getRift(), listener->getRigidBodyID()));
 			}
 		}
+		
 		mRigidBodies.push_back(listener);
 	}
 }
@@ -254,7 +269,9 @@ RigidBody* RiftEvaluator::evaluateRigidBody(unsigned int ID, const long long& re
 			return higherBody;
 			break;
 		case FRAME_INTERPOLATE_LINEAR:
-			return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+			if(higherBody != nullptr && lowerBody != nullptr){
+				return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+			}
 			break;
 		default:
 			printf("Frame Evaluation Method unknown! Nothing will happen!");
@@ -283,7 +300,9 @@ void RiftEvaluator::evaluate(){
 		for(unsigned int i = 0; i < mCurrentFrame->mNRigidBodys; i++){
 			if((*it).first == mCurrentFrame->mRbs[i]->mID){
 				TimedFrame* t = (*it).second;
-				delete t->mBody;
+				if(t->mBody != nullptr){
+					delete t->mBody;
+				}
 				for(unsigned int j = mFrameBufferSize - 1; j > 0 ; j--){
 					t[i] = t[i-1];
 				}

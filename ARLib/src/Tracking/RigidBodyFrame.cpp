@@ -20,7 +20,9 @@ namespace ARLib{
 	}
 
 	_RigidBody::~_RigidBody(){
-		delete [] mMarkers;
+		if(mNMarker > 0 && mMarkers != nullptr){
+			delete [] mMarkers;
+		}
 	}
 
 	void _RigidBody::addMarker(unsigned int index, int markerID, float markerSize, float x, float y, float z){

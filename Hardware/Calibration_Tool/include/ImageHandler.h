@@ -9,7 +9,7 @@ class ImageHandler
 public:
 	ImageHandler(void);
 	~ImageHandler(void);
-	void ImageHandler::loadImagePairs(vector<const char*> imagepathLeft, vector<const char*> imagepathRight);
+	void ImageHandler::loadImagePair(string imagepathLeft, string imagepathRight);
 	void ImageHandler::undistortAndRotate();
 	void ImageHandler::calculateMatches(int method);
 	void ImageHandler::estimateGeometry(int method);
