@@ -60,7 +60,12 @@ RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& r
 }
 
 void FrameEvaluator::addRigidBodyEventListener(RigidBodyEventListener* listener){
-	mRigidBodies.push_back(listener);
+	if(listener != nullptr){
+		if(listener->isRiftListener() && mRigidBodyHistories.find(listener->getRigidBodyID()) == mRigidBodyHistories.end()){
+			mRigidBodyHistories[listener->getRigidBodyID()] = new TimedFrame[mFrameBufferSize];
+		}
+		mRigidBodies.push_back(listener);
+	}
 }
 
 void FrameEvaluator::setEvaluationMethod(FRAME_EVALUATION_METHOD evalMethod){
