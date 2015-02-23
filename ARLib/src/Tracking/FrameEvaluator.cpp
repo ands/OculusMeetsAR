@@ -62,7 +62,14 @@ RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& r
 void FrameEvaluator::addRigidBodyEventListener(RigidBodyEventListener* listener){
 	if(listener != nullptr){
 		if(listener->isRiftListener() && mRigidBodyHistories.find(listener->getRigidBodyID()) == mRigidBodyHistories.end()){
-			mRigidBodyHistories[listener->getRigidBodyID()] = new TimedFrame[mFrameBufferSize];
+			TimedFrame *t = new TimedFrame[mFrameBufferSize];
+			LARGE_INTEGER current;
+			QueryPerformanceCounter(&current);
+			mRigidBodyHistories[listener->getRigidBodyID()] = t;
+			for(unsigned int i = 0; i < mFrameBufferSize; i++){
+				t[i].mTimestamp = current.QuadPart;
+				t[i].mBody = nullptr;
+			}
 		}
 		mRigidBodies.push_back(listener);
 	}
@@ -158,7 +165,9 @@ RigidBody* NatNetEvaluator::evaluateRigidBody(unsigned int ID, const long long& 
         return higherBody;
         break;
     case FRAME_INTERPOLATE_LINEAR:
-        return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+		if(higherBody != nullptr && lowerBody != nullptr){
+			return interpolateRigidBodies(lowerBody, higherBody, static_cast<float>( min(1.0, max(0.0, weight))));
+		}
         break;
     default:
         printf("Frame Evaluation Method unknown! Nothing will happen!");

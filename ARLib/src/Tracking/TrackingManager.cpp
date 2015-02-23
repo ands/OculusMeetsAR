@@ -14,7 +14,8 @@ TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBuf
 	, mFrameBufferSize(frameBufferSize)
 	, mInitialized(false)
 	, mNatNetHostCommandPort(1510)
-	, mNatNetHostDataPort(1511){
+	, mNatNetHostDataPort(1511)
+	, mEval(FRAME_ROUND){
 
 }
 
