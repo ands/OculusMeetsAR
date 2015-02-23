@@ -97,7 +97,9 @@ void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
 		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
 		if(SUCCEEDED(check))
 		{
-			captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
+			if(captureTimeStamp){
+				captureTimeStamp->QuadPart -= additionalLatency.QuadPart;
+			}
 			return sample;
 		}
 	}

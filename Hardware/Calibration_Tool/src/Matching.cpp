@@ -58,28 +58,46 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 	resizeWindow("current match",1200,800);
 
 	//manual selection
-	vector<DMatch> goodmatches;
-	for(int i=0;i<acceptable_matches.size();i++){
-		DMatch current = acceptable_matches[i];
-		bool nearby=false;
-		for(int j=0;j<goodmatches.size();j++){
-			DMatch currentgood = goodmatches[j];
-			if(pointdistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx])<50 && vectordistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx],pointsright[current.trainIdx],pointsright[currentgood.trainIdx])<10){
-				nearby=true;
-				break;
+	vector<DMatch> goodmatches, badmatches;
+	if(method==1){
+		for(int i=0;i<acceptable_matches.size();i++){
+			DMatch current = acceptable_matches[i];
+			bool nearby=false;
+			for(int j=0;j<goodmatches.size();j++){
+				DMatch currentgood = goodmatches[j];
+				if(pointdistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx])<50 && vectordistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx],pointsright[current.trainIdx],pointsright[currentgood.trainIdx])<10){
+					nearby=true;
+					break;
+				}
 			}
-		}
 
-		if(!nearby){
-			Mat currentmatchimage;
-			vector<DMatch> currentMatch;
-			currentMatch.push_back(current);
-			drawMatches(*imageLeftUndistort,pointsleft,*imageRightUndistort,pointsright,currentMatch,currentmatchimage);
-			imshow("current match",currentmatchimage);
-			if(waitKey(0)==2555904){
-				goodmatches.push_back(current);
+			for(int j=0;j<badmatches.size();j++){
+				DMatch currentbad = badmatches[j];
+				if(pointdistance(pointsleft[current.queryIdx],pointsleft[currentbad.queryIdx])<50 && vectordistance(pointsleft[current.queryIdx],pointsleft[currentbad.queryIdx],pointsright[current.trainIdx],pointsright[currentbad.trainIdx])<5){
+					nearby=true;
+					break;
+				}
+			}
+			if(nearby){
+				badmatches.push_back(current);
+			}
+			else{
+				Mat currentmatchimage;
+				vector<DMatch> currentMatch;
+				currentMatch.push_back(current);
+				drawMatches(*imageLeftUndistort,pointsleft,*imageRightUndistort,pointsright,currentMatch,currentmatchimage);
+				imshow("current match",currentmatchimage);
+				if(waitKey(0)==2555904){
+					goodmatches.push_back(current);
+				}
+				else{
+					badmatches.push_back(current);
+				}
 			}
 		}
+	}
+	else if(method==2){
+		goodmatches=acceptable_matches;
 	}
 
 	vector<Point2f> pointsL, pointsR;

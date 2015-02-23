@@ -150,7 +150,7 @@ LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPAR
 
 int Snapshot::startCapture()
 {
-	destinationDir = "images";
+	destinationDir = "../media/images";
 
 	if (directoryExists(destinationDir))
 	{
@@ -249,11 +249,10 @@ int Snapshot::startCapture()
 		ReleaseDC(window, dc);
 	}
 
-	CloseWindow(window);
 	delete[] memL;
 	delete[] memR;
 	delete leftPlayer;
 	delete rightPlayer;
-
+	DestroyWindow(window);
 	return 0;
 }
