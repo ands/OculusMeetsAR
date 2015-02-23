@@ -150,7 +150,7 @@ LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPAR
 
 int Snapshot::startCapture()
 {
-	destinationDir = "images";
+	destinationDir = "../media/images";
 
 	if (directoryExists(destinationDir))
 	{
@@ -175,8 +175,8 @@ int Snapshot::startCapture()
 	}
 
 	// video initialization
-	leftPlayer = new ARLib::VideoPlayer(0,"calib_results_CAM1.txt",3.0);
-	rightPlayer = new ARLib::VideoPlayer(1,"calib_results_CAM2.txt",3.0);
+	leftPlayer = new ARLib::VideoPlayer(0);
+	rightPlayer = new ARLib::VideoPlayer(1);
 
 	assert(leftPlayer->getVideoWidth() == rightPlayer->getVideoWidth() &&
 		   leftPlayer->getVideoHeight() == rightPlayer->getVideoHeight());
@@ -249,11 +249,10 @@ int Snapshot::startCapture()
 		ReleaseDC(window, dc);
 	}
 
-	CloseWindow(window);
 	delete[] memL;
 	delete[] memR;
 	delete leftPlayer;
 	delete rightPlayer;
-
+	DestroyWindow(window);
 	return 0;
 }
