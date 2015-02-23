@@ -318,16 +318,16 @@ done:
 			hr = OpenMediaSource(pSource);
 		}
 
-		//Set camera parameters
-		if (SUCCEEDED(hr))
-		{
-			hr = setParams(pSource);
-		}
-
 		// Set up the reader.
 		if (SUCCEEDED(hr))
 		{
 			hr = ConfigureSourceReader(m_pReader);
+		}
+
+		//Set camera parameters
+		if (SUCCEEDED(hr))
+		{
+			hr = setParams(pSource);
 		}
 
 		if (SUCCEEDED(hr))
@@ -517,11 +517,19 @@ done:
 			IAMVideoProcAmp *pProcAmp = NULL;
 			hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcAmp));
 			//TODO: Make these configurable?
-			long streamProperty[7]={VideoProcAmp_Brightness,VideoProcAmp_Contrast,VideoProcAmp_Saturation,VideoProcAmp_Sharpness,VideoProcAmp_WhiteBalance,VideoProcAmp_BacklightCompensation,VideoProcAmp_Gain};
-			long value[7]={128,32,32,32,4000,0,16};
+			long streamPropertyValues[]=
+			{
+				VideoProcAmp_Brightness, 128,
+				VideoProcAmp_Contrast, 32,
+				VideoProcAmp_Saturation, 32,
+				VideoProcAmp_Sharpness, 32,
+				VideoProcAmp_WhiteBalance, 4000,
+				VideoProcAmp_BacklightCompensation, 0,
+				VideoProcAmp_Gain, 16
+			};
 			for(int i=0;i<7;i++){
 				if(SUCCEEDED(hr)){
-					hr=pProcAmp->Set(streamProperty[i], value[i], VideoProcAmp_Flags_Manual);
+					hr=pProcAmp->Set(streamPropertyValues[i*2], streamPropertyValues[i*2+1], VideoProcAmp_Flags_Manual);
 				}
 			}
 		}
