@@ -17,6 +17,8 @@ namespace ARLib{
 		virtual void onChange(const RigidBody *rb) = 0;
 		unsigned int getRigidBodyID()const;
         bool isRiftListener()const;
+		bool isCalibrating()const;
+		void calibrate(bool t = true);
 		void setReferencePosition(float x, float y, float z);
 		void setReferenceOrientation(float qx, float qy, float qz, float qw);
 	protected:
@@ -24,6 +26,7 @@ namespace ARLib{
 		float mRefQX, mRefQY, mRefQZ, mRefQW;
 		unsigned int mRigidBodyID;
         bool mRiftListener;
+		bool mCalibrating;
 	};
 
 	class RiftRigidBodyEventListener : public RigidBodyEventListener{

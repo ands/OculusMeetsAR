@@ -15,8 +15,6 @@ public:
     void changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat);
     void changeMaterial(float interp);
 
-    void fire(const Ogre::Vector3& target);
-    void pickNewDestination();
 private:
     Ogre::SceneNode *mSceneNode;
     Ogre::SceneNode *mSpinNode;
@@ -40,7 +38,8 @@ private:
     float mRadius;
     float mAccumTime;
     float mAccumRot;
-    bool mShotsFired;
+	float mTimeSinceShotsFired;
+	float mTimeBetweenShots;
 };
 
 #endif

@@ -168,6 +168,11 @@ void NatNetEvaluator::evaluate(){
 			for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
 				if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[j]->mID){
 					mRigidBodies[i]->onChange(mCurrentFrame->mRbs[j]);
+					if(mRigidBodies[i]->isCalibrating()){
+						mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
+						mRigidBodies[i]->setReferencePosition(mCurrentFrame->mRbs[j]->mX, mCurrentFrame->mRbs[j]->mY, mCurrentFrame->mRbs[j]->mZ);
+						mRigidBodies[i]->calibrate(false);
+					}
 					break;
 				}
 			}
@@ -276,6 +281,11 @@ void RiftEvaluator::evaluate(){
 		for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
 			if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[i]->mID){
 				mRigidBodies[i]->onChange(mCurrentFrame->mRbs[i]);
+				if(mRigidBodies[i]->isCalibrating()){
+					mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
+					mRigidBodies[i]->setReferencePosition(mCurrentFrame->mRbs[j]->mX, mCurrentFrame->mRbs[j]->mY, mCurrentFrame->mRbs[j]->mZ);
+					mRigidBodies[i]->calibrate(false);
+				}
 			}
 		}
 	}

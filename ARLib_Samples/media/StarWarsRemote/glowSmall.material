@@ -1,8 +1,8 @@
-material GreenGlow
+material GreenGlowSmall
 {
 	technique
 	{
-		scheme glow
+		scheme glowsmall
 		pass
 		{
 			ambient 0 1 0
@@ -25,11 +25,11 @@ material GreenGlow
     }
 }
 
-material BlueGlow
+material BlueGlowSmall
 {
 	technique
 	{
-		scheme glow
+		scheme glowsmall
 		pass
 		{			
 			ambient 0 0 1
@@ -52,11 +52,11 @@ material BlueGlow
     }
 }
 
-material RedGlow
+material RedGlowSmall
 {
 	technique
 	{
-		scheme glow
+		scheme glowsmall
 		pass
 		{			
 			ambient 1 0 0

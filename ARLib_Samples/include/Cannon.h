@@ -10,7 +10,12 @@ public:
 
     void update(float dt);
     void shoot(const Ogre::Vector3& tarWorldPos);
+	void changeMaterial(float delta);
 private:
+    Ogre::Pass *mCannonHighPass;
+    Ogre::Pass *mCannonLowPass;
+    Ogre::Pass *mCannonIntermediatePass;
+
     Ogre::SceneManager* mSceneMgr;
     Ogre::SceneNode *mSceneNode;
     Ogre::Vector3 mCannonCenters[8];

@@ -8,9 +8,15 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     , mAccumTime(0.0f){
     mSceneNode = parentNode->createChildSceneNode("StarWarsLaserSword");
     Ogre::Entity *swordEntity = sceneMgr->createEntity("Blade.mesh");
-    swordEntity->setMaterialName("BlueGlow");
+    swordEntity->setMaterialName("BlueGlowBig");
     mSceneNode->attachObject(swordEntity);
     mSceneNode->setScale(1.0f, 0.0f, 1.0f);
+
+	mSoundNode = mSceneNode->createChildSceneNode();
+	mSoundNode->setPosition(0.0f, 1.0f, 0.0f);
+	
+	ARLib::SoundManager::instance().getSound("../../media/StarWarsRemote/Sounds/lightsaber activation.wav");
+	mSoundSource = new ARLib::SoundSource();
 
     //create bullet collision object
     OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter();
@@ -37,10 +43,14 @@ void StarWarsLightSaber::draw(){
 }
 
 void StarWarsLightSaber::update(float dt){
+	mSoundSource->setPosition(mSoundNode->_getDerivedPosition());
+
     const float drawTime = 0.15f;
     mAccumTime += dt;
     if(mDrawing){
         if(!mDrawn){
+			if(!mSoundSource->isPlaying())
+				mSoundSource->playSound("../../media/StarWarsRemote/Sounds/lightsaber activation.wav");
             if(mAccumTime > drawTime){
                 mAccumTime = 0.0f;
                 mDrawn = true;

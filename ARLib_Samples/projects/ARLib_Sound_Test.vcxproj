@@ -72,7 +72,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>OpenAL32.lib;OgreMain_d.lib;OIS_d.lib;OgreOverlay_d.lib;OgreBulletCollisions_d.lib;OgreBulletDynamics_d.lib;BulletCollision_d.lib;BulletDynamics_d.lib;LinearMath_d.lib;ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus_d.lib;ARLibOgre_d.lib;ARLibTracking_d.lib;ARLibSound_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain_d.lib;OIS_d.lib;OgreOverlay_d.lib;OgreBulletCollisions_d.lib;OgreBulletDynamics_d.lib;BulletCollision_d.lib;BulletDynamics_d.lib;LinearMath_d.lib;ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus_d.lib;ARLibOgre_d.lib;ARLibTracking_d.lib;ARLibSound_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib;$(OPEN_AL)\libs\Win32</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

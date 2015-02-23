@@ -1,8 +1,7 @@
 #ifndef ARLIB_SOUND_H
 #define ARLIB_SOUND_H
 
-#include "AL\al.h"
-#include "AL\alc.h"
+typedef int ALenum;
 
 namespace ARLib{
 
@@ -24,20 +23,7 @@ namespace ARLib{
 			return mSampleRate;
 		}
 		
-		float getDuration()const{
-			switch(mFormat){
-			case AL_FORMAT_MONO8: 
-					return static_cast<float>(mSize)/static_cast<float>(mSampleRate);
-			case AL_FORMAT_MONO16: 
-					return static_cast<float>(mSize)/static_cast<float>(mSampleRate*2);
-			case AL_FORMAT_STEREO8: 
-					return static_cast<float>(mSize)/static_cast<float>(mSampleRate*2);
-			case AL_FORMAT_STEREO16: 
-					return static_cast<float>(mSize)/static_cast<float>(mSampleRate*4);
-			default:
-					return -1.0f;
-			}
-		}
+		float getDuration()const;
 	private:
 		ALenum mFormat;
 		void *mData;

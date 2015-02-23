@@ -21,7 +21,7 @@ LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::Dynam
 	mSceneNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
 	mSceneNode->setPosition(position);
     Ogre::Entity *bullet = sceneMgr->createEntity("Bullet.mesh");
-    bullet->setMaterialName("RedGlow");
+    bullet->setMaterialName("RedGlowBig");
     mSceneNode->attachObject(bullet);
 
 	OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter(bullet);

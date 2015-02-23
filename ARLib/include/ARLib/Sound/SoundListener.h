@@ -5,7 +5,7 @@
 
 namespace ARLib{
 
-class SoundListener : public Ogre::FrameListener{
+class SoundListener{
 public:
 	static SoundListener& instance(){
 		static SoundListener sLInstance;
@@ -14,7 +14,7 @@ public:
 	~SoundListener();
 	
 	void attachToNode(Ogre::SceneNode* sceneNode);
-	bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	void update(float dt);
 private:
 	SoundListener();
 	SoundListener(const SoundListener& sm);

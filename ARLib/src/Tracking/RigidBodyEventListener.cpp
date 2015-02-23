@@ -18,6 +18,18 @@ RigidBodyEventListener::RigidBodyEventListener(unsigned int rigidBodyID, bool is
 unsigned int RigidBodyEventListener::getRigidBodyID()const{
 	return mRigidBodyID;
 }
+        
+bool RigidBodyEventListener::isRiftListener()const{
+	return mRiftListener;
+}
+
+bool RigidBodyEventListener::isCalibrating()const{
+	return mCalibrating;
+}
+
+void RigidBodyEventListener::calibrate(bool t){
+	mCalibrating = t;
+}
 
 void RigidBodyEventListener::setReferencePosition(float x, float y, float z){
 	mRefX = x;

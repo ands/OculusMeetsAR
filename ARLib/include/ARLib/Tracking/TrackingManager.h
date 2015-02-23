@@ -48,6 +48,8 @@ namespace ARLib{
 		void setNatNetConnectionType(ConnectionType cType);
 		void setNatNetServerIP(const std::string& sIP = "");
 		void setNatNetClientIP(const std::string& cIP = "");
+		void setNatNetHostCommandPort(int hostCommandPort);
+		void setNatNetHostDataPort(int hostDataPort);
         void setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval);
 
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
@@ -60,6 +62,8 @@ namespace ARLib{
 		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;
 
+		int mNatNetHostCommandPort;
+		int mNatNetHostDataPort;
 		std::string mNatNetServerIP;
 		std::string mNatNetClientIP;
 		ConnectionType mNatNetConnectionType;

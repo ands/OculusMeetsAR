@@ -8,6 +8,7 @@
 #include "OGRE/Ogre.h"
 #include "RemotePuppet.h"
 #include "ARLib/ARLibOgre.h"
+#include "RigidListenerNode.h"
 #include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
@@ -48,11 +49,12 @@ class BulletScene
         StarWarsRemote* mRemote;
         StarWarsLightSaber* mSword;
 
+		RigidListenerNode *mSwordParentNode;
+
 		Ogre::Root* mRoot;
 		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
-		Ogre::SceneNode* mRoomNode;
 		ARLib::RiftSceneNode* mRiftNode;
         
         PFXSSAO *mDebugLeftSSAO;

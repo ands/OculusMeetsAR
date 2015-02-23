@@ -28,7 +28,7 @@ namespace ARLib{
 		NatNetHandler(ConnectionType iCType, std::string logFile = "NatNetHandler.info");
 		~NatNetHandler();
 
-		int connect(const char* rClientIP, const char* rServerIP);
+		int connect(const char* rClientIP, const char* rServerIP, int HostCommandPort = 1510, int HostDataPort = 1511);
 		int disconnect();
 
 		CONNECTION_STATE connected()const;

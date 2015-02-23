@@ -1,7 +1,7 @@
-fragment_program GlowX_fp cg
+fragment_program GlowBigX_fp cg
 {
-	source glow.cg
-	entry_point GlowX_fp
+	source glowBig.cg
+	entry_point GlowBigX_fp
 	
 	default_params
 	{
@@ -11,7 +11,7 @@ fragment_program GlowX_fp cg
 	profiles ps_2_0 arbfp1
 }
 
-material GlowCompositorMat/GlowX
+material GlowBigCompositorMat/GlowX
 {
 	technique
 	{
@@ -21,7 +21,7 @@ material GlowCompositorMat/GlowX
 			cull_software none
 			depth_func always_pass
 			
-			fragment_program_ref GlowX_fp
+			fragment_program_ref GlowBigX_fp
 			{
 			
 			}
@@ -36,10 +36,10 @@ material GlowCompositorMat/GlowX
 	}
 }
 
-fragment_program GlowY_fp cg
+fragment_program GlowBigY_fp cg
 {
-	source glow.cg
-	entry_point GlowY_fp
+	source glowBig.cg
+	entry_point GlowBigY_fp
 	
 	default_params
 	{
@@ -50,7 +50,7 @@ fragment_program GlowY_fp cg
 	profiles ps_2_0 arbfp1
 }
 
-material GlowCompositorMat/GlowY
+material GlowBigCompositorMat/GlowY
 {
 	technique
 	{
@@ -60,7 +60,7 @@ material GlowCompositorMat/GlowY
 			cull_software none
 			depth_func always_pass
 			
-			fragment_program_ref GlowY_fp
+			fragment_program_ref GlowBigY_fp
 			{
 			
 			}

@@ -15,9 +15,12 @@ public:
     }
 
     Ogre::Technique *handleSchemeNotFound(unsigned short, const Ogre::String& schemeName, Ogre::Material *mat, unsigned short, const Ogre::Renderable*){
-        if(schemeName == "glow"){
+        if(schemeName == "glowbig"){
             return mBlackMat->getTechnique(0);
         }
+		if(schemeName == "glowsmall"){
+            return mBlackMat->getTechnique(0);
+		}
         if(schemeName == "geom"){
             return mBlackMat->getTechnique(0);
         }

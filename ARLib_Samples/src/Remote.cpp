@@ -7,10 +7,11 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     , mRemoteBody(nullptr)
     , mRadius(radius)
     , mPlayer(player)
-    , mShotsFired(false)
     , mAngularAccel(1.0f)
     , mAngularVelo(0.0f)
     , mMaxVelo(1.5f)
+	, mTimeSinceShotsFired(0.0f)
+	, mTimeBetweenShots(5.0f)
     , mTravelDest(180.0f,0.0f,radius){
 
     mSphericalPos.x = mRadius;
@@ -74,17 +75,24 @@ StarWarsRemote::~StarWarsRemote(){
 }
 
 void StarWarsRemote::update(float dt){
-    if(mShotsFired){
-        //animate remote and shoot lazors
-    }
+	const float GlowTime = 0.5f;
     mAccumTime += dt;
     mAccumRot += dt/10.0f;
+	mTimeSinceShotsFired += dt;
+	if(mTimeSinceShotsFired <= GlowTime + 0.1f && mTimeSinceShotsFired >= 0.1){
+		mCannons->changeMaterial(1.0f - std::max(std::min((GlowTime - mTimeSinceShotsFired)/GlowTime, 1.0f),0.0f));
+	}else if((mTimeBetweenShots - mTimeSinceShotsFired) <= GlowTime){
+		mCannons->changeMaterial(1.0f - std::max(std::min((GlowTime - (mTimeBetweenShots - mTimeSinceShotsFired))/GlowTime, 1.0f), 0.0f));
+		if(mTimeSinceShotsFired >= mTimeBetweenShots + 0.1f){
+			mTimeSinceShotsFired = 0.0f;
+			//pick new random time
+			mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO);
+		}
+    }
     //mSpinNode->setOrientation(Ogre::Quaternion(Ogre::Radian(mAccumRot), Ogre::Vector3::UNIT_Y));
     if(mAccumTime >= 2.0f){
         mAccumTime = 0.0f;
         changeMaterial(0.0f);
-        //this delays stuff :(
-        mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO);
     }
     if(mAccumTime >= 1.0f){
         changeMaterial(1.0f - mAccumTime);
@@ -106,18 +114,4 @@ void StarWarsRemote::changeMaterial(float interp){
     mThrusterIntermediatePass->setDiffuse(mThrusterHighPass->getDiffuse()*(1-interp) + mThrusterLowPass->getDiffuse() * interp);
     mThrusterIntermediatePass->setSpecular(mThrusterHighPass->getSpecular()*(1-interp) + mThrusterLowPass->getSpecular() * interp);
     mThrusterIntermediatePass->setEmissive(mThrusterHighPass->getEmissive()*(1-interp) + mThrusterLowPass->getEmissive() * interp);
-
-    /*Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
-    Ogre::MaterialPtr mp = materialManager->getByName("test");
-    printf((std::string(mp->getParameter("diffuse").c_str()) + "\n").c_str());
-    mp->getTechnique("test_technique")->getPass("test_standard")->setDiffuse(0,0,1,1);*/
-}
-
-void StarWarsRemote::fire(const Ogre::Vector3& target){
-    mShotsFired = true;
-}
-
-void StarWarsRemote::pickNewDestination(){
-    //some random stuff
-
 }

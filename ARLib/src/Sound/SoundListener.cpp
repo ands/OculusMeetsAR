@@ -17,11 +17,20 @@ void SoundListener::attachToNode(Ogre::SceneNode* SceneNode){
 	mSceneNode = SceneNode;	
 }
 
-bool SoundListener::frameRenderingQueued(const Ogre::FrameEvent& evt){
+void SoundListener::update(float dt){
 	Ogre::Vector3 globalPos = mSceneNode->_getDerivedPosition();
+	Ogre::Quaternion globalOrientation = mSceneNode->_getDerivedOrientation();
 	alListener3f(AL_POSITION, globalPos.x, globalPos.y, globalPos.z);
-	//alListenerfv(AL_ORIENATION, someArray);
-	return true;
+	float ori[6];
+	Ogre::Vector3 at = globalOrientation * -Ogre::Vector3::UNIT_Z;
+	Ogre::Vector3 up = globalOrientation * Ogre::Vector3::UNIT_Y;
+	ori[0] = at.x;
+	ori[1] = at.y;
+	ori[2] = at.z;
+	ori[3] = up.x;
+	ori[4] = up.y;
+	ori[5] = up.z;
+	alListenerfv(AL_ORIENTATION, ori);
 }
 
 }; //namespace ARLib

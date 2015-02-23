@@ -4,6 +4,8 @@
 #include "OGRE\Ogre.h"
 #include "ARLib\Sound\SoundManager.h"
 
+typedef unsigned int ALuint;
+
 namespace ARLib{
 
 class SoundSource{

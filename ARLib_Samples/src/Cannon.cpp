@@ -11,7 +11,14 @@ StarWarsLaserCannon::StarWarsLaserCannon(Ogre::SceneNode *parentNode, Ogre::Scen
         Ogre::Entity *entity = sceneMgr->createEntity("Cannon" + std::to_string(static_cast<unsigned long long>(i+1)) + ".mesh");
         mSceneNode->attachObject(entity);
         mCannonCenters[i] = entity->getBoundingBox().getCenter();
+		entity->setMaterialName("Cannon_intermediate");
     }
+	
+
+    Ogre::MaterialManager *materialManager = &Ogre::MaterialManager::getSingleton();
+    mCannonHighPass = materialManager->getByName("Cannon_high")->getTechnique(0)->getPass(0);
+    mCannonLowPass = materialManager->getByName("Cannon_low")->getTechnique(0)->getPass(0);
+    mCannonIntermediatePass = materialManager->getByName("Cannon_intermediate")->getTechnique(0)->getPass(0);
 }
 
 StarWarsLaserCannon::~StarWarsLaserCannon(){
@@ -19,7 +26,7 @@ StarWarsLaserCannon::~StarWarsLaserCannon(){
 }
 
 void StarWarsLaserCannon::update(float dt){
-    mAccumTime += dt;
+   /* mAccumTime += dt;
     if(mShooting){
         if(mAccumTime >= 2.0f){
             mShooting = false;
@@ -33,7 +40,7 @@ void StarWarsLaserCannon::update(float dt){
         }
     }else{
         mAccumTime = 0.0f;
-    }
+    }*/
 }
 
 
@@ -54,10 +61,17 @@ void StarWarsLaserCannon::shoot(const Ogre::Vector3& tarWorldPos){
             mShootingCannon = i;
         }
     }
-    printf("%f, %f, %f \n", minDistanceOrigin.x, minDistanceOrigin.y, minDistanceOrigin.z);
-    /*LaserBulletManager::getSingleton().addBullet(
-        new LaserBullet(mSceneMgr
+	LaserBulletManager::getSingleton().addBullet(
+                        new LaserBullet(mSceneMgr
                       , LaserBulletManager::getSingleton().getDynamicsWorld()
                       , minDistanceOrigin
-                      , (tarWorldPos - minDistanceOrigin) * 1.0f));*/
+                      , (mTargetWorldPos - minDistanceOrigin) * 1.0f));
+}
+
+void StarWarsLaserCannon::changeMaterial(float delta){
+    mCannonIntermediatePass->setAmbient(mCannonHighPass->getAmbient()*(1-delta) + mCannonLowPass->getAmbient() * delta);
+    mCannonIntermediatePass->setDiffuse(mCannonHighPass->getDiffuse()*(1-delta) + mCannonLowPass->getDiffuse() * delta);
+    mCannonIntermediatePass->setSpecular(mCannonHighPass->getSpecular()*(1-delta) + mCannonLowPass->getSpecular() * delta);
+    mCannonIntermediatePass->setEmissive(mCannonHighPass->getEmissive()*(1-delta) + mCannonLowPass->getEmissive() * delta);
+
 }

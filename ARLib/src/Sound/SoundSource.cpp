@@ -1,5 +1,8 @@
 #include "ARLib\Sound\SoundSource.h"
 
+#include "AL\al.h"
+#include "AL\alc.h"
+
 namespace ARLib{
 	
 SoundSource::SoundSource(){

@@ -210,8 +210,8 @@ void BulletApp::initTracking()
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("192.168.0.164"); //local machine
-	mTracker->setNatNetServerIP("192.168.0.164"); //local machine
+	mTracker->setNatNetClientIP("10.66.49.198"); //local machine
+	mTracker->setNatNetServerIP("128.176.181.56"); //local machine
     mTracker->setFrameEvaluationMethod(ARLib::FRAME_ROUND);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
@@ -242,13 +242,11 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	mKeyboard->capture();
 	mMouse->capture();
 
-    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
-	
     if (mTrackingAvailable)
 		mTracker->update(); //right place?
-	
-    mScene->update(evt.timeSinceLastFrame);
 
+    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
+    mScene->update(evt.timeSinceLastFrame);
 	return true; 
 }
 

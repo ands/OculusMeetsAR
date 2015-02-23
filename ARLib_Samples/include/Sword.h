@@ -2,6 +2,7 @@
 #define SWORD_H
 
 #include "OGRE/Ogre.h"
+#include "ARLib/Sound/SoundSource.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
@@ -20,7 +21,10 @@ private:
     OgreBulletDynamics::RigidBody *mSwordBody;
     OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 
+	ARLib::SoundSource* mSoundSource;
+
     Ogre::SceneNode *mSceneNode;
+	Ogre::SceneNode *mSoundNode;
     float mAccumTime;
     bool mDrawn;
     bool mDrawing;

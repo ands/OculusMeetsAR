@@ -1,11 +1,13 @@
 #include "ARLib/Sound/SoundManager.h"
+#include "AL\al.h"
+#include "AL\alc.h"
 
 namespace ARLib{
 	
 SoundManager::SoundManager(){
 	ALCdevice *device;
 
-	device = alcOpenDevice((nullptr));
+	device = alcOpenDevice(NULL);
 	if(!device){
 		printf("Error opening the device\n");
 	}

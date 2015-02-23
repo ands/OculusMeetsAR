@@ -20,12 +20,12 @@ NatNetHandler::~NatNetHandler(){
 	delete mClientHandle;
 }
 
-int NatNetHandler::connect(const char* rClientIP, const char* rServerIP){
+int NatNetHandler::connect(const char* rClientIP, const char* rServerIP, int HostCommandPort, int HostDataPort){
 	if (mConnectionState == NATNET_CONNECTED){
 		disconnect();
 	}
 
-	int ret = mClientHandle->Initialize(const_cast<char*>(rClientIP), const_cast<char*>(rServerIP));
+	int ret = mClientHandle->Initialize(const_cast<char*>(rClientIP), const_cast<char*>(rServerIP), HostCommandPort, HostDataPort);
 
 	if (ret != ErrorCode_OK){
 		return ErrorCode_Internal;

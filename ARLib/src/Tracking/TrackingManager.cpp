@@ -12,7 +12,9 @@ TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBuf
 	, mEvaluator(nullptr)
 	, mNatNetHandler(nullptr)
 	, mFrameBufferSize(frameBufferSize)
-	, mInitialized(false){
+	, mInitialized(false)
+	, mNatNetHostCommandPort(1510)
+	, mNatNetHostDataPort(1511){
 
 }
 
@@ -32,7 +34,7 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 		mEvaluator = new NatNetEvaluator(mFrameBufferSize);
 		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
 		mNatNetHandler->registerFrameEvaluator(dynamic_cast<GenericNatNetEvaluator*>(mEvaluator));
-		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str());
+		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str(), mNatNetHostCommandPort, mNatNetHostDataPort);
 		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
 			mNatNetHandler->connected() & NATNET_PENDING){
 				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
@@ -92,6 +94,14 @@ void TrackingManager::setNatNetServerIP(const std::string& sIP){
 
 void TrackingManager::setNatNetClientIP(const std::string& cIP){
 	mNatNetClientIP = cIP;
+}
+
+void TrackingManager::setNatNetHostCommandPort(int hostCommandPort){
+	mNatNetHostCommandPort = hostCommandPort;
+}
+
+void TrackingManager::setNatNetHostDataPort(int hostDataPort){
+	mNatNetHostDataPort = hostDataPort;
 }
 
 void TrackingManager::setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval){
