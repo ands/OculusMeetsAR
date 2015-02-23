@@ -175,8 +175,8 @@ int Snapshot::startCapture()
 	}
 
 	// video initialization
-	leftPlayer = new ARLib::VideoPlayer(0);
-	rightPlayer = new ARLib::VideoPlayer(1);
+	leftPlayer = new ARLib::VideoPlayer(0,"calib_results_CAM1.txt",3.0);
+	rightPlayer = new ARLib::VideoPlayer(1,"calib_results_CAM2.txt",3.0);
 
 	assert(leftPlayer->getVideoWidth() == rightPlayer->getVideoWidth() &&
 		   leftPlayer->getVideoHeight() == rightPlayer->getVideoHeight());

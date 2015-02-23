@@ -4,9 +4,9 @@
 ImageHandler::ImageHandler(void)
 {
 	numOfImages=0;
-	leftUndistortion = Undistortion("./calib_results_CAM1.txt",3.0);
+	leftUndistortion = Undistortion("../media/calib_results_CAM1.txt",3.0);
 	Rect roiLeft=leftUndistortion.calculateROI();
-	rightUndistortion = Undistortion("./calib_results_CAM2.txt",3.0);
+	rightUndistortion = Undistortion("../media/calib_results_CAM2.txt",3.0);
 	Rect roiRight=rightUndistortion.calculateROI();
 	matcher = Matching(roiLeft,roiRight);
 }
@@ -15,12 +15,10 @@ ImageHandler::~ImageHandler(void)
 {
 }
 
-void ImageHandler::loadImagePairs(vector<const char*> imagepathLeft, vector<const char*> imagepathRight){
-	for(int i=0;i<imagepathLeft.size();i++){
-		leftImages.push_back(imread(imagepathLeft[i],CV_LOAD_IMAGE_GRAYSCALE));
-		rightImages.push_back(imread(imagepathRight[i],CV_LOAD_IMAGE_GRAYSCALE));
-	}
-	numOfImages=imagepathLeft.size();
+void ImageHandler::loadImagePair(string imagepathLeft, string imagepathRight){
+	leftImages.push_back(imread(imagepathLeft,CV_LOAD_IMAGE_GRAYSCALE));
+	rightImages.push_back(imread(imagepathRight,CV_LOAD_IMAGE_GRAYSCALE));
+	numOfImages++;
 }
 
 void ImageHandler::undistortAndRotate(){
@@ -37,13 +35,13 @@ void ImageHandler::calculateMatches(int method){
 		vector<vector<Point2f>> pairMatches;
 		Mat currentLeft = leftImages[i];
 		Mat currentRight = rightImages[i];
-		if(method==1){//Chessboardmatching
+		if(method==3){//Chessboardmatching
 			pairMatches=matcher.computeChessboardMatches(&currentLeft,&currentRight);
 		}
 		else if(method==2){//SIFT+Ransac Automatching
-			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,0);
+			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,2);
 		}
-		else{//SIFT+Ransac manual selection
+		else if(method==1){//SIFT+Ransac manual selection
 			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,1);
 		}
 		if(pairMatches.size()!=0){
@@ -118,16 +116,16 @@ void ImageHandler::visualize(){
 
 void ImageHandler::saveMatches(){
 	std::ofstream leftfile;
-	std::remove("leftmatch.txt");
-	leftfile.open ("leftmatch.txt");
+	std::remove("../media/leftmatch.txt");
+	leftfile.open ("../media/leftmatch.txt");
 	for(int i=0;i<leftMatch.size();i++){
 		leftfile << leftMatch[i].x<<" "<<leftMatch[i].y<<"\n";
 	}
 	leftfile.close();
 
 	std::ofstream rightfile;
-	std::remove("rightmatch.txt");
-	rightfile.open ("rightmatch.txt");
+	std::remove("../media/rightmatch.txt");
+	rightfile.open ("../media/rightmatch.txt");
 	for(int i=0;i<rightMatch.size();i++){
 		rightfile << rightMatch[i].x<<" "<<rightMatch[i].y<<"\n";
 	}
@@ -138,7 +136,7 @@ void ImageHandler::loadMatches(){
 	std::ifstream leftfile, rightfile;
 	leftMatch.clear();
 	rightMatch.clear();
-	leftfile.open("leftmatch.txt");
+	leftfile.open("../media/leftmatch.txt");
 	if (leftfile.is_open())
 	{
 		string line;
@@ -152,7 +150,7 @@ void ImageHandler::loadMatches(){
 		}
 		leftfile.close();
 	}
-	rightfile.open("rightmatch.txt");
+	rightfile.open("../media/rightmatch.txt");
 	if (rightfile.is_open())
 	{
 		string rline;
@@ -178,12 +176,12 @@ void ImageHandler::loadMatches(){
 }
 
 void ImageHandler::saveEpiGeo(){
-	if(epigeo.saveMatrices("./Fundamental.txt","./homography_CAM1.txt","./homography_CAM2.txt")){
+	if(epigeo.saveMatrices("../media/Fundamental.txt","../media/homography_CAM1.txt","../media/homography_CAM2.txt")){
 		std::cout<<"\nFiles successfully saved.";
 	}
 }
 void ImageHandler::loadEpiGeo(){
-	if(epigeo.loadMatrices("./Fundamental.txt","./homography_CAM1.txt","homography_CAM2.txt")){
+	if(epigeo.loadMatrices("../media/Fundamental.txt","../media/homography_CAM1.txt","../media/homography_CAM2.txt")){
 		std::cout<<"\nFiles successfully loaded.";
 	}
 }
@@ -192,7 +190,7 @@ void ImageHandler::saveImg(Mat img, string name){
 	vector<int> compression_params;
 	compression_params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	compression_params.push_back(90);
-	imwrite(name,img,compression_params);
+	imwrite("../media/"+name,img,compression_params);
 }
 
 float ImageHandler::distancePointLine(const cv::Point2f point, const Vec<float,3>& line)
