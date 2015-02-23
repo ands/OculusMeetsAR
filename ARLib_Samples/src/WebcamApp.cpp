@@ -202,7 +202,7 @@ void WebcamApp::quitRift()
 		
 void WebcamApp::initTracking()
 {
-	if(mRiftAvailable)
+	/*if(mRiftAvailable)
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET ,1000);
@@ -220,7 +220,7 @@ void WebcamApp::initTracking()
 		mTracker = nullptr;
 	}else{
 		mTrackingAvailable = true;	
-	}
+	}*/
 }
 		
 void WebcamApp::quitTracking()
