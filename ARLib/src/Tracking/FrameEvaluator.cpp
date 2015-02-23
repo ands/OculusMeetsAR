@@ -181,12 +181,17 @@ void NatNetEvaluator::evaluate(){
 		for(unsigned int i = 0; i < mRigidBodies.size(); i++){
 			for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
 				if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[j]->mID){
-					mRigidBodies[i]->onChange(mCurrentFrame->mRbs[j]);
 					if(mRigidBodies[i]->isCalibrating()){
 						mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
 						mRigidBodies[i]->setReferencePosition(mCurrentFrame->mRbs[j]->mX, mCurrentFrame->mRbs[j]->mY, mCurrentFrame->mRbs[j]->mZ);
 						mRigidBodies[i]->calibrate(false);
 					}
+					RigidBody rb = RigidBody(*mCurrentFrame->mRbs[j]);
+					rb.mqW = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqX - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqY - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqZ;
+					rb.mqX = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqY;
+					rb.mqY = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqX;
+					rb.mqZ = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqZ - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqW;
+					mRigidBodies[i]->onChange(&rb);
 					break;
 				}
 			}
@@ -293,13 +298,19 @@ void RiftEvaluator::evaluate(){
 	//Let all RigidBodyEventListeners know
 	for(unsigned int i = 0; i < mRigidBodies.size(); i++){
 		for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
-			if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[i]->mID){
-				mRigidBodies[i]->onChange(mCurrentFrame->mRbs[i]);
+			if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[j]->mID){
 				if(mRigidBodies[i]->isCalibrating()){
 					mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
 					mRigidBodies[i]->setReferencePosition(mCurrentFrame->mRbs[j]->mX, mCurrentFrame->mRbs[j]->mY, mCurrentFrame->mRbs[j]->mZ);
 					mRigidBodies[i]->calibrate(false);
 				}
+				RigidBody rb = RigidBody(*mCurrentFrame->mRbs[j]);
+				rb.mqW = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqX - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqY - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqZ;
+				rb.mqX = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqY;
+				rb.mqY = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqX;
+				rb.mqZ = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqZ - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqW;
+				mRigidBodies[i]->onChange(&rb);
+				break;
 			}
 		}
 	}

@@ -21,9 +21,10 @@ namespace ARLib{
 		void calibrate(bool t = true);
 		void setReferencePosition(float x, float y, float z);
 		void setReferenceOrientation(float qx, float qy, float qz, float qw);
-	protected:
+
 		float mRefX, mRefY, mRefZ;
 		float mRefQX, mRefQY, mRefQZ, mRefQW;
+	protected:
 		unsigned int mRigidBodyID;
         bool mRiftListener;
 		bool mCalibrating;

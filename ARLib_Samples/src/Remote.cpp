@@ -23,6 +23,7 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
 
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
     mSceneNode->setInheritOrientation(false);
+	mSceneNode->setPosition(0,0,-5);
 
     mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
     mSpinNode->setFixedYawAxis(true);

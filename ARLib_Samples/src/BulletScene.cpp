@@ -167,6 +167,7 @@ void BulletScene::update(float dt)
 bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 {
     if(e.key == OIS::KC_C){
+		mRiftNode->calibrate();
 		mSwordParentNode->calibrate();
     }if(e.key == OIS::KC_V){
         mSword->draw();

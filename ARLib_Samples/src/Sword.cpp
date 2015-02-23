@@ -43,7 +43,9 @@ void StarWarsLightSaber::draw(){
 }
 
 void StarWarsLightSaber::update(float dt){
-	mSoundSource->setPosition(mSoundNode->_getDerivedPosition());
+	Ogre::Vector3 p = mSceneNode->_getDerivedPosition();
+	Ogre::Quaternion q = mSceneNode->_getDerivedOrientation();
+	mSwordBody->getBulletRigidBody()->setWorldTransform(btTransform(btQuaternion(q.x, q.y, q.z, q.w), btVector3(p.x, p.y, p.z)));
 
     const float drawTime = 0.15f;
     mAccumTime += dt;
@@ -57,7 +59,7 @@ void StarWarsLightSaber::update(float dt){
                 mDrawing = false;
 
                 delete mSwordBody;
-                mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld);
+                mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
                 mSwordBody->setShape(mSceneNode, mSwordShape, 0.6f, 0.6f, 0.0f);
                 mSceneNode->setScale(1.0f, 1.0f, 1.0f);
             }else{
@@ -70,7 +72,7 @@ void StarWarsLightSaber::update(float dt){
                 mDrawing = false;
 
                 delete mSwordBody;
-                mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld);
+                mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
                 mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
                 mSceneNode->setScale(1.0f, 0.0f, 1.0f);
             }else{
