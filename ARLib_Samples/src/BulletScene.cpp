@@ -32,7 +32,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	//rift node
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1); // TODO: set correct rigid body id!
-	mRiftNode->getBodyNode()->setPosition(3.0f, 1.5f, 3.0f);
+	mRiftNode->getBodyNode()->setPosition(0.f,0.f,0.f);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
     
@@ -52,13 +52,11 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mGlow[0]->setEnabled(mToggle);
     mGlow[1] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "GlowBig");
     mGlow[1]->setEnabled(mToggle);
-	Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "GlowSmall");
-	Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "GlowSmall");
     GlowMaterialListener *gml = new GlowMaterialListener();
     Ogre::MaterialManager::getSingleton().addListener(gml);
 
 
-	//mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
     //roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -105,9 +103,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     //mLeftSSAO = new PFXSSAO(window, mRiftNode->getLeftCamera());
     //mRightSSAO = new PFXSSAO(window, mRiftNode->getRightCamera());
 	
-	//mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
-	//mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
-	//mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
+	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
+	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
 	//mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
 	//mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 }
@@ -156,7 +154,7 @@ void BulletScene::update(float dt)
 	mRemote->update(dt);
     mSword->update(dt);
     LaserBulletManager::getSingleton().update(dt);
-
+	
 	//mRiftVideoScreens->update();
 }
 
@@ -169,6 +167,7 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
     if(e.key == OIS::KC_C){
 		mRiftNode->calibrate();
 		mSwordParentNode->calibrate();
+		mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0.0f, 0.0f, -1.0f));
     }if(e.key == OIS::KC_V){
         mSword->draw();
     }if(e.key == OIS::KC_N){

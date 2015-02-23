@@ -12,20 +12,16 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     mSceneNode->attachObject(swordEntity);
     mSceneNode->setScale(1.0f, 0.0f, 1.0f);
 
-	mSoundNode = mSceneNode->createChildSceneNode();
-	mSoundNode->setPosition(0.0f, 1.0f, 0.0f);
-	
-	ARLib::SoundManager::instance().getSound("../../media/StarWarsRemote/Sounds/lightsaber activation.wav");
-	mSoundSource = new ARLib::SoundSource();
+	mSwordLocalPos = Ogre::Vector3(0,-0.75f, -0.3f); //delete!!!!
 
     //create bullet collision object
-    OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter();
-    stmc->addEntity(swordEntity);
+    OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter(swordEntity);
     mSwordShape = stmc->createConvex();
+	mSwordShape->getBulletShape()->setLocalScaling(btVector3(0.1f,0.95f,0.1f));
     mNoShape = new OgreBulletCollisions::BoxCollisionShape(Ogre::Vector3(0.0f, 0.0f, 0.0f));
 
     mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-    mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
+	mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
 
 	mSwordBody->getBulletRigidBody()->setUserPointer(nullptr);
 
@@ -51,8 +47,6 @@ void StarWarsLightSaber::update(float dt){
     mAccumTime += dt;
     if(mDrawing){
         if(!mDrawn){
-			if(!mSoundSource->isPlaying())
-				mSoundSource->playSound("../../media/StarWarsRemote/Sounds/lightsaber activation.wav");
             if(mAccumTime > drawTime){
                 mAccumTime = 0.0f;
                 mDrawn = true;
@@ -60,7 +54,7 @@ void StarWarsLightSaber::update(float dt){
 
                 delete mSwordBody;
                 mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-                mSwordBody->setShape(mSceneNode, mSwordShape, 0.6f, 0.6f, 0.0f);
+				mSwordBody->setShape(mSceneNode, mSwordShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
                 mSceneNode->setScale(1.0f, 1.0f, 1.0f);
             }else{
                 mSceneNode->setScale(1.0f, mAccumTime/drawTime, 1.0f);
@@ -73,7 +67,7 @@ void StarWarsLightSaber::update(float dt){
 
                 delete mSwordBody;
                 mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-                mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
+                mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
                 mSceneNode->setScale(1.0f, 0.0f, 1.0f);
             }else{
                 mSceneNode->setScale(1.0f, (drawTime - mAccumTime)/drawTime, 1.0f);

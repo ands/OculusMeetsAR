@@ -23,6 +23,7 @@ private:
 
 	ARLib::SoundSource* mSoundSource;
 
+	Ogre::Vector3 mSwordLocalPos;
     Ogre::SceneNode *mSceneNode;
 	Ogre::SceneNode *mSoundNode;
     float mAccumTime;

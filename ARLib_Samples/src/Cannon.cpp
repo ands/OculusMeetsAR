@@ -26,21 +26,6 @@ StarWarsLaserCannon::~StarWarsLaserCannon(){
 }
 
 void StarWarsLaserCannon::update(float dt){
-   /* mAccumTime += dt;
-    if(mShooting){
-        if(mAccumTime >= 2.0f){
-            mShooting = false;
-            mAccumTime = 0.0f;
-            Ogre::Vector3 shootFrom = mSceneNode->_getDerivedPosition() + mSceneNode->_getDerivedOrientation() * mSceneNode->_getDerivedScale() * mCannonCenters[mShootingCannon];
-            LaserBulletManager::getSingleton().addBullet(
-                        new LaserBullet(mSceneMgr
-                      , LaserBulletManager::getSingleton().getDynamicsWorld()
-                      , shootFrom
-                      , (mTargetWorldPos - shootFrom) * 1.0f));
-        }
-    }else{
-        mAccumTime = 0.0f;
-    }*/
 }
 
 
@@ -53,7 +38,7 @@ void StarWarsLaserCannon::shoot(const Ogre::Vector3& tarWorldPos){
     float minDist = FLT_MAX;
     mShootingCannon = 0;
     for(unsigned int i = 0; i < 8; i++){
-        Ogre::Vector3 CannonCenter = inScenePos + inSceneRotScale * mCannonCenters[i];
+        Ogre::Vector3 CannonCenter = inScenePos + mSceneNode->_getDerivedScale() * (mSceneNode->_getDerivedOrientation() * mCannonCenters[i]);
         float distance = CannonCenter.distance(tarWorldPos);
         if(minDist > distance){
             minDist = distance;
