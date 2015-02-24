@@ -28,7 +28,6 @@ class BulletScene
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
 		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
 
-        void setRenderTarget(ARLib::RenderTarget *renderTarget);
         void toggleGlow();
 
 		void update(float dt);
@@ -40,6 +39,8 @@ class BulletScene
 		bool mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID);
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 	private:
+		void setAdditionalLatency(double seconds);
+
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 
         std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
@@ -64,7 +65,11 @@ class BulletScene
         PFXSSAO *mRightSSAO;
 
         Ogre::CompositorInstance *mGlow[2];
-		ARLib::RiftVideoScreens *mRiftVideoScreens;
+
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
+		ARLib::RiftVideoScreens* mRiftVideoScreens;
+		double additionalLatency;
 
 		Ogre::Vector2 mVideoOffset[2];
 		Ogre::Vector2 mVideoScale;

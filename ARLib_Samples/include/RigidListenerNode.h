@@ -9,8 +9,8 @@ public:
 	RigidListenerNode(Ogre::SceneNode *parent, Ogre::SceneManager *sceneManager, unsigned int rigidBodyID) 
         : ARLib::RigidBodyEventListener(rigidBodyID, false){
 		mRigidBodyNode = parent->createChildSceneNode();
-		mRigidBodyCalibNode = mRigidBodyNode->createChildSceneNode();
-		mRigidBodyOrientationNode = mRigidBodyCalibNode->createChildSceneNode();
+		mRigidBodyOrientationNode = mRigidBodyNode->createChildSceneNode();
+		mRigidBodyCalibNode = mRigidBodyOrientationNode->createChildSceneNode();
 	};
 	void onChange(const ARLib::RigidBody* rb){
         mRigidBodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
@@ -19,7 +19,7 @@ public:
 		//do other interresting stuff
 	};
     Ogre::SceneNode *getSceneNode(){
-        return mRigidBodyOrientationNode;
+        return mRigidBodyCalibNode;
     }
 private:
 	Ogre::SceneNode *mRigidBodyNode;

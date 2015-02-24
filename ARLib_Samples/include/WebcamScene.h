@@ -28,8 +28,6 @@ class WebcamScene
 
 		void update(float dt);
 
-		void setAdditionalLatency(double seconds);
-
 		// Keyboard and mouse events:
 		bool keyPressed(const OIS::KeyEvent&);
 		bool keyReleased(const OIS::KeyEvent&);
@@ -39,6 +37,7 @@ class WebcamScene
 
 	private:
 		void toggleNPRRenderer();
+		void setAdditionalLatency(double seconds);
 
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 

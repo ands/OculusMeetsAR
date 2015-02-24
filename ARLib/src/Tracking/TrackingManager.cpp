@@ -30,6 +30,13 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 	if((mTracking == (ARLIB_NATNET | ARLIB_RIFT))){
 		delete mEvaluator;
 		mEvaluator = new NatNetRiftEvaluator(mFrameBufferSize);
+		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
+		mNatNetHandler->registerFrameEvaluator(dynamic_cast<GenericNatNetEvaluator*>(mEvaluator));
+		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str(), mNatNetHostCommandPort, mNatNetHostDataPort);
+		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
+			mNatNetHandler->connected() & NATNET_PENDING){
+				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
+		}
 	}else if(mTracking & ARLIB_NATNET){
 		delete mEvaluator;
 		mEvaluator = new NatNetEvaluator(mFrameBufferSize);

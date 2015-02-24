@@ -32,6 +32,8 @@ BulletApp::BulletApp(bool showDebugWindow)
 	initOIS();
 	initRift();
 	initTracking();
+
+	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
 	
 	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
 	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
@@ -211,11 +213,11 @@ void BulletApp::initTracking()
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
 		*/
 
-	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_RIFT, 1000, mRift);
+	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("10.66.22.143"); //local machine
-	mTracker->setNatNetServerIP("10.66.22.143"); //local machine
-    mTracker->setFrameEvaluationMethod(ARLib::FRAME_ROUND);
+	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
+	mTracker->setNatNetServerIP("128.176.181.34"); //local machine
+    mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
 	if(error != ARLib::ARLIB_TRACKING_OK){

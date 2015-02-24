@@ -4,9 +4,6 @@
 #include "ARLib/Sound/SoundListener.h"
 #include "ARLib/Sound/SoundManager.h"
 
-#define VISIBILITY_FLAG_LEFT  (1 << 0)
-#define VISIBILITY_FLAG_RIGHT (1 << 1)
-
 BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
@@ -15,6 +12,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     : mRenderTarget(nullptr)
     , mSmallRenderTarget(nullptr)
     , mToggle(true)
+	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
+	, mRiftVideoScreens(nullptr)
+	, additionalLatency(0.048)
 {
     LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
 
@@ -32,7 +32,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	//rift node
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1); // TODO: set correct rigid body id!
-	mRiftNode->getBodyNode()->setPosition(0.f,0.f,0.f);
+	//mRiftNode->getBodyNode()->setPosition(0.f,0.f,0.f);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
     
@@ -59,11 +59,11 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::MaterialManager::getSingleton().addListener(gml);
 	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
-	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	/*Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
 	cubeEntity->setMaterialName("CubeMaterialRed");
 	cubeNode->attachObject(cubeEntity);
-	cubeNode->setPosition(0,0,-10);
+	cubeNode->setPosition(0,0,-10);*/
 
     //roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -73,7 +73,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	roomLight->setAttenuation( 65.0f, 1.0f, 0.07f, 0.017f );
 	roomLight->setSpecularColour( .25f, .25f, .25f );
 	roomLight->setDiffuseColour( 1.0f, 1.0f, 1.0f );
-	roomLight->setPosition( 5.f, 5.f, 5.f );
+	roomLight->setPosition( 3.f, 0.5f, 1.f );
 	mSceneMgr->getRootSceneNode()->attachObject( roomLight );
 
     //ground-plane
@@ -111,8 +111,10 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
 	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
 	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
-	//mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
-	//mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+
+	setAdditionalLatency(additionalLatency);
 }
 
 BulletScene::~BulletScene()
@@ -137,14 +139,6 @@ BulletScene::~BulletScene()
 	delete mRiftNode;
 }
 
-void BulletScene::setRenderTarget(ARLib::RenderTarget *renderTarget)
-{
-	mRiftNode->removeAllRenderTargets();
-	mRiftNode->addRenderTarget(renderTarget);
-	mRiftNode->getLeftCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_LEFT);
-	mRiftNode->getRightCamera()->getViewport()->setVisibilityMask(VISIBILITY_FLAG_RIGHT);
-}
-
 void BulletScene::toggleGlow()
 {
     mToggle = !mToggle;
@@ -160,6 +154,16 @@ void BulletScene::update(float dt)
     LaserBulletManager::getSingleton().update(dt);
 	
 	mRiftVideoScreens->update();
+}
+
+void BulletScene::setAdditionalLatency(double seconds)
+{
+	LARGE_INTEGER frequency, additionalLatency;
+	QueryPerformanceFrequency(&frequency);
+	additionalLatency.QuadPart = (LONGLONG)(seconds * frequency.QuadPart);
+	mVideoPlayerLeft->setAdditionalLatency(additionalLatency);
+	mVideoPlayerRight->setAdditionalLatency(additionalLatency);
+	printf("additional latency: %03lfs\n", seconds);
 }
 
 //////////////////////////////////////////////////////////////
@@ -180,7 +184,7 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
         mDynamicsWorld->setShowDebugShapes(!mDynamicsWorld->getShowDebugShapes());
     }
 	
-	/*const float offsetStep = 0.004f;
+	const float offsetStep = 0.004f;
 	bool setOffsets = false;
 	// left
 	if (e.key == OIS::KC_D) { mVideoOffset[0].x -= offsetStep; setOffsets = true; }
@@ -193,8 +197,8 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 	if (e.key == OIS::KC_I) { mVideoOffset[1].y += offsetStep; setOffsets = true; }
 	if (e.key == OIS::KC_K) { mVideoOffset[1].y -= offsetStep; setOffsets = true; }
 	// IPD adjustment
-	if (e.key == OIS::KC_B) { mVideoOffset[0].x += 0.5f * offsetStep; mVideoOffset[1].x -= 0.5f * offsetStep; setOffsets = true; }
-	if (e.key == OIS::KC_V) { mVideoOffset[0].x -= 0.5f * offsetStep; mVideoOffset[1].x += 0.5f * offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_M) { mVideoOffset[0].x += 0.5f * offsetStep; mVideoOffset[1].x -= 0.5f * offsetStep; setOffsets = true; }
+	if (e.key == OIS::KC_B) { mVideoOffset[0].x -= 0.5f * offsetStep; mVideoOffset[1].x += 0.5f * offsetStep; setOffsets = true; }
 
 	if (setOffsets)
 	{
@@ -215,7 +219,15 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 	{
 		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
-	}*/
+	}
+
+	// video latency
+	const double latencyStep = 0.002;
+	bool setLatency = false;
+	if (e.key == OIS::KC_0) { additionalLatency -= latencyStep; setLatency = true; }
+	if (e.key == OIS::KC_9) { additionalLatency += latencyStep; setLatency = true; }
+	if (setLatency) setAdditionalLatency(additionalLatency);
+
 	return true;
 }
 bool BulletScene::keyReleased( const OIS::KeyEvent& e )
