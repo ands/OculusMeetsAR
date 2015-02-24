@@ -26,6 +26,7 @@ BulletApp::BulletApp(bool showDebugWindow)
 	if (!mRiftAvailable) // at least show the debug window if it is not available
 		showDebugWindow = true;
 
+	//showDebugWindow = false;
 	initOgre(showDebugWindow);
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();

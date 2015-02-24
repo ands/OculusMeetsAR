@@ -39,13 +39,22 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     //create viewports
     if(window && rift){
         mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-        setRenderTarget(mRenderTarget);
+		mGlowRenderTarget = new GlowRenderTarget(mRenderTarget);
     }
 
     if(smallWindow){
         mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-        setRenderTarget(mSmallRenderTarget);
+		mSmallGlowRenderTarget = new GlowRenderTarget(mSmallRenderTarget);
     }
+
+	
+	mRiftNode->removeAllRenderTargets();
+
+	if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+			mRiftNode->addRenderTarget(mGlowRenderTarget);
+	if (mSmallRenderTarget)
+			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
+	
 
 	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
@@ -53,15 +62,8 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	cubeNode->attachObject(cubeEntity);
 	cubeNode->setPosition(0,0,-10);
 
-    //add Glow compositor
-    mGlow[0] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "GlowBig");
-    mGlow[0]->setEnabled(mToggle);
-    mGlow[1] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "GlowBig");
-    mGlow[1]->setEnabled(mToggle);
-    GlowMaterialListener *gml = new GlowMaterialListener();
-    Ogre::MaterialManager::getSingleton().addListener(gml);
-
-
+	GlowMaterialListener *gml = new GlowMaterialListener();
+	Ogre::MaterialManager::getSingleton().addListener(gml);
 	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
     //roomLight

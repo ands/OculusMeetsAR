@@ -15,6 +15,7 @@
     <ClCompile Include="..\src\bulletmain.cpp" />
     <ClCompile Include="..\src\BulletScene.cpp" />
     <ClCompile Include="..\src\Cannon.cpp" />
+    <ClCompile Include="..\src\GlowRenderTarget.cpp" />
     <ClCompile Include="..\src\LaserBulletManager.cpp" />
     <ClCompile Include="..\src\Remote.cpp" />
     <ClCompile Include="..\src\RemotePuppet.cpp" />
@@ -26,6 +27,7 @@
     <ClInclude Include="..\include\BulletScene.h" />
     <ClInclude Include="..\include\Cannon.h" />
     <ClInclude Include="..\include\GlowMaterialListener.h" />
+    <ClInclude Include="..\include\GlowRenderTarget.h" />
     <ClInclude Include="..\include\LaserBulletManager.h" />
     <ClInclude Include="..\include\PFXSSAO.h" />
     <ClInclude Include="..\include\Remote.h" />
@@ -105,7 +107,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>OgreMain.lib;OIS.lib;OgreOverlay.lib;OgreBulletCollisions.lib;OgreBulletDynamics.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovr.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus.lib;ARLibOgre.lib;ARLibTracking.lib;ARLibSound.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>OgreMain.lib;OIS.lib;OgreOverlay.lib;OgreBulletCollisions.lib;OgreBulletDynamics.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovr.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus.lib;ARLibOgre.lib;ARLibTracking.lib;ARLibSound.lib;ARLibWebcam.lib;mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib;$(OGRE_BULLET_PACK)\lib\release</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
