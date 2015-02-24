@@ -66,10 +66,21 @@ int _tmain(int argc, _TCHAR* argv[])
 	ImageHandler hand = ImageHandler();
 	int input=0;
 	cout<<"Oculus Rift meets AR - Calibration Tool"<<"\n"<<"\n";
-	while(true){
+	bool done=false;
+	while(!done){
 		input=0;
-		cout<<"\n1 - Take snapshots \n2 - Load images \n3 - Keypoint extraction and matching \n4 - Approximating the epipolar geometry \n5 - Visualize epipolar geometry \n";
-		cin>>input;
+		cout<<"\n1 - Take snapshots \n2 - Load images \n3 - Keypoint extraction and matching \n4 - Approximating the epipolar geometry \n5 - Visualize epipolar geometry \nx - Exit\n";
+		char c;
+		cin>>c;
+		if(c=='x'){
+			done=true;
+			continue;
+		}
+		else{
+			input=c-'0';
+		}
+
+		
 		if(input==1){
 			Snapshot snap;
 			cout<<"Starting snapshot tool...\n";
@@ -102,8 +113,9 @@ int _tmain(int argc, _TCHAR* argv[])
 					string pathleft = "../media/images/"+filenames[2*(selected[i]-1)];
 					string pathright = "../media/images/"+filenames[2*selected[i]-1];
 					hand.loadImagePair(pathleft,pathright);
+					cout<<selected[i]<<", ";
 				}
-				cout<<"  done.\n"<<"Undistort the selected images according to the intrinsic calibration parameters in calib_results_CAM*.txt...";
+				cout<<"\nUndistort the selected images according to the intrinsic calibration parameters in calib_results_CAM*.txt...";
 				hand.undistortAndRotate();
 				cout<<"  done.\nPress Enter\n";
 				cin.ignore();
@@ -117,8 +129,15 @@ int _tmain(int argc, _TCHAR* argv[])
 		}
 		else if(input==3){
 			int method;
-			cout<<"\n1 - Load matches\n2 - Find new keypoints and matches\n3 - Save matches\n";
-			cin>>method;
+			cout<<"\n1 - Load matches\n2 - Find new keypoints and matches\n3 - Save matches\nx - Exit\n";
+
+			cin>>c;
+			if(c=='x'){
+				continue;
+			}
+			else{
+				method=c-'0';
+			}
 			if(method==1){
 				hand.loadMatches();
 			}
@@ -154,8 +173,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}
 		else if(input==4){
-			cout<<"\n"<<"1 - Load previously determined epipolar geometry\n"<<"2 - New approximation of epipolar geometry\n"<<"3 - Save current epipolar geometry\n";
-			cin>>input;
+			cout<<"\n1 - Load previously determined epipolar geometry\n2 - New approximation of epipolar geometry\n3 - Save current epipolar geometry\nx - Exit\n";
+			cin>>c;
+			if(c=='x'){
+				continue;
+			}
+			else{
+				input=c-'0';
+			}
 			if(input==1){
 				hand.loadEpiGeo();
 			}
