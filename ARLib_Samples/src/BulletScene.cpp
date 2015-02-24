@@ -39,30 +39,31 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     //create viewports
     if(window && rift){
         mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-        setRenderTarget(mRenderTarget);
+		mGlowRenderTarget = new GlowRenderTarget(mRenderTarget);
     }
 
     if(smallWindow){
         mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-        setRenderTarget(mSmallRenderTarget);
+		mSmallGlowRenderTarget = new GlowRenderTarget(mSmallRenderTarget);
     }
+
+	
+	mRiftNode->removeAllRenderTargets();
+
+	if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
+			mRiftNode->addRenderTarget(mGlowRenderTarget);
+	if (mSmallRenderTarget)
+			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
+
+	GlowMaterialListener *gml = new GlowMaterialListener();
+	Ogre::MaterialManager::getSingleton().addListener(gml);
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
 	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
 	cubeEntity->setMaterialName("CubeMaterialRed");
 	cubeNode->attachObject(cubeEntity);
 	cubeNode->setPosition(0,0,-10);
-
-    //add Glow compositor
-    mGlow[0] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "GlowBig");
-    mGlow[0]->setEnabled(mToggle);
-    mGlow[1] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getRightCamera()->getViewport(), "GlowBig");
-    mGlow[1]->setEnabled(mToggle);
-    GlowMaterialListener *gml = new GlowMaterialListener();
-    Ogre::MaterialManager::getSingleton().addListener(gml);
-
-
-	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
     //roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -82,18 +83,6 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     planeBody->setStaticShape(shape, 0.1f, 0.8f);
     mRigidBodies.push_back(planeBody);
 
-
-	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),5.0f);
-    mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 10.0f);
-    mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
-
-    mSwordParentNode = new RigidListenerNode(mRiftNode->getBodyNode(), mSceneMgr, 2);
-    mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
-    if(tracker){
-        tracker->addRigidBodyEventListener(mSwordParentNode);
-    }
-
-    //rift light
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
@@ -101,6 +90,16 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setSpecularColour( .25f, .25f, .25f );
 	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
 	mRiftNode->getBodyNode()->attachObject(light); 
+
+    mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 2);
+    mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
+    if(tracker){
+        tracker->addRigidBodyEventListener(mSwordParentNode);
+    }
+
+	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),5.0f);
+    mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 10.0f);
+    mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
 
 
     //Add Screenspace Ambient Occlusion
@@ -155,13 +154,12 @@ void BulletScene::toggleGlow()
 
 void BulletScene::update(float dt)
 {
-	ARLib::Rift *rift = mRiftNode->getRift();
     mRemotePuppet->update(dt);
 	mRemote->update(dt);
     mSword->update(dt);
     LaserBulletManager::getSingleton().update(dt);
 	
-	//mRiftVideoScreens->update();
+	mRiftVideoScreens->update();
 }
 
 //////////////////////////////////////////////////////////////
@@ -173,7 +171,7 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
     if(e.key == OIS::KC_C){
 		mRiftNode->calibrate();
 		mSwordParentNode->calibrate();
-		mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0.0f, 0.0f, -1.0f));
+		mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
     }if(e.key == OIS::KC_V){
         mSword->draw();
     }if(e.key == OIS::KC_N){

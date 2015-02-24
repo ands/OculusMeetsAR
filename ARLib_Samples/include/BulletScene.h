@@ -7,6 +7,7 @@
 #include "PFXSSAO.h"
 #include "OGRE/Ogre.h"
 #include "RemotePuppet.h"
+#include "GlowRenderTarget.h"
 #include "ARLib/ARLibOgre.h"
 #include "RigidListenerNode.h"
 #include "ARLib/Webcam/VideoPlayer.h"
@@ -70,6 +71,8 @@ class BulletScene
 
         ARLib::RenderTarget* mRenderTarget;
         ARLib::RenderTarget* mSmallRenderTarget;
+		GlowRenderTarget *mGlowRenderTarget;
+		GlowRenderTarget *mSmallGlowRenderTarget;
 };
 
 #endif

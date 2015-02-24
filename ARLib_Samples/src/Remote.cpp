@@ -7,29 +7,15 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     , mRemoteBody(nullptr)
     , mRadius(radius)
     , mPlayer(player)
-    , mAngularAccel(1.0f)
-    , mAngularVelo(0.0f)
-    , mMaxVelo(1.5f)
 	, mTimeSinceShotsFired(0.0f)
-	, mTimeBetweenShots(5.0f)
-    , mTravelDest(180.0f,0.0f,radius){
-
-    mSphericalPos.x = mRadius;
-    mSphericalPos.y = std::acosf(mRadius/mSphericalPos.x);
-    mSphericalPos.z = std::atan2f(mSphericalPos.y,mSphericalPos.x);
-    
-    mAngularVelo.x = 0.0f;
-    mAngularAccel.x = 0.0f;
-
+	, mTimeBetweenShots(5.0f){
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
     mSceneNode->setInheritOrientation(false);
-	mSceneNode->setPosition(0,0,-5);
 
     mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
     mSpinNode->setFixedYawAxis(true);
 
     //Scene Construction
-
     const char* MeshNames[] = { "BigHatch.mesh",
                     "BlackHatch.mesh",
                     "BottomRing.mesh",
@@ -61,10 +47,6 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     mThrusterHighPass = materialManager->getByName("Thruster_high")->getTechnique(0)->getPass(0);
     mThrusterLowPass = materialManager->getByName("Thruster_low")->getTechnique(0)->getPass(0);
     mThrusterIntermediatePass = materialManager->getByName("Thruster_intermediate")->getTechnique(0)->getPass(0);
-
-    //mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.05f);
-    //mRemoteBody = new OgreBulletDynamics::RigidBody("remoteBody", dynamicsWorld);
-    //mRemoteBody->setShape(mSceneNode, mRemoteSphere, 0.6f, 0.6f, 1.0f, Ogre::Vector3(0.0f, 0.0f, 0.0f));
 
     mAccumTime = 0.0f;
     mAccumRot = 0.0f;
@@ -100,14 +82,10 @@ void StarWarsRemote::update(float dt){
     }else{
         changeMaterial(mAccumTime);
     }
-
-    //update Cannons
-    mCannons->update(dt);
 }
 
 void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){
     mSceneNode->setPosition(newPos);
-   // mSpinNode->setOrientation(quat);
 }
 
 void StarWarsRemote::changeMaterial(float interp){

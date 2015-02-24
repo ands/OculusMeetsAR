@@ -26,6 +26,7 @@ BulletApp::BulletApp(bool showDebugWindow)
 	if (!mRiftAvailable) // at least show the debug window if it is not available
 		showDebugWindow = true;
 
+	//showDebugWindow = false;
 	initOgre(showDebugWindow);
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
@@ -203,12 +204,14 @@ void BulletApp::quitRift()
 		
 void BulletApp::initTracking()
 {
-	
+	/*
 	if(mRiftAvailable)
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
 	else
 		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
+		*/
 
+	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_RIFT, 1000, mRift);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP("10.66.22.143"); //local machine
 	mTracker->setNatNetServerIP("10.66.22.143"); //local machine

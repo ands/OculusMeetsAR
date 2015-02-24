@@ -28,6 +28,8 @@ class WebcamScene
 
 		void update(float dt);
 
+		void setAdditionalLatency(double seconds);
+
 		// Keyboard and mouse events:
 		bool keyPressed(const OIS::KeyEvent&);
 		bool keyReleased(const OIS::KeyEvent&);
@@ -53,8 +55,11 @@ class WebcamScene
 		ARLib::RenderTarget* mSmallRenderTarget;
 		NPRWatercolorRenderTarget* mWatercolorRenderTarget;
 		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
 		ARLib::RiftVideoScreens* mRiftVideoScreens;
 		bool enabledNPRRenderer;
+		double additionalLatency;
 
 		Ogre::Vector2 mVideoOffset[2];
 		Ogre::Vector2 mVideoScale;
