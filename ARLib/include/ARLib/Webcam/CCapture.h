@@ -9,6 +9,41 @@
 
 namespace ARLib {
 
+// Structure for collecting info about one parametr of current video device
+struct Parametr
+{
+	long CurrentValue;
+
+	long Min;
+	long Max;
+	long Step;
+	long Default; 
+	long Flag;
+};
+
+// Structure for collecting info about 17 parametrs of current video device
+struct CamParametrs
+{
+	    Parametr Brightness;
+        Parametr Contrast;
+        Parametr Hue;
+        Parametr Saturation;
+        Parametr Sharpness;
+        Parametr Gamma;
+        Parametr ColorEnable;
+        Parametr WhiteBalance;
+        Parametr BacklightCompensation;
+        Parametr Gain;
+
+		Parametr Pan;
+        Parametr Tilt;
+        Parametr Roll;
+        Parametr Zoom;
+        Parametr Exposure;
+        Parametr Iris;
+        Parametr Focus;
+};
+
 //Class for enumerating videocapture devices
 class DeviceList
 {
@@ -81,6 +116,8 @@ protected:
     HRESULT OpenMediaSource(IMFMediaSource *pSource);
     HRESULT EndCaptureInternal();
 	HRESULT setParams(IMFMediaSource *vd_pSource);
+	void CCapture::setParametrs(CamParametrs parametrs,IMFMediaSource *vd_pSource);
+	CamParametrs CCapture::getParametrs(IMFMediaSource *vd_pSource);
 
     long                    m_nRefCount;        // Reference count.
     CRITICAL_SECTION        m_critsec;

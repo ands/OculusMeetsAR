@@ -320,15 +320,17 @@ done:
 				);
 		}
 
-		if (SUCCEEDED(hr))
-		{
-			hr = OpenMediaSource(pSource);
-		}
-
 		//Set camera parameters
 		if (SUCCEEDED(hr))
 		{
+			CamParametrs test = getParametrs(pSource);
+			setParametrs(test,pSource);
 			hr = setParams(pSource);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = OpenMediaSource(pSource);
 		}
 
 		// Set up the reader.
@@ -530,7 +532,7 @@ done:
 				VideoProcAmp_Contrast, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Saturation, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Sharpness, 32, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_WhiteBalance, 2000, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_WhiteBalance, 6000, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Gain, 16, VideoProcAmp_Flags_Manual
 			};
@@ -544,8 +546,103 @@ done:
 				}
 			}
 			pProcAmp->Release();
+
+			/*IAMCameraControl *pProcControl = NULL;
+			hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcControl));
+
+			if (SUCCEEDED(hr))
+			{
+			long value, flag;
+			pProcControl->Get(CameraControl_Exposure,&value,&flag);
+			std::cout<<"Value: "<<value<<" Flag: "<<flag<<"\n";
+			pProcControl->Release();
+			}*/
 		}
 		return hr;
+	}
+
+	void CCapture::setParametrs(CamParametrs parametrs,IMFMediaSource *vd_pSource)
+	{
+		if(vd_pSource)
+		{
+			Parametr *pParametr = (Parametr *)(&parametrs);
+			IAMVideoProcAmp *pProcAmp = NULL;
+			HRESULT hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcAmp));
+
+			if (SUCCEEDED(hr))
+			{
+				for(unsigned int i = 0; i < 10; i++)
+				{
+					hr = pProcAmp->Set(VideoProcAmp_Brightness + i, pParametr[i].CurrentValue, pParametr[i].Flag);
+				}
+				pProcAmp->Release();
+			}
+
+			IAMCameraControl *pProcControl = NULL;
+			hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcControl));
+
+			if (SUCCEEDED(hr))
+			{
+				for(unsigned int i = 0; i < 7; i++)
+				{
+					hr = pProcControl->Set(CameraControl_Pan+i, pParametr[10 + i].CurrentValue, pParametr[10 + i].Flag);					
+				}
+				pProcControl->Release();
+			}
+		}
+	}
+
+	CamParametrs CCapture::getParametrs(IMFMediaSource *vd_pSource)
+	{
+		CamParametrs out;
+
+		if(vd_pSource)
+		{
+			Parametr *pParametr = (Parametr *)(&out);
+			IAMVideoProcAmp *pProcAmp = NULL;
+			HRESULT hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcAmp));
+
+			if (SUCCEEDED(hr))
+			{
+				for(unsigned int i = 0; i < 10; i++)
+				{
+					Parametr temp;
+					hr = pProcAmp->GetRange(VideoProcAmp_Brightness+i, &temp.Min, &temp.Max, &temp.Step, &temp.Default, &temp.Flag);
+
+					if (SUCCEEDED(hr))
+					{
+						long currentValue = temp.Default;
+						hr = pProcAmp->Get(VideoProcAmp_Brightness+i, &currentValue, &temp.Flag);
+						temp.CurrentValue = currentValue;
+						pParametr[i] = temp;
+					}
+				}
+
+				pProcAmp->Release();
+			}
+
+			IAMCameraControl *pProcControl = NULL;
+			hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcControl));
+
+			if (SUCCEEDED(hr))
+			{
+				for(unsigned int i = 0; i < 7; i++)
+				{
+					Parametr temp;
+					hr = pProcControl->GetRange(CameraControl_Pan+i, &temp.Min, &temp.Max, &temp.Step, &temp.Default, &temp.Flag);
+
+					if (SUCCEEDED(hr))
+					{
+						long currentValue = temp.Default;
+						hr = pProcAmp->Get(CameraControl_Pan+i, &currentValue, &temp.Flag);
+						temp.CurrentValue = currentValue;
+						pParametr[10 + i] = temp;
+					}
+				}
+				pProcControl->Release();
+			}
+		}
+		return out;
 	}
 
 }; // ARLib namespace
