@@ -3,6 +3,7 @@
 #include <shlwapi.h>
 #include "ARLib/Webcam/CCapture.h"
 #include <strmif.h>
+#include <iostream>
 
 namespace ARLib {
 
@@ -292,15 +293,21 @@ done:
 	HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameters& param*/)
 	{
 		HRESULT hr = S_OK;
+		if(!pActivate){
+			hr = E_FAIL;
+		}
+
+
 		IMFMediaSource *pSource = NULL;
 
 		EnterCriticalSection(&m_critsec);
-
-		// Create the media source for the device.
-		hr = pActivate->ActivateObject(
-			__uuidof(IMFMediaSource),
-			(void**)&pSource
-			);
+		if(SUCCEEDED(hr)){
+			// Create the media source for the device.
+			hr = pActivate->ActivateObject(
+				__uuidof(IMFMediaSource),
+				(void**)&pSource
+				);
+		}
 
 		// Get the symbolic link. This is needed to handle device-
 		// loss notifications. (See CheckDeviceLost.)
@@ -318,16 +325,16 @@ done:
 			hr = OpenMediaSource(pSource);
 		}
 
-		// Set up the reader.
-		if (SUCCEEDED(hr))
-		{
-			hr = ConfigureSourceReader(m_pReader);
-		}
-
 		//Set camera parameters
 		if (SUCCEEDED(hr))
 		{
 			hr = setParams(pSource);
+		}
+
+		// Set up the reader.
+		if (SUCCEEDED(hr))
+		{
+			hr = ConfigureSourceReader(m_pReader);
 		}
 
 		if (SUCCEEDED(hr))
@@ -519,19 +526,21 @@ done:
 			//TODO: Make these configurable?
 			long streamPropertyValues[]=
 			{
-				VideoProcAmp_Brightness, 128,
-				VideoProcAmp_Contrast, 32,
-				VideoProcAmp_Saturation, 32,
-				VideoProcAmp_Sharpness, 32,
-				VideoProcAmp_WhiteBalance, 4000,
-				VideoProcAmp_BacklightCompensation, 0,
-				VideoProcAmp_Gain, 16
+				VideoProcAmp_Brightness, 128, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_Contrast, 32, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_Saturation, 32, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_Sharpness, 32, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_WhiteBalance, 2000, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_Gain, 16, VideoProcAmp_Flags_Manual
 			};
+
 			for(int i=0;i<7;i++){
 				if(SUCCEEDED(hr)){
-					hr=pProcAmp->Set(streamPropertyValues[i*2], streamPropertyValues[i*2+1], VideoProcAmp_Flags_Manual);
+					hr=pProcAmp->Set(streamPropertyValues[i*3], streamPropertyValues[i*3+1], streamPropertyValues[i*3+2]);
 				}
 			}
+			pProcAmp->Release();
 		}
 		return hr;
 	}

@@ -9,6 +9,7 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 	: videoDistance(_videoDistance)
 	, ocamModel(NULL)
 {
+	cameraFound=false;
 	additionalLatency.QuadPart = 0;
 
 	if (FAILED(CCapture::CreateInstance(&capture)))
@@ -38,8 +39,13 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 				else
 					break;
 			}
+			else{
+				temp=NULL;
+			}
 		}
-		capture->StartCapture(temp);
+		if(SUCCEEDED(capture->StartCapture(temp))){
+			cameraFound=true;
+		}
 
 		if (ocamModelParametersFilename)
 			ocamModel = ocam_get_model(ocamModelParametersFilename);
@@ -111,6 +117,10 @@ int VideoPlayer::getVideoWidth()
 int VideoPlayer::getVideoHeight()
 {
 	return 960; // TODO: request and read out actual dimensions 
+}
+
+bool VideoPlayer::cameraExists(){
+	return cameraFound;
 }
 
 void VideoPlayer::calculateUndistortionMap(float *xyMap)

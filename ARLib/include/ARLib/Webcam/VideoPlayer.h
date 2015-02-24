@@ -18,6 +18,8 @@ public:
 	int getVideoWidth();
 	// Returns the height of the video image
 	int getVideoHeight();
+	// Returns true if camera exists
+	bool cameraExists();
 	// Sets a value that is substracted from each captureTimeStamp
 	void setAdditionalLatency(LARGE_INTEGER _additionalLatency) { additionalLatency = _additionalLatency; }
 	// Returns a pointer to the current video frame memory in the BGR format
@@ -33,6 +35,7 @@ private:
 	float videoDistance;
 	ocam_model *ocamModel;
 	float homographyMatrix[3 * 3];
+	bool cameraFound;
 };
 
 }; // ARLib namespace

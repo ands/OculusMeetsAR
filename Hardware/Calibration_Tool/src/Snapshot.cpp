@@ -181,6 +181,12 @@ int Snapshot::startCapture()
 	assert(leftPlayer->getVideoWidth() == rightPlayer->getVideoWidth() &&
 		   leftPlayer->getVideoHeight() == rightPlayer->getVideoHeight());
 
+	//TODO: uncomment after debug!
+	/*if(!leftPlayer->cameraExists() || !rightPlayer->cameraExists()){
+		fprintf(stderr, "\nCould not find both cameras.\n");
+		return -1;
+	}*/
+
 	width = leftPlayer->getVideoWidth();
 	height = rightPlayer->getVideoHeight();
 
@@ -194,11 +200,12 @@ int Snapshot::startCapture()
 	windowClass.hInstance = GetModuleHandle(NULL);
 	windowClass.lpszClassName = "VideoWindowClass";
 
-	if (!RegisterClassA(&windowClass))
+	RegisterClassA(&windowClass);
+	/*if (!RegisterClassA(&windowClass))
 	{
 		fprintf(stderr, "could not create window class\n");
 		return -1;
-	}
+	}*/
 
 	HWND window = CreateWindowExA(
 		0, windowClass.lpszClassName, "Live Capture", WS_OVERLAPPEDWINDOW | WS_VISIBLE,
