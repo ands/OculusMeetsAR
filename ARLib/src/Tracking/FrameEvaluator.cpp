@@ -27,14 +27,14 @@ RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& r
 	long long currentTime = frames[0].mTimestamp;
 
     unsigned int index = 1;
-    for( ; currentTime < retroActiveQueryTime && index < mFrameBufferSize - 1; index++){
+    for( ; currentTime > retroActiveQueryTime && index < mFrameBufferSize - 1; index++){
         currentTime = frames[index].mTimestamp;
     }
 	index = index - 1;
-    double weight =  static_cast<double>(retroActiveQueryTime - frames[index-1].mTimestamp) / static_cast<double>(frames[index].mTimestamp - frames[index-1].mTimestamp);
+    double weight =  static_cast<double>(retroActiveQueryTime - frames[index].mTimestamp) / static_cast<double>(frames[index+1].mTimestamp - frames[index].mTimestamp);
 
-    RigidBody *lowerBody = frames[index-1].mBody;
-    RigidBody *higherBody = frames[index].mBody;
+    RigidBody *lowerBody = frames[index].mBody;
+    RigidBody *higherBody = frames[index+1].mBody;
 
     switch(mEval){
     case FRAME_ROUND:
@@ -76,7 +76,7 @@ void FrameEvaluator::addRigidBodyEventListener(RigidBodyEventListener* listener)
 				}
 			}
 			bool unregistered = true;
-			for(int i = 0; i < mRifts.size();i++){
+			for(unsigned int i = 0; i < mRifts.size();i++){
 				if(listener->getRigidBodyID() == mRifts[i].second){
 					unregistered = false;
 					break;
@@ -255,11 +255,11 @@ void RiftEvaluator::evaluate(){
 		for(unsigned int i = 0; i < mCurrentFrame->mNRigidBodys; i++){
 			if((*it).first == mCurrentFrame->mRbs[i]->mID){
 				TimedFrame* t = (*it).second;
-				if(t->mBody != nullptr){
-					delete t->mBody;
+				if(t[mFrameBufferSize-1].mBody != nullptr){
+					delete t[mFrameBufferSize-1].mBody;
 				}
 				for(unsigned int j = mFrameBufferSize - 1; j > 0 ; j--){
-					t[i] = t[i-1];
+					t[j] = t[j-1];
 				}
 				t[0].mBody = new RigidBody(*mCurrentFrame->mRbs[i]);
 				LARGE_INTEGER tempStamp;

@@ -6,6 +6,8 @@
 #include "OGRE/Overlay/OgreOverlayContainer.h"
 #include "OGRE/Overlay/OgreFontManager.h"
 
+#include "ARLib/Webcam/VideoPlayer.h"
+
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
@@ -17,6 +19,9 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	, enabledNPRRenderer(false)
 	, mWatercolorRenderTarget(nullptr)
 	, mSmallWatercolorRenderTarget(nullptr)
+	, mVideoPlayerLeft(videoPlayerLeft), mVideoPlayerRight(videoPlayerRight)
+	, mRiftVideoScreens(nullptr)
+	, additionalLatency(0.048)
 {
 	mRoot = root;
 	mMouse = mouse;
@@ -79,7 +84,7 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition(0.6f, 0.0f, 0.0f);
+	cubeNode2->setPosition(0.6f, 1.0f, 0.0f);
 	cubeNode2->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* light = mSceneMgr->createLight();
@@ -122,6 +127,8 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
 	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
 	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+
+	setAdditionalLatency(additionalLatency);
 }
 
 WebcamScene::~WebcamScene()
@@ -205,6 +212,16 @@ void WebcamScene::update(float dt)
 	}*/
 }
 
+void WebcamScene::setAdditionalLatency(double seconds)
+{
+	LARGE_INTEGER frequency, additionalLatency;
+	QueryPerformanceFrequency(&frequency);
+	additionalLatency.QuadPart = (LONGLONG)(seconds * frequency.QuadPart);
+	mVideoPlayerLeft->setAdditionalLatency(additionalLatency);
+	mVideoPlayerRight->setAdditionalLatency(additionalLatency);
+	printf("additional latency: %03lfs\n", seconds);
+}
+
 //////////////////////////////////////////////////////////////
 // Handle Input:
 //////////////////////////////////////////////////////////////
@@ -258,6 +275,13 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
 		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
 	}
+
+	// video latency
+	const double latencyStep = 0.002;
+	bool setLatency = false;
+	if (e.key == OIS::KC_0) { additionalLatency -= latencyStep; setLatency = true; }
+	if (e.key == OIS::KC_9) { additionalLatency += latencyStep; setLatency = true; }
+	if (setLatency) setAdditionalLatency(additionalLatency);
 
 	return true;
 }

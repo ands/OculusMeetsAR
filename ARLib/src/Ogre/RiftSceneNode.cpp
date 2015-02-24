@@ -13,7 +13,7 @@ RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, floa
 	bodyNode->setFixedYawAxis(true);
 
 	bodyTiltNode = bodyNode->createChildSceneNode();
-	headCalibrationNode = bodyTiltNode->createChildSceneNode("HeadCalibrationNode");
+	headCalibrationNode = bodyTiltNode->createChildSceneNode("ARLib/Oculus/HeadCalibrationNode");
 	headNode = headCalibrationNode->createChildSceneNode("ARLib/Oculus/HeadNode");
 
 	cameras[0] = sceneManager->createCamera("ARLib/Oculus/LeftCamera");

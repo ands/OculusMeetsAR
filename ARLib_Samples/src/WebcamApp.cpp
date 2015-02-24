@@ -32,8 +32,11 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	initRift();
 	initTracking();
 
+	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
+
 	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
 	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
+
     mScene = new WebcamScene(
 		mRift, mTracker,
 		mRoot, mSceneMgr,
@@ -210,7 +213,7 @@ void WebcamApp::initTracking()
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP(); //local machine
 	mTracker->setNatNetServerIP(); //local machine
-	mTracker->setFrameEvaluationMethod(ARLib::FRAME_INTERPOLATE_LINEAR);
+	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
 	if(error != ARLib::ARLIB_TRACKING_OK){

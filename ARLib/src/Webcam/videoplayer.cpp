@@ -9,6 +9,7 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 	: videoDistance(_videoDistance)
 	, ocamModel(NULL)
 {
+	cameraFound=false;
 	additionalLatency.QuadPart = 0;
 
 	if (FAILED(CCapture::CreateInstance(&capture)))
@@ -38,9 +39,14 @@ VideoPlayer::VideoPlayer(int cameraNumber, const char *ocamModelParametersFilena
 				else
 					break;
 			}
+			else{
+				temp=NULL;
+			}
 		}
-		if (temp)
+		if (temp){
 			capture->StartCapture(temp);
+			cameraFound=true;
+		}
 		else
 			fprintf_s(stderr, "WARNING: Camera number %d not connected!\n", cameraNumber);
 
@@ -114,6 +120,10 @@ int VideoPlayer::getVideoWidth()
 int VideoPlayer::getVideoHeight()
 {
 	return 960; // TODO: request and read out actual dimensions 
+}
+
+bool VideoPlayer::cameraExists(){
+	return cameraFound;
 }
 
 void VideoPlayer::calculateUndistortionMap(float *xyMap)

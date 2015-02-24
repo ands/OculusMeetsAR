@@ -3,6 +3,7 @@
 #include <shlwapi.h>
 #include "ARLib/Webcam/CCapture.h"
 #include <strmif.h>
+#include <iostream>
 
 namespace ARLib {
 
@@ -292,15 +293,21 @@ done:
 	HRESULT CCapture::StartCapture(IMFActivate *pActivate/*, const EncodingParameters& param*/)
 	{
 		HRESULT hr = S_OK;
+		if(!pActivate){
+			hr = E_FAIL;
+		}
+
+
 		IMFMediaSource *pSource = NULL;
 
 		EnterCriticalSection(&m_critsec);
-
-		// Create the media source for the device.
-		hr = pActivate->ActivateObject(
-			__uuidof(IMFMediaSource),
-			(void**)&pSource
-			);
+		if(SUCCEEDED(hr)){
+			// Create the media source for the device.
+			hr = pActivate->ActivateObject(
+				__uuidof(IMFMediaSource),
+				(void**)&pSource
+				);
+		}
 
 		// Get the symbolic link. This is needed to handle device-
 		// loss notifications. (See CheckDeviceLost.)
@@ -318,16 +325,16 @@ done:
 			hr = OpenMediaSource(pSource);
 		}
 
-		// Set up the reader.
-		if (SUCCEEDED(hr))
-		{
-			hr = ConfigureSourceReader(m_pReader);
-		}
-
 		//Set camera parameters
 		if (SUCCEEDED(hr))
 		{
 			hr = setParams(pSource);
+		}
+
+		// Set up the reader.
+		if (SUCCEEDED(hr))
+		{
+			hr = ConfigureSourceReader(m_pReader);
 		}
 
 		if (SUCCEEDED(hr))
@@ -523,10 +530,11 @@ done:
 				VideoProcAmp_Contrast, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Saturation, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Sharpness, 32, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_WhiteBalance, 4000, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Auto,
+				VideoProcAmp_WhiteBalance, 2000, VideoProcAmp_Flags_Manual,
+				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Gain, 16, VideoProcAmp_Flags_Manual
 			};
+
 			for(int i=0;i<7;i++){
 				if(SUCCEEDED(hr)){
 					hr=pProcAmp->Set(
@@ -535,6 +543,7 @@ done:
 						streamPropertyValues[i*3+2]);
 				}
 			}
+			pProcAmp->Release();
 		}
 		return hr;
 	}
