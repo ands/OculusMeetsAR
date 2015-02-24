@@ -30,16 +30,16 @@ private:
 	float mRadius;
 	float mYVel;
 	float mXVel;
-	float mYMaxVel;
-	float mXMaxVel;
+	const float mYMaxVel;
+	const float mXMaxVel;
 	float mYAcc;
 	float mXAcc;
 
 	float mTravelTimeX;
 	float mTravelTimeY;
 
-	float mMaxTravelTimeX;
-	float mMaxTravelTimeY;
+	const float mMaxTravelTimeX;
+	const float mMaxTravelTimeY;
 };
 
 #endif

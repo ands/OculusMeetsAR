@@ -24,7 +24,6 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
 	mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
 
 	mSwordBody->getBulletRigidBody()->setUserPointer(nullptr);
-
     delete stmc;
 }
 

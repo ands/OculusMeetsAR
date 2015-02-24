@@ -28,12 +28,6 @@ private:
 
     StarWarsLaserCannon *mCannons;
 
-    Ogre::Vector3 mSphericalPos;
-    Ogre::Vector3 mAngularAccel;
-    Ogre::Vector3 mAngularVelo;
-    float mMaxVelo;
-    Ogre::Vector3 mTravelDest;
-
     Ogre::SceneNode *mPlayer;
     float mRadius;
     float mAccumTime;
