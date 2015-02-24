@@ -5,6 +5,7 @@ namespace ARLib{
 RigidBodyEventListener::RigidBodyEventListener(unsigned int rigidBodyID, bool isRiftListener)
 		: mRigidBodyID(rigidBodyID)
 		, mRiftListener(isRiftListener)
+		, mCalibrating(false)
 		, mRefX(0.0f)
 		, mRefY(0.0f)
 		, mRefZ(0.0f)

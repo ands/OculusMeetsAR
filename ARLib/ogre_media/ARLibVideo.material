@@ -5,6 +5,7 @@ vertex_program ARLib/Video/UndistortionVertex glsl
 	{
 		param_named offset float2 0 0
 		param_named scale float2 1 1
+		param_named_auto worldViewProj worldviewproj_matrix
 	}
 }
 fragment_program ARLib/Video/UndistortionFragment glsl
