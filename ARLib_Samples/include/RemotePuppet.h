@@ -16,7 +16,7 @@ public:
 
     void fire(const Ogre::Vector3& target);
     void pickNewDestination();
-    void init(const Ogre::Vector3& lookDir);
+    void init(const Ogre::Vector3& position);
 private:
     Ogre::SceneNode *mSceneNode;
     Ogre::SceneNode *mParentPosNode;
@@ -27,13 +27,19 @@ private:
     Ogre::AxisAlignedBox mMovingBounds;
     StarWarsRemote *mRemote;
 
-    Ogre::Vector3 mLookDir;
-    Ogre::Vector3 mVel;
-    Ogre::Vector3 mAcc;
-    Ogre::Vector3 mMaxVel;
-    float mTravelTime;
-    float mRadius;
-    float accumTime;
+	float mRadius;
+	float mYVel;
+	float mXVel;
+	float mYMaxVel;
+	float mXMaxVel;
+	float mYAcc;
+	float mXAcc;
+
+	float mTravelTimeX;
+	float mTravelTimeY;
+
+	float mMaxTravelTimeX;
+	float mMaxTravelTimeY;
 };
 
 #endif

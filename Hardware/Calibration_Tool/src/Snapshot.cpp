@@ -181,11 +181,9 @@ int Snapshot::startCapture()
 	assert(leftPlayer->getVideoWidth() == rightPlayer->getVideoWidth() &&
 		   leftPlayer->getVideoHeight() == rightPlayer->getVideoHeight());
 
-	//TODO: uncomment after debug!
-	/*if(!leftPlayer->cameraExists() || !rightPlayer->cameraExists()){
-		fprintf(stderr, "\nCould not find both cameras.\n");
+	if(!leftPlayer->cameraExists() || !rightPlayer->cameraExists()){
 		return -1;
-	}*/
+	}
 
 	width = leftPlayer->getVideoWidth();
 	height = rightPlayer->getVideoHeight();

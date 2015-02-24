@@ -16,7 +16,6 @@ LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::Dynam
 	Ogre::Vector3 cross = Ogre::Vector3::UNIT_Y.crossProduct(normalizedImpulse);
 	Ogre::Matrix3 rotation = Ogre::Matrix3(0, -cross.z, cross.y, cross.z, 0, -cross.x, -cross.y, cross.x, 0);
 	Ogre::Matrix3 finalRotation = Ogre::Matrix3::IDENTITY + rotation + rotation * rotation * ((1.0f - normalizedImpulse.y)/cross.squaredLength());
-	
 
 	mSceneNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
 	mSceneNode->setPosition(position);
@@ -28,7 +27,7 @@ LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::Dynam
     mShape = stmc->createConvex();
 	mShape->getBulletShape()->setLocalScaling(btVector3(0.1f, 0.2f, 0.1f));
     mBody = new OgreBulletDynamics::RigidBody("LaserBullet" + std::to_string(LaserBulletManager::getSingleton().getBulletCounter()), dyWorld, 1, 2);
-	mBody->setShape(mSceneNode, mShape, 0.6f, 0.6f, 1.0f, Ogre::Vector3::ZERO, Ogre::Quaternion(finalRotation));
+	mBody->setShape(mSceneNode, mShape, 0.6f, 0.6f, 1.0f, position, Ogre::Quaternion(finalRotation));
 
     mBody->enableActiveState();
     mBody->applyImpulse(impulse, Ogre::Vector3::ZERO);

@@ -13,7 +13,8 @@ RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, floa
 	bodyNode->setFixedYawAxis(true);
 
 	bodyTiltNode = bodyNode->createChildSceneNode();
-	headNode = bodyTiltNode->createChildSceneNode("ARLib/Oculus/HeadNode");
+	headCalibrationNode = bodyTiltNode->createChildSceneNode("HeadCalibrationNode");
+	headNode = headCalibrationNode->createChildSceneNode("ARLib/Oculus/HeadNode");
 
 	cameras[0] = sceneManager->createCamera("ARLib/Oculus/LeftCamera");
 	cameras[1] = sceneManager->createCamera("ARLib/Oculus/RightCamera");
@@ -111,6 +112,7 @@ void RiftSceneNode::onChange(const RigidBody *rb)
 	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
 	bodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 
+	headCalibrationNode->setOrientation(Ogre::Quaternion(mRefQW, mRefQX, mRefQY, mRefQZ).UnitInverse());
 	/*if (rift && renderTargets.size())
 	{
 		float s[2][16], e[2][16];

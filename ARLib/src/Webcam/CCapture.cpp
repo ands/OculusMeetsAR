@@ -537,7 +537,10 @@ done:
 
 			for(int i=0;i<7;i++){
 				if(SUCCEEDED(hr)){
-					hr=pProcAmp->Set(streamPropertyValues[i*3], streamPropertyValues[i*3+1], streamPropertyValues[i*3+2]);
+					hr=pProcAmp->Set(
+						streamPropertyValues[i*3], 
+						streamPropertyValues[i*3+1], 
+						streamPropertyValues[i*3+2]);
 				}
 			}
 			pProcAmp->Release();

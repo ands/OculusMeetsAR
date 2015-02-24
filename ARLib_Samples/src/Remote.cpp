@@ -23,6 +23,7 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
 
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
     mSceneNode->setInheritOrientation(false);
+	mSceneNode->setPosition(0,0,-5);
 
     mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
     mSpinNode->setFixedYawAxis(true);
@@ -77,7 +78,7 @@ StarWarsRemote::~StarWarsRemote(){
 void StarWarsRemote::update(float dt){
 	const float GlowTime = 0.5f;
     mAccumTime += dt;
-    mAccumRot += dt/10.0f;
+    mAccumRot += dt/2.0f;
 	mTimeSinceShotsFired += dt;
 	if(mTimeSinceShotsFired <= GlowTime + 0.1f && mTimeSinceShotsFired >= 0.1){
 		mCannons->changeMaterial(1.0f - std::max(std::min((GlowTime - mTimeSinceShotsFired)/GlowTime, 1.0f),0.0f));
@@ -89,7 +90,7 @@ void StarWarsRemote::update(float dt){
 			mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO);
 		}
     }
-    //mSpinNode->setOrientation(Ogre::Quaternion(Ogre::Radian(mAccumRot), Ogre::Vector3::UNIT_Y));
+    mSpinNode->setOrientation(Ogre::Quaternion(Ogre::Radian(mAccumRot), Ogre::Vector3::UNIT_Y));
     if(mAccumTime >= 2.0f){
         mAccumTime = 0.0f;
         changeMaterial(0.0f);
@@ -105,8 +106,8 @@ void StarWarsRemote::update(float dt){
 }
 
 void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){
-    //mRemoteBody->setPosition(newPos);
-    //mSpinNode->setOrientation(quat);
+    mSceneNode->setPosition(newPos);
+   // mSpinNode->setOrientation(quat);
 }
 
 void StarWarsRemote::changeMaterial(float interp){

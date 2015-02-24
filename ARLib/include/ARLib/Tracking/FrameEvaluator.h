@@ -36,7 +36,7 @@ namespace ARLib{
 		FrameEvaluator(unsigned int frameBufferSize = 0);
 		~FrameEvaluator();
 
-		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime) = 0;
+		RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
         virtual void evaluate() = 0;
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
         void setEvaluationMethod(FRAME_EVALUATION_METHOD evalMethod);
@@ -56,6 +56,7 @@ namespace ARLib{
 	public:
 		GenericNatNetEvaluator(unsigned int frameBufferSize);
 		virtual void updateFrame(RBFrame *frame) = 0;
+		virtual void evaluate();
 	protected:
 	};
 
@@ -64,8 +65,6 @@ namespace ARLib{
 		NatNetRiftEvaluator(unsigned int frameBufferSize = 0);
 		~NatNetRiftEvaluator();
 
-		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
-		virtual void evaluate();
 		virtual void updateFrame(RBFrame *frame);
 	};
 
@@ -74,8 +73,6 @@ namespace ARLib{
 		NatNetEvaluator(unsigned int frameBufferSize = 0);
 		~NatNetEvaluator();
 
-		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
-		virtual void evaluate();
 		virtual void updateFrame(RBFrame *frame);
 	};
 
@@ -84,7 +81,6 @@ namespace ARLib{
 		RiftEvaluator(unsigned int frameBufferSize = 0);
 		~RiftEvaluator();
 
-		virtual RigidBody* evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime);
 		virtual void evaluate();
 	private:
 	};

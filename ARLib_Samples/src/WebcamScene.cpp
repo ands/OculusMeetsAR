@@ -181,14 +181,14 @@ void WebcamScene::update(float dt)
 			rift->recenterPose();
 
 		// TODO: this needs to be done by the tracking system!
-		static ARLib::RigidBody rb; float q[4]; float p[3];
+		/*static ARLib::RigidBody rb; float q[4]; float p[3];
 		Ogre::Vector3 riftPosition = mRiftNode->getBodyNode()->getPosition();
 		rift->getPose(p, q); // get the head tracking data relative to the body position
 		rb.mX = 0.8f + p[0];
 		rb.mY = 0.3f + p[1];
 		rb.mZ = 0.8f + p[2];
 		rb.mqX = q[0]; rb.mqY = q[1]; rb.mqZ = q[2]; rb.mqW = q[3];
-		mRiftNode->onChange(&rb);
+		mRiftNode->onChange(&rb);*/
 	}
 
 	// update video frames
