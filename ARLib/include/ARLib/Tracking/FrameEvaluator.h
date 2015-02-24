@@ -56,6 +56,7 @@ namespace ARLib{
 	public:
 		GenericNatNetEvaluator(unsigned int frameBufferSize);
 		virtual void updateFrame(RBFrame *frame) = 0;
+		virtual void evaluate();
 	protected:
 	};
 
@@ -64,7 +65,6 @@ namespace ARLib{
 		NatNetRiftEvaluator(unsigned int frameBufferSize = 0);
 		~NatNetRiftEvaluator();
 
-		virtual void evaluate();
 		virtual void updateFrame(RBFrame *frame);
 	};
 
@@ -73,7 +73,6 @@ namespace ARLib{
 		NatNetEvaluator(unsigned int frameBufferSize = 0);
 		~NatNetEvaluator();
 
-		virtual void evaluate();
 		virtual void updateFrame(RBFrame *frame);
 	};
 

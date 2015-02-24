@@ -19,18 +19,19 @@ FrameEvaluator::~FrameEvaluator(){
 
 RigidBody* FrameEvaluator::evaluateRigidBody(unsigned int ID, const long long& retroActiveQueryTime){
     tthread::lock_guard<tthread::mutex> guard(mMutex);
-    long long currentTime = 0;
 	
 	if(mRigidBodyHistories.find(ID) == mRigidBodyHistories.end()){
 		return nullptr;
 	}
 	TimedFrame *frames = mRigidBodyHistories[ID];
+	long long currentTime = frames[0].mTimestamp;
 
     unsigned int index = 1;
     for( ; currentTime < retroActiveQueryTime && index < mFrameBufferSize - 1; index++){
-        currentTime += frames[index-1].mTimestamp - frames[index].mTimestamp;
+        currentTime = frames[index].mTimestamp;
     }
-    double weight =  static_cast<double>(retroActiveQueryTime - frames[index].mTimestamp) / static_cast<double>(frames[index-1].mTimestamp - frames[index].mTimestamp);
+	index = index - 1;
+    double weight =  static_cast<double>(retroActiveQueryTime - frames[index-1].mTimestamp) / static_cast<double>(frames[index].mTimestamp - frames[index-1].mTimestamp);
 
     RigidBody *lowerBody = frames[index-1].mBody;
     RigidBody *higherBody = frames[index].mBody;
