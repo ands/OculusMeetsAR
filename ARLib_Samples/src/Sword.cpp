@@ -12,7 +12,7 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     mSceneNode->attachObject(swordEntity);
     mSceneNode->setScale(1.0f, 0.0f, 1.0f);
 
-	mSwordLocalPos = Ogre::Vector3(0,-0.75f, -0.3f); //delete!!!!
+	mSwordLocalPos = Ogre::Vector3(0,0,0); //delete!!!!
 
     //create bullet collision object
     OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter(swordEntity);

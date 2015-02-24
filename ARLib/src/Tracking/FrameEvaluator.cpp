@@ -114,15 +114,22 @@ void GenericNatNetEvaluator::evaluate(){
 						mRigidBodies[i]->setReferencePosition(mCurrentFrame->mRbs[j]->mX, mCurrentFrame->mRbs[j]->mY, mCurrentFrame->mRbs[j]->mZ);
 						mRigidBodies[i]->calibrate(false);
 					}
-					RigidBody rb = RigidBody();
-					rb.mqW = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqX - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqY - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqZ;
-					rb.mqX = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqY;
-					rb.mqY = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqX;
-					rb.mqZ = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqZ - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqW;
+					/*RigidBody rb = RigidBody();
+					RigidBodyEventListener* p = mRigidBodies[i];
+					RigidBody *q = mCurrentFrame->mRbs[j];
+					rb.mqW = q->mqW * p->mRefQW - q->mqX * p->mRefQX - q->mqY * p->mRefQY - q->mqZ * p->mRefQZ;
+					rb.mqX = q->mqW * p->mRefQX + q->mqX * p->mRefQW + q->mqY * p->mRefQZ - q->mqZ * p->mRefQY;
+					rb.mqY = q->mqW * p->mRefQY - q->mqX * p->mRefQZ + q->mqY * p->mRefQW + q->mqZ * p->mRefQX;
+					rb.mqZ = q->mqW * p->mRefQZ + q->mqX * p->mRefQY - q->mqY * p->mRefQX + q->mqZ * p->mRefQW;
+
+					/*rb.mqW = p->mRefQW * q->mqW + p->mRefQX * q->mqX + p->mRefQY * q->mqY + p->mRefQZ * q->mqZ;
+					rb.mqX = p->mRefQW * q->mqX - p->mRefQX * q->mqW + p->mRefQY * q->mqZ - p->mRefQZ * q->mqY;
+					rb.mqY = p->mRefQW * q->mqY - p->mRefQX * q->mqZ - p->mRefQY * q->mqW + p->mRefQZ * q->mqX;
+					rb.mqZ = p->mRefQW * q->mqZ + p->mRefQX * q->mqY - p->mRefQY * q->mqX - p->mRefQZ * q->mqW;
 					rb.mX = mCurrentFrame->mRbs[j]->mX;
 					rb.mY = mCurrentFrame->mRbs[j]->mY;
-					rb.mZ = mCurrentFrame->mRbs[j]->mZ;
-					mRigidBodies[i]->onChange(&rb);
+					rb.mZ = mCurrentFrame->mRbs[j]->mZ;*/
+					mRigidBodies[i]->onChange(mCurrentFrame->mRbs[j]);
 					break;
 				}
 			}
@@ -272,14 +279,22 @@ void RiftEvaluator::evaluate(){
 					mRigidBodies[i]->calibrate(false);
 				}
 				RigidBody rb = RigidBody();
-				rb.mqW = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqX - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqY - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqZ;
-				rb.mqX = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqY;
-				rb.mqY = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqZ + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqW - mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqX;
-				rb.mqZ = mRigidBodies[i]->mRefQW * mCurrentFrame->mRbs[j]->mqZ - mRigidBodies[i]->mRefQX * mCurrentFrame->mRbs[j]->mqY + mRigidBodies[i]->mRefQY * mCurrentFrame->mRbs[j]->mqX + mRigidBodies[i]->mRefQZ * mCurrentFrame->mRbs[j]->mqW;
+					RigidBodyEventListener* p = mRigidBodies[i];
+					RigidBody *q = mCurrentFrame->mRbs[j];/*
+					rb.mqW = q->mqW * p->mRefQW - q->mqX * p->mRefQX - q->mqY * p->mRefQY - q->mqZ * p->mRefQZ;
+					rb.mqX = q->mqW * p->mRefQX + q->mqX * p->mRefQW + q->mqY * p->mRefQZ - q->mqZ * p->mRefQY;
+					rb.mqY = q->mqW * p->mRefQY - q->mqX * p->mRefQZ + q->mqY * p->mRefQW + q->mqZ * p->mRefQX;
+					rb.mqZ = q->mqW * p->mRefQZ + q->mqX * p->mRefQY - q->mqY * p->mRefQX + q->mqZ * p->mRefQW;
+
+					/*rb.mqW = p->mRefQW * q->mqW + p->mRefQX * q->mqX + p->mRefQY * q->mqY + p->mRefQZ * q->mqZ;
+					rb.mqX = p->mRefQW * q->mqX - p->mRefQX * q->mqW + p->mRefQY * q->mqZ - p->mRefQZ * q->mqY;
+					rb.mqY = p->mRefQW * q->mqY - p->mRefQX * q->mqZ - p->mRefQY * q->mqW + p->mRefQZ * q->mqX;
+					rb.mqZ = p->mRefQW * q->mqZ + p->mRefQX * q->mqY - p->mRefQY * q->mqX - p->mRefQZ * q->mqW;*/
 				rb.mX = mCurrentFrame->mRbs[j]->mX;
 				rb.mY = mCurrentFrame->mRbs[j]->mY;
 				rb.mZ = mCurrentFrame->mRbs[j]->mZ;
-				mRigidBodies[i]->onChange(&rb);
+				//mRigidBodies[i]->onChange(&rb);
+				mRigidBodies[i]->onChange(mCurrentFrame->mRbs[j]);
 				break;
 			}
 		}

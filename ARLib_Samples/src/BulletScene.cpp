@@ -47,6 +47,12 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
         setRenderTarget(mSmallRenderTarget);
     }
 
+	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
+	cubeEntity->setMaterialName("CubeMaterialRed");
+	cubeNode->attachObject(cubeEntity);
+	cubeNode->setPosition(0,0,-10);
+
     //add Glow compositor
     mGlow[0] = Ogre::CompositorManager::getSingleton().addCompositor(mRiftNode->getLeftCamera()->getViewport(), "GlowBig");
     mGlow[0]->setEnabled(mToggle);

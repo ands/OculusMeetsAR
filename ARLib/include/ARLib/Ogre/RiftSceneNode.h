@@ -23,6 +23,7 @@ class RiftSceneNode : public RiftRigidBodyEventListener
 		Rift *getRift() { return rift; }
 		Ogre::SceneNode *getBodyNode() { return bodyNode; }
 		Ogre::SceneNode *getHeadNode() { return headNode; }
+		Ogre::SceneNode *getHeadCalibrationNode() { return headCalibrationNode; }
 		Ogre::Camera *getLeftCamera() { return cameras[0]; }
 		Ogre::Camera *getRightCamera() { return cameras[1]; }
 
@@ -38,6 +39,7 @@ class RiftSceneNode : public RiftRigidBodyEventListener
 	private:
 		Rift *rift;
 		Ogre::Camera *cameras[2];
+		Ogre::SceneNode *headCalibrationNode;
 		Ogre::SceneNode *headNode;
 		Ogre::SceneNode *bodyNode;
 		Ogre::SceneNode *bodyTiltNode;
