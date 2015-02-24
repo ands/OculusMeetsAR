@@ -54,17 +54,16 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			mRiftNode->addRenderTarget(mGlowRenderTarget);
 	if (mSmallRenderTarget)
 			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
-	
+
+	GlowMaterialListener *gml = new GlowMaterialListener();
+	Ogre::MaterialManager::getSingleton().addListener(gml);
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
 	Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
 	cubeEntity->setMaterialName("CubeMaterialRed");
 	cubeNode->attachObject(cubeEntity);
 	cubeNode->setPosition(0,0,-10);
-
-	GlowMaterialListener *gml = new GlowMaterialListener();
-	Ogre::MaterialManager::getSingleton().addListener(gml);
-	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
     //roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -160,7 +159,7 @@ void BulletScene::update(float dt)
     mSword->update(dt);
     LaserBulletManager::getSingleton().update(dt);
 	
-	//mRiftVideoScreens->update();
+	mRiftVideoScreens->update();
 }
 
 //////////////////////////////////////////////////////////////
