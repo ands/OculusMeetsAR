@@ -8,8 +8,10 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
     , mRadius(radius)
     , mPlayer(player)
 	, mTimeSinceShotsFired(0.0f)
-	, mTimeBetweenShots(5.0f){
+	, mTimeBetweenShots(5.0f)
+	, mDistribution(3.0f, 8.0f){
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemote");
+	mSceneNode->setScale(0.45f, 0.45f, 0.45f);
     mSceneNode->setInheritOrientation(false);
 
     mSpinNode = mSceneNode->createChildSceneNode("StarWarsRemoteSpin");
@@ -50,6 +52,10 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
 
     mAccumTime = 0.0f;
     mAccumRot = 0.0f;
+
+	mRemoteBody = new OgreBulletDynamics::RigidBody("StarWarsRemote", dynamicsWorld, 4, 1); //set CollisionMask!
+	mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.225f);
+	mRemoteBody->setShape(mSpinNode, mRemoteSphere, 0.6f, 0.6f, 0.0f);
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -58,6 +64,10 @@ StarWarsRemote::~StarWarsRemote(){
 }
 
 void StarWarsRemote::update(float dt){
+	Ogre::Vector3 p = mSpinNode->_getDerivedPosition();
+	Ogre::Quaternion q = mSpinNode->_getDerivedOrientation();
+	mRemoteBody->getBulletRigidBody()->setWorldTransform(btTransform(btQuaternion(q.x, q.y, q.z, q.w), btVector3(p.x, p.y, p.z)));
+
 	const float GlowTime = 0.5f;
     mAccumTime += dt;
     mAccumRot += dt/2.0f;
@@ -68,8 +78,8 @@ void StarWarsRemote::update(float dt){
 		mCannons->changeMaterial(1.0f - std::max(std::min((GlowTime - (mTimeBetweenShots - mTimeSinceShotsFired))/GlowTime, 1.0f), 0.0f));
 		if(mTimeSinceShotsFired >= mTimeBetweenShots + 0.1f){
 			mTimeSinceShotsFired = 0.0f;
-			//pick new random time
-			mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO);
+			mTimeBetweenShots = mDistribution(mGenerator);
+			mCannons->shoot(mPlayer->_getDerivedPosition() + mPlayer->_getDerivedOrientation() * mPlayer->_getDerivedScale() * Ogre::Vector3::ZERO + Ogre::Vector3(0,-0.15f, 0));
 		}
     }
     mSpinNode->setOrientation(Ogre::Quaternion(Ogre::Radian(mAccumRot), Ogre::Vector3::UNIT_Y));
@@ -84,7 +94,7 @@ void StarWarsRemote::update(float dt){
     }
 }
 
-void StarWarsRemote::changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat){
+void StarWarsRemote::changePos(const Ogre::Vector3& newPos){
     mSceneNode->setPosition(newPos);
 }
 

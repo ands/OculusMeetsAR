@@ -95,8 +95,8 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
 	light->setAttenuation( 65.0f, 1.0f, 0.07f, 0.017f );
-	light->setSpecularColour( .25f, .25f, .25f );
-	light->setDiffuseColour( 0.35f, 0.27f, 0.23f );
+	light->setSpecularColour( .4f, .4f, .4f );
+	light->setDiffuseColour( 0.7f, 0.54f, 0.46f );
 	mRiftNode->getBodyNode()->attachObject(light); 
 
     mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 2);
@@ -105,16 +105,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
         tracker->addRigidBodyEventListener(mSwordParentNode);
     }
 
-	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),5.0f);
-    mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 10.0f);
+	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),2.0f);
+    mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 2.0f);
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
-
-
-    //Add Screenspace Ambient Occlusion
-    //mDebugLeftSSAO = new PFXSSAO(smallWindow, mRiftNode->getLeftCamera());
-    //mDebugRightSSAO = new PFXSSAO(smallWindow, mRiftNode->getRightCamera());
-    //mLeftSSAO = new PFXSSAO(window, mRiftNode->getLeftCamera());
-    //mRightSSAO = new PFXSSAO(window, mRiftNode->getRightCamera());
 	
 	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
 	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
