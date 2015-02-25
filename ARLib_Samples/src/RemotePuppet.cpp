@@ -38,7 +38,7 @@ void StarWarsRemotePuppet::update(float dt){
 		mYAcc = -mYAcc;
 	}
 	mSceneNode->setPosition(mSceneNode->getPosition().x + mXVel*dt, mSceneNode->getPosition().y + mYVel*dt, mSceneNode->getPosition().z);
-	mRemote->changePos(Ogre::Vector3(mRadius*std::cosf(mSceneNode->getPosition().x), mSceneNode->getPosition().y, mRadius*std::sinf(mSceneNode->getPosition().x))+mCenterOfRotation, Ogre::Quaternion());
+	mRemote->changePos(Ogre::Vector3(mRadius*std::cosf(mSceneNode->getPosition().x), mSceneNode->getPosition().y, mRadius*std::sinf(mSceneNode->getPosition().x))+mCenterOfRotation);
 
 	mXVel = std::min(std::max(mXVel + mXAcc * dt, -mXMaxVel), mXMaxVel);
 	mYVel = std::min(std::max(mYVel + mYAcc * dt, -mYMaxVel), mYMaxVel);

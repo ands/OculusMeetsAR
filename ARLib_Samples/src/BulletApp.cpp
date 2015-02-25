@@ -23,10 +23,10 @@ BulletApp::BulletApp(bool showDebugWindow)
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);
+	showDebugWindow = false;
 	if (!mRiftAvailable) // at least show the debug window if it is not available
 		showDebugWindow = true;
 
-	showDebugWindow = false;
 	initOgre(showDebugWindow);
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
