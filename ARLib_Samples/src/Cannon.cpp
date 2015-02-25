@@ -50,7 +50,7 @@ void StarWarsLaserCannon::shoot(const Ogre::Vector3& tarWorldPos){
                         new LaserBullet(mSceneMgr
                       , LaserBulletManager::getSingleton().getDynamicsWorld()
                       , minDistanceOrigin
-                      , (mTargetWorldPos - minDistanceOrigin) * 1.0f));
+					  , (mTargetWorldPos - minDistanceOrigin).normalisedCopy() * 5.0f));
 }
 
 void StarWarsLaserCannon::changeMaterial(float delta){

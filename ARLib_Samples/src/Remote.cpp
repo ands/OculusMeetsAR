@@ -50,6 +50,10 @@ StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *
 
     mAccumTime = 0.0f;
     mAccumRot = 0.0f;
+
+	mRemoteBody = new OgreBulletDynamics::RigidBody("StarWarsRemote", dynamicsWorld, 4, 1); //set CollisionMask!
+	mRemoteSphere = new OgreBulletCollisions::SphereCollisionShape(0.5f);
+	mRemoteBody->setShape(mSpinNode, mRemoteSphere, 0.6f, 0.6f, 0.0f);
 }
 
 StarWarsRemote::~StarWarsRemote(){
@@ -58,6 +62,10 @@ StarWarsRemote::~StarWarsRemote(){
 }
 
 void StarWarsRemote::update(float dt){
+	Ogre::Vector3 p = mSpinNode->_getDerivedPosition();
+	Ogre::Quaternion q = mSpinNode->_getDerivedOrientation();
+	mRemoteBody->getBulletRigidBody()->setWorldTransform(btTransform(btQuaternion(q.x, q.y, q.z, q.w), btVector3(p.x, p.y, p.z)));
+
 	const float GlowTime = 0.5f;
     mAccumTime += dt;
     mAccumRot += dt/2.0f;

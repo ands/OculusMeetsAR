@@ -14,7 +14,7 @@ StarWarsRemotePuppet::StarWarsRemotePuppet(StarWarsRemote *remote, Ogre::SceneNo
 	,mYAcc(0.6f)
 	,mYMaxVel(0.6f)
 	,mMaxTravelTimeX(3.0f)
-	,mMaxTravelTimeY(6.0f){
+	,mMaxTravelTimeY(2.0f){
     mSceneNode = parentNode->createChildSceneNode("StarWarsRemotePuppet");
 
     //valid Range [0, pi/2]x[0, 3]x[mRadius, mRadius]
@@ -43,6 +43,9 @@ void StarWarsRemotePuppet::update(float dt){
 
 	mXVel = std::min(std::max(mXVel + mXAcc * dt, -mXMaxVel), mXMaxVel);
 	mYVel = std::min(std::max(mYVel + mYAcc * dt, -mYMaxVel), mYMaxVel);
+
+	float value = Ogre::Vector2(mXVel, mYVel).length()/ Ogre::Vector2(mXMaxVel, mYMaxVel).length();
+	mRemote->changeMaterial(value);
 }
 
 void StarWarsRemotePuppet::pickNewDestination(){
@@ -54,6 +57,8 @@ void StarWarsRemotePuppet::init(const Ogre::Vector3& position){
 	mXVel = 0.0f;
     mTravelTimeX = 1.5f;
 	mTravelTimeY = 3.f;
+	mXAcc = std::abs(mXAcc);
+	mYAcc = -std::abs(mYAcc);
 
 	mSceneNode->setPosition(std::atan2f(position.z, position.x) + mParentPosNode->_getDerivedPosition().x,
                             position.z + mParentPosNode->_getDerivedPosition().y, mRadius + mParentPosNode->_getDerivedPosition().z);

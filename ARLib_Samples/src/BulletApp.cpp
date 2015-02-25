@@ -250,7 +250,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
     if (mTrackingAvailable)
 		mTracker->update(); //right place?
 
-    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame);
+    mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 5);
     mScene->update(evt.timeSinceLastFrame);
 	return true; 
 }

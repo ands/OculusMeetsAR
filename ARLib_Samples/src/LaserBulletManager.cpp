@@ -67,13 +67,13 @@ bool LaserBullet::update(float dt){
 		Ogre::Radian angle;
 		finalRotation.ToAngleAxis(axis, angle);
 
-		OgreBulletDynamics::RigidBody *body = new OgreBulletDynamics::RigidBody("LaserBullet" + std::to_string(LaserBulletManager::getSingleton().getBulletCounter()), mBody->getDynamicsWorld(), 1, 2);
+		OgreBulletDynamics::RigidBody *body = new OgreBulletDynamics::RigidBody("LaserBullet" + std::to_string(LaserBulletManager::getSingleton().getBulletCounter()), mBody->getDynamicsWorld(), 1, 4);
 		delete mBody;
 		mBody = body;
 		mBody->setShape(mSceneNode, mShape, 0.6f, 0.6f, 1.0f, wp, Ogre::Quaternion(finalRotation));
 
 		mBody->enableActiveState();
-		mBody->applyImpulse(Ogre::Vector3(impulse.x, impulse.y, impulse.z), Ogre::Vector3::ZERO);
+		mBody->applyImpulse(Ogre::Vector3(impulse.x, impulse.y, impulse.z).normalisedCopy()*5.0f, Ogre::Vector3::ZERO);
 
 		mBody->getBulletRigidBody()->setCollisionFlags(mBody->getBulletRigidBody()->getCollisionFlags() | btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
 		mBody->getBulletRigidBody()->setAngularFactor(0.0f);
