@@ -17,6 +17,7 @@
     <ClCompile Include="..\src\Cannon.cpp" />
     <ClCompile Include="..\src\GlowRenderTarget.cpp" />
     <ClCompile Include="..\src\LaserBulletManager.cpp" />
+    <ClCompile Include="..\src\NPRWatercolorRenderTarget.cpp" />
     <ClCompile Include="..\src\Remote.cpp" />
     <ClCompile Include="..\src\RemotePuppet.cpp" />
     <ClCompile Include="..\src\RigidListenerNode.cpp" />
@@ -29,6 +30,7 @@
     <ClInclude Include="..\include\GlowMaterialListener.h" />
     <ClInclude Include="..\include\GlowRenderTarget.h" />
     <ClInclude Include="..\include\LaserBulletManager.h" />
+    <ClInclude Include="..\include\NPRWatercolorRenderTarget.h" />
     <ClInclude Include="..\include\PFXSSAO.h" />
     <ClInclude Include="..\include\Remote.h" />
     <ClInclude Include="..\include\RemotePuppet.h" />

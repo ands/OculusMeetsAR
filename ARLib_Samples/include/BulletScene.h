@@ -17,6 +17,8 @@
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
 
+class NPRWatercolorRenderTarget;
+
 class BulletScene
 {
 	public:
@@ -39,6 +41,7 @@ class BulletScene
 		bool mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID);
 		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 	private:
+		void toggleNPRRenderer();
 		void setAdditionalLatency(double seconds);
 
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
@@ -66,9 +69,12 @@ class BulletScene
 
         Ogre::CompositorInstance *mGlow[2];
 
+		NPRWatercolorRenderTarget* mWatercolorRenderTarget;
+		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
 		ARLib::VideoPlayer* mVideoPlayerLeft;
 		ARLib::VideoPlayer* mVideoPlayerRight;
 		ARLib::RiftVideoScreens* mRiftVideoScreens;
+		bool enabledNPRRenderer;
 		double additionalLatency;
 
 		Ogre::Vector2 mVideoOffset[2];

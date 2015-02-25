@@ -19,6 +19,7 @@ class GlowRenderTarget
 	private:
 		ARLib::RenderTarget *destination;
 		Ogre::Camera *camera[2];
+		Ogre::CompositorInstance *glow;
 };
 
 #endif

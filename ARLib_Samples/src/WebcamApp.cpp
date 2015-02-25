@@ -19,7 +19,7 @@ WebcamApp::WebcamApp(bool showDebugWindow)
 	, mVideoPlayerRight(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
-	//showDebugWindow = false; // for testing purposes
+	showDebugWindow = false; // for testing purposes
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);

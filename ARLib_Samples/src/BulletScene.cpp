@@ -3,6 +3,7 @@
 #include "GlowMaterialListener.h"
 #include "ARLib/Sound/SoundListener.h"
 #include "ARLib/Sound/SoundManager.h"
+#include "NPRWatercolorRenderTarget.h"
 
 BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
@@ -15,6 +16,11 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
 	, mRiftVideoScreens(nullptr)
 	, additionalLatency(0.048)
+	, enabledNPRRenderer(false)
+	, mWatercolorRenderTarget(nullptr)
+	, mSmallWatercolorRenderTarget(nullptr)
+	, mSmallGlowRenderTarget(nullptr)
+	, mGlowRenderTarget(nullptr)
 {
     LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
 
@@ -40,11 +46,13 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     if(window && rift){
         mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
 		mGlowRenderTarget = new GlowRenderTarget(mRenderTarget);
+		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mGlowRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
     }
 
     if(smallWindow){
         mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
 		mSmallGlowRenderTarget = new GlowRenderTarget(mSmallRenderTarget);
+		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallGlowRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
     }
 
 	
@@ -119,8 +127,10 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 BulletScene::~BulletScene()
 {
-    if(mRenderTarget) delete mRenderTarget;
-    if(mSmallRenderTarget) delete mSmallRenderTarget;
+    delete mRenderTarget;
+    delete mSmallRenderTarget;
+	delete mWatercolorRenderTarget;
+	delete mSmallWatercolorRenderTarget;
 
 	mRoot->destroySceneManager(mSceneMgr);
 
@@ -144,6 +154,28 @@ void BulletScene::toggleGlow()
     mToggle = !mToggle;
     mGlow[0]->setEnabled(mToggle);
     mGlow[1]->setEnabled(mToggle);
+}
+
+void BulletScene::toggleNPRRenderer()
+{
+	mRiftNode->removeAllRenderTargets();
+
+	if (enabledNPRRenderer)
+	{
+		if (mGlowRenderTarget && mGlowRenderTarget != mSmallGlowRenderTarget)
+			mRiftNode->addRenderTarget(mGlowRenderTarget);
+		if (mSmallGlowRenderTarget)
+			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
+		enabledNPRRenderer = false;
+	}
+	else
+	{
+		if (mGlowRenderTarget && mGlowRenderTarget != mSmallGlowRenderTarget)
+			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
+		if (mSmallGlowRenderTarget)
+			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
+		enabledNPRRenderer = true;
+	}
 }
 
 void BulletScene::update(float dt)
@@ -179,7 +211,7 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
     }if(e.key == OIS::KC_V){
         mSword->draw();
     }if(e.key == OIS::KC_N){
-        toggleGlow();
+        toggleNPRRenderer(); //toggleGlow();
     }if(e.key == OIS::KC_D){
         mDynamicsWorld->setShowDebugShapes(!mDynamicsWorld->getShowDebugShapes());
     }
