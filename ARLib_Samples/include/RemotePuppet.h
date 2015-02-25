@@ -5,7 +5,6 @@
 #include "Remote.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include <random>
 
 class StarWarsRemotePuppet{
 public:
@@ -21,8 +20,7 @@ private:
     Ogre::SceneNode *mSceneNode;
     Ogre::SceneNode *mParentPosNode;
 
-    std::default_random_engine mGenerator;
-    std::uniform_real_distribution<float> mDistribution;
+	Ogre::Vector3 mCenterOfRotation;
 
     Ogre::AxisAlignedBox mMovingBounds;
     StarWarsRemote *mRemote;

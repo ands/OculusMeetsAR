@@ -5,6 +5,7 @@
 #include "Cannon.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include <random>
 
 class StarWarsRemote{
 public:
@@ -12,7 +13,7 @@ public:
     ~StarWarsRemote();
 		
     void update(float dt);
-    void changePos(const Ogre::Vector3& newPos, const Ogre::Quaternion& quat);
+    void changePos(const Ogre::Vector3& newPos);
     void changeMaterial(float interp);
 
 private:
@@ -20,6 +21,9 @@ private:
     Ogre::SceneNode *mSpinNode;
     OgreBulletCollisions::SphereCollisionShape *mRemoteSphere;
     OgreBulletDynamics::RigidBody *mRemoteBody;
+	
+    std::default_random_engine mGenerator;
+    std::uniform_real_distribution<float> mDistribution;
 
     Ogre::SceneNode *mThrusterNode;
     Ogre::Pass *mThrusterHighPass;
