@@ -1,22 +1,20 @@
-#include "BulletScene.h"
+#include "RemoteScene.h"
 #include "LaserBulletManager.h"
 #include "GlowMaterialListener.h"
-#include "ARLib/Sound/SoundListener.h"
-#include "ARLib/Sound/SoundManager.h"
 #include "NPRWatercolorRenderTarget.h"
 
-BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
+RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
     OIS::Mouse *mouse, OIS::Keyboard *keyboard,
 	ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer)
-    : mRenderTarget(nullptr)
-    , mSmallRenderTarget(nullptr)
-    , mToggle(true)
+    : mToggle(true)
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
-	, mRiftVideoScreens(nullptr)
 	, additionalLatency(0.048)
 	, enabledNPRRenderer(false)
+    , mRenderTarget(nullptr)
+	, mRiftVideoScreens(nullptr)
+    , mSmallRenderTarget(nullptr)
 	, mWatercolorRenderTarget(nullptr)
 	, mSmallWatercolorRenderTarget(nullptr)
 	, mSmallGlowRenderTarget(nullptr)
@@ -120,7 +118,7 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	setAdditionalLatency(additionalLatency);
 }
 
-BulletScene::~BulletScene()
+RemoteScene::~RemoteScene()
 {
     delete mRenderTarget;
     delete mSmallRenderTarget;
@@ -144,14 +142,14 @@ BulletScene::~BulletScene()
 	delete mRiftNode;
 }
 
-void BulletScene::toggleGlow()
+void RemoteScene::toggleGlow()
 {
     mToggle = !mToggle;
     mGlow[0]->setEnabled(mToggle);
     mGlow[1]->setEnabled(mToggle);
 }
 
-void BulletScene::toggleNPRRenderer()
+void RemoteScene::toggleNPRRenderer()
 {
 	mRiftNode->removeAllRenderTargets();
 
@@ -173,7 +171,7 @@ void BulletScene::toggleNPRRenderer()
 	}
 }
 
-void BulletScene::update(float dt)
+void RemoteScene::update(float dt)
 {
     mRemotePuppet->update(dt);
 	mRemote->update(dt);
@@ -183,7 +181,7 @@ void BulletScene::update(float dt)
 	mRiftVideoScreens->update();
 }
 
-void BulletScene::setAdditionalLatency(double seconds)
+void RemoteScene::setAdditionalLatency(double seconds)
 {
 	LARGE_INTEGER frequency, additionalLatency;
 	QueryPerformanceFrequency(&frequency);
@@ -197,7 +195,7 @@ void BulletScene::setAdditionalLatency(double seconds)
 // Handle Input:
 //////////////////////////////////////////////////////////////
 
-bool BulletScene::keyPressed( const OIS::KeyEvent& e )
+bool RemoteScene::keyPressed( const OIS::KeyEvent& e )
 {
     if(e.key == OIS::KC_C){
 		mRiftNode->calibrate();
@@ -257,12 +255,12 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 
 	return true;
 }
-bool BulletScene::keyReleased( const OIS::KeyEvent& e )
+bool RemoteScene::keyReleased( const OIS::KeyEvent& e )
 {
 	return true;
 }
 
-bool BulletScene::mouseMoved( const OIS::MouseEvent& e )
+bool RemoteScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
@@ -272,12 +270,12 @@ bool BulletScene::mouseMoved( const OIS::MouseEvent& e )
 	return true;
 }
 
-bool BulletScene::mousePressed( const OIS::MouseEvent& e, OIS::MouseButtonID id )
+bool RemoteScene::mousePressed( const OIS::MouseEvent& e, OIS::MouseButtonID id )
 {
 	return true;
 }
 
-bool BulletScene::mouseReleased( const OIS::MouseEvent& e, OIS::MouseButtonID id )
+bool RemoteScene::mouseReleased( const OIS::MouseEvent& e, OIS::MouseButtonID id )
 {
 	return true;
 }

@@ -1,7 +1,7 @@
-#include "BulletApp.h"
+#include "RemoteApp.h"
 #include "NatNetTypes.h"
 
-BulletApp::BulletApp(bool showDebugWindow)
+RemoteApp::RemoteApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
 	, mMouse(nullptr)
@@ -38,14 +38,14 @@ BulletApp::BulletApp(bool showDebugWindow)
 	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
 	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
 
-    mScene = new BulletScene(mRift, mTracker, mRoot,
+    mScene = new RemoteScene(mRift, mTracker, mRoot,
 						mWindow, mSmallWindow, mSceneMgr, 
 						mDynamicsWorld, mMouse, mKeyboard,
 						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
-BulletApp::~BulletApp()
+RemoteApp::~RemoteApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
 	delete mRenderTarget;
@@ -65,7 +65,7 @@ BulletApp::~BulletApp()
 	delete mVideoPlayerRight;
 }
 
-void BulletApp::initOgre(bool showDebugWindow)
+void RemoteApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
 	mRoot = new Ogre::Root("plugins.cfg");
@@ -114,12 +114,12 @@ void BulletApp::initOgre(bool showDebugWindow)
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
-void BulletApp::quitOgre()
+void RemoteApp::quitOgre()
 {
 	delete mRoot;
 }
 
-void BulletApp::initBullet(bool enableDebugDrawing){
+void RemoteApp::initBullet(bool enableDebugDrawing){
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
    
@@ -136,13 +136,13 @@ void BulletApp::initBullet(bool enableDebugDrawing){
 
 }
 
-void BulletApp::quitBullet(){
+void RemoteApp::quitBullet(){
     delete mGroundShape;
     delete mDebugDrawer;
     delete mDynamicsWorld;
 }
 
-void BulletApp::initOIS()
+void RemoteApp::initOIS()
 {
 	OIS::ParamList pl;
     size_t windowHnd = 0;
@@ -170,13 +170,13 @@ void BulletApp::initOIS()
 	mKeyboard->setEventCallback(this);
 	mMouse->setEventCallback(this);
 }
-void BulletApp::quitOIS()
+void RemoteApp::quitOIS()
 {
 	delete mKeyboard;
 	delete mMouse;
 }
 
-void BulletApp::initRift()
+void RemoteApp::initRift()
 {
 	// try to initialize the Oculus Rift (ID 0):
 	if (mRiftAvailable)
@@ -190,14 +190,14 @@ void BulletApp::initRift()
 		}
 	}
 }
-void BulletApp::quitRift()
+void RemoteApp::quitRift()
 {
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
 	delete mRift;
 	ARLib::Rift::shutdown();
 }
 
-ARLib::TRACKING_ERROR_CODE BulletApp::initTracking(ARLib::TRACKING_METHOD method)
+ARLib::TRACKING_ERROR_CODE RemoteApp::initTracking(ARLib::TRACKING_METHOD method)
 {
 	mTracker = new ARLib::TrackingManager(method, 100, mRift);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
@@ -218,7 +218,7 @@ ARLib::TRACKING_ERROR_CODE BulletApp::initTracking(ARLib::TRACKING_METHOD method
 	return error;
 }
 		
-void BulletApp::initTracking()
+void RemoteApp::initTracking()
 {
 	ARLib::TRACKING_ERROR_CODE error;
 
@@ -226,13 +226,13 @@ void BulletApp::initTracking()
 	if (error == ARLib::ARLIB_TRACKING_OK)
 		std::cout << "NatNet + Rift Tracking initialized." << std::endl;
 
-	if (error == ARLib::ARLIB_NATNET)
+	if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
 	{
 		error = initTracking(ARLib::ARLIB_RIFT); // Rift Tracking only
 		if (error == ARLib::ARLIB_TRACKING_OK)
 			std::cout << "Rift Tracking initialized." << std::endl;
 	}
-	else if (error == ARLib::ARLIB_RIFT)
+	else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
 	{
 		error = initTracking(ARLib::ARLIB_NATNET); // NatNet Tracking only
 		if (error == ARLib::ARLIB_TRACKING_OK)
@@ -243,14 +243,14 @@ void BulletApp::initTracking()
 		std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
 }
 		
-void BulletApp::quitTracking()
+void RemoteApp::quitTracking()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
 	mTracker->uninitialize();
 	delete mTracker;
 }
 
-bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
+bool RemoteApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
 
@@ -266,7 +266,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	return true; 
 }
 
-bool BulletApp::keyPressed(const OIS::KeyEvent& e)
+bool RemoteApp::keyPressed(const OIS::KeyEvent& e)
 {
 	mScene->keyPressed(e);
 
@@ -277,28 +277,28 @@ bool BulletApp::keyPressed(const OIS::KeyEvent& e)
 
 	return true;
 }
-bool BulletApp::keyReleased(const OIS::KeyEvent& e)
+bool RemoteApp::keyReleased(const OIS::KeyEvent& e)
 {
 	mScene->keyReleased(e);
 	return true;
 }
-bool BulletApp::mouseMoved(const OIS::MouseEvent& e)
+bool RemoteApp::mouseMoved(const OIS::MouseEvent& e)
 {
 	mScene->mouseMoved(e);
 	return true;
 }
-bool BulletApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
-bool BulletApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
 
-void BulletApp::quit()
+void RemoteApp::quit()
 {
 	std::cout << "QUIT." << std::endl;
 	mShutdown = true;

@@ -1,4 +1,4 @@
-#include "Remote.h"
+#include "StarWarsRemote.h"
 
 
 StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::SceneNode *player, float radius)
