@@ -1,5 +1,5 @@
 #include <iostream>
-#include "BulletApp.h"
+#include "RemoteApp.h"
 
 extern "C" int main(int argc, char *argv[])
 {
@@ -18,10 +18,10 @@ extern "C" int main(int argc, char *argv[])
 		}
 	}
 
-	BulletApp* app;
+	RemoteApp* app;
 	try 
     {
-		app = new BulletApp(showDebugWindow);
+		app = new RemoteApp(showDebugWindow);
     } 
 	catch(Ogre::Exception& e) 
 	{

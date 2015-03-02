@@ -2,7 +2,7 @@
 #define REMOTE_PUPPET_H
 
 #include "OGRE/Ogre.h"
-#include "Remote.h"
+#include "StarWarsRemote.h"
 #include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 

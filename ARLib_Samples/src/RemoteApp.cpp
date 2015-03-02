@@ -1,7 +1,7 @@
-#include "BulletApp.h"
+#include "RemoteApp.h"
 #include "NatNetTypes.h"
 
-BulletApp::BulletApp(bool showDebugWindow)
+RemoteApp::RemoteApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
 	, mMouse(nullptr)
@@ -38,14 +38,14 @@ BulletApp::BulletApp(bool showDebugWindow)
 	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
 	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
 
-    mScene = new BulletScene(mRift, mTracker, mRoot,
+    mScene = new RemoteScene(mRift, mTracker, mRoot,
 						mWindow, mSmallWindow, mSceneMgr, 
 						mDynamicsWorld, mMouse, mKeyboard,
 						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
-BulletApp::~BulletApp()
+RemoteApp::~RemoteApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
 	if (mRenderTarget) delete mRenderTarget;
@@ -65,7 +65,7 @@ BulletApp::~BulletApp()
 	delete mVideoPlayerRight;
 }
 
-void BulletApp::initOgre(bool showDebugWindow)
+void RemoteApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
 	mRoot = new Ogre::Root("plugins.cfg");
@@ -118,12 +118,12 @@ void BulletApp::initOgre(bool showDebugWindow)
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
-void BulletApp::quitOgre()
+void RemoteApp::quitOgre()
 {
 	if(mRoot) delete mRoot;
 }
 
-void BulletApp::initBullet(bool enableDebugDrawing){
+void RemoteApp::initBullet(bool enableDebugDrawing){
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
    
@@ -140,7 +140,7 @@ void BulletApp::initBullet(bool enableDebugDrawing){
 
 }
 
-void BulletApp::quitBullet(){
+void RemoteApp::quitBullet(){
     if(mGroundShape != nullptr)
         delete mGroundShape;
     if(mDebugDrawer != nullptr)
@@ -149,7 +149,7 @@ void BulletApp::quitBullet(){
         delete mDynamicsWorld;
 }
 
-void BulletApp::initOIS()
+void RemoteApp::initOIS()
 {
 	OIS::ParamList pl;
     size_t windowHnd = 0;
@@ -177,13 +177,13 @@ void BulletApp::initOIS()
 	mKeyboard->setEventCallback(this);
 	mMouse->setEventCallback(this);
 }
-void BulletApp::quitOIS()
+void RemoteApp::quitOIS()
 {
 	if(mKeyboard) delete mKeyboard;
 	if(mMouse) delete mMouse;
 }
 
-void BulletApp::initRift()
+void RemoteApp::initRift()
 {
 	// try to initialize the Oculus Rift (ID 0):
 	if (mRiftAvailable)
@@ -197,14 +197,14 @@ void BulletApp::initRift()
 		}
 	}
 }
-void BulletApp::quitRift()
+void RemoteApp::quitRift()
 {
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
 	if(mRift) delete mRift;
 	ARLib::Rift::shutdown();
 }
 		
-void BulletApp::initTracking()
+void RemoteApp::initTracking()
 {
 	/*
 	if(mRiftAvailable)
@@ -232,14 +232,14 @@ void BulletApp::initTracking()
 	}
 }
 		
-void BulletApp::quitTracking()
+void RemoteApp::quitTracking()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
 	//mTracker->uninitialize(); ::todo
 	if(mTracker) delete mTracker;
 }
 
-bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
+bool RemoteApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
 
@@ -255,7 +255,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	return true; 
 }
 
-bool BulletApp::keyPressed(const OIS::KeyEvent& e)
+bool RemoteApp::keyPressed(const OIS::KeyEvent& e)
 {
 	mScene->keyPressed(e);
 
@@ -266,28 +266,28 @@ bool BulletApp::keyPressed(const OIS::KeyEvent& e)
 
 	return true;
 }
-bool BulletApp::keyReleased(const OIS::KeyEvent& e)
+bool RemoteApp::keyReleased(const OIS::KeyEvent& e)
 {
 	mScene->keyReleased(e);
 	return true;
 }
-bool BulletApp::mouseMoved(const OIS::MouseEvent& e)
+bool RemoteApp::mouseMoved(const OIS::MouseEvent& e)
 {
 	mScene->mouseMoved(e);
 	return true;
 }
-bool BulletApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
-bool BulletApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
 
-void BulletApp::quit()
+void RemoteApp::quit()
 {
 	std::cout << "QUIT." << std::endl;
 	mShutdown = true;

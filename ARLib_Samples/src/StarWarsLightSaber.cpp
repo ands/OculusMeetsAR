@@ -1,4 +1,4 @@
-#include "Sword.h"
+#include "StarWarsLightSaber.h"
 #include "OgreBullet/Collisions/Utils/OgreBulletCollisionsMeshToShapeConverter.h"
 
 StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld * dynamicsWorld)
