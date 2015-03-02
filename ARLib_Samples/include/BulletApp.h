@@ -38,6 +38,7 @@ class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitOIS();
 		void initRift();
 		void quitRift();
+		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method);
 		void initTracking();
 		void quitTracking();
 

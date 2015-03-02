@@ -321,12 +321,12 @@ done:
 		}
 
 		//Set camera parameters
-		if (SUCCEEDED(hr))
+		/*if (SUCCEEDED(hr))
 		{
 			CamParametrs test = getParametrs(pSource);
 			setParametrs(test,pSource);
 			hr = setParams(pSource);
-		}
+		}*/
 
 		if (SUCCEEDED(hr))
 		{
@@ -526,18 +526,21 @@ done:
 			IAMVideoProcAmp *pProcAmp = NULL;
 			hr = vd_pSource->QueryInterface(IID_PPV_ARGS(&pProcAmp));
 			//TODO: Make these configurable?
+
+
+
 			long streamPropertyValues[]=
 			{
 				VideoProcAmp_Brightness, 128, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Contrast, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Saturation, 32, VideoProcAmp_Flags_Manual,
 				VideoProcAmp_Sharpness, 32, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_WhiteBalance, 6000, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Manual,
-				VideoProcAmp_Gain, 16, VideoProcAmp_Flags_Manual
+				//VideoProcAmp_WhiteBalance, 6000, VideoProcAmp_Flags_Manual+VideoProcAmp_Flags_Auto,
+				VideoProcAmp_BacklightCompensation, 0, VideoProcAmp_Flags_Auto,
+				VideoProcAmp_Gain, 0, VideoProcAmp_Flags_Manual
 			};
 
-			for(int i=0;i<7;i++){
+			for(int i=0;i<6;i++){
 				if(SUCCEEDED(hr)){
 					hr=pProcAmp->Set(
 						streamPropertyValues[i*3], 
@@ -573,7 +576,7 @@ done:
 			{
 				for(unsigned int i = 0; i < 10; i++)
 				{
-					hr = pProcAmp->Set(VideoProcAmp_Brightness + i, pParametr[i].CurrentValue, pParametr[i].Flag);
+					hr = pProcAmp->Set(VideoProcAmp_Brightness + i, pParametr[i].Default, pParametr[i].Flag);
 				}
 				pProcAmp->Release();
 			}
@@ -585,7 +588,7 @@ done:
 			{
 				for(unsigned int i = 0; i < 7; i++)
 				{
-					hr = pProcControl->Set(CameraControl_Pan+i, pParametr[10 + i].CurrentValue, pParametr[10 + i].Flag);					
+					hr = pProcControl->Set(CameraControl_Pan+i, pParametr[10 + i].Default, pParametr[10 + i].Flag);					
 				}
 				pProcControl->Release();
 			}

@@ -99,7 +99,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setDiffuseColour( 0.7f, 0.54f, 0.46f );
 	mRiftNode->getBodyNode()->attachObject(light); 
 
-    mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 2);
+	Ogre::SceneNode *swordOffsetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	swordOffsetNode->setPosition(0,0,-0.2f);
+    mSwordParentNode = new RigidListenerNode(swordOffsetNode, mSceneMgr, 2);
     mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
     if(tracker){
         tracker->addRigidBodyEventListener(mSwordParentNode);

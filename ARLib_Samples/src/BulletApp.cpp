@@ -48,12 +48,12 @@ BulletApp::BulletApp(bool showDebugWindow)
 BulletApp::~BulletApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
-	if (mRenderTarget) delete mRenderTarget;
-	if (mSmallRenderTarget) delete mSmallRenderTarget;
+	delete mRenderTarget;
+	delete mSmallRenderTarget;
 	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
-	if(mScene) delete mScene;
+	delete mScene;
 	std::cout << "Closing OIS:" << std::endl;
 	quitOIS();
     std::cout << "Closing Bullet:" << std::endl;
@@ -88,12 +88,8 @@ void BulletApp::initOgre(bool showDebugWindow)
 	Ogre::ConfigOptionMap cfgMap = pRS->getConfigOptions();
 	cfgMap["Full Screen"].currentValue = "No";
 	cfgMap["VSync"].currentValue = "Yes";
-	#ifdef _DEBUG
-		cfgMap["FSAA"].currentValue = "0";
-	#else
-		cfgMap["FSAA"].currentValue = "8";
-	#endif
-	cfgMap["Video Mode"].currentValue = "1200 x 800";
+	cfgMap["FSAA"].currentValue = "8";
+	cfgMap["Video Mode"].currentValue = "1200 x 800"; // will be overriden
 	for(Ogre::ConfigOptionMap::iterator iter = cfgMap.begin(); iter != cfgMap.end(); iter++)
 		pRS->setConfigOption(iter->first, iter->second.currentValue);
 	mRoot->setRenderSystem(pRS);
@@ -120,7 +116,7 @@ void BulletApp::initOgre(bool showDebugWindow)
 }
 void BulletApp::quitOgre()
 {
-	if(mRoot) delete mRoot;
+	delete mRoot;
 }
 
 void BulletApp::initBullet(bool enableDebugDrawing){
@@ -141,12 +137,9 @@ void BulletApp::initBullet(bool enableDebugDrawing){
 }
 
 void BulletApp::quitBullet(){
-    if(mGroundShape != nullptr)
-        delete mGroundShape;
-    if(mDebugDrawer != nullptr)
-        delete mDebugDrawer;
-    if(mDynamicsWorld != nullptr)
-        delete mDynamicsWorld;
+    delete mGroundShape;
+    delete mDebugDrawer;
+    delete mDynamicsWorld;
 }
 
 void BulletApp::initOIS()
@@ -179,8 +172,8 @@ void BulletApp::initOIS()
 }
 void BulletApp::quitOIS()
 {
-	if(mKeyboard) delete mKeyboard;
-	if(mMouse) delete mMouse;
+	delete mKeyboard;
+	delete mMouse;
 }
 
 void BulletApp::initRift()
@@ -200,43 +193,61 @@ void BulletApp::initRift()
 void BulletApp::quitRift()
 {
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
-	if(mRift) delete mRift;
+	delete mRift;
 	ARLib::Rift::shutdown();
+}
+
+ARLib::TRACKING_ERROR_CODE BulletApp::initTracking(ARLib::TRACKING_METHOD method)
+{
+	mTracker = new ARLib::TrackingManager(method, 100, mRift);
+	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
+	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
+	mTracker->setNatNetServerIP("128.176.181.34"); //local machine
+	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
+
+	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
+	mTrackingAvailable = (error == ARLib::ARLIB_TRACKING_OK);
+
+	if(!mTrackingAvailable)
+	{
+		mTracker->uninitialize();
+		delete mTracker;
+		mTracker = nullptr;
+	}
+	
+	return error;
 }
 		
 void BulletApp::initTracking()
 {
-	/*
-	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
-	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
-		*/
+	ARLib::TRACKING_ERROR_CODE error;
 
-	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
-	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
-	mTracker->setNatNetServerIP("128.176.181.34"); //local machine
-    mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
+	error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT); // Try both first
+	if (error == ARLib::ARLIB_TRACKING_OK)
+		std::cout << "NatNet + Rift Tracking initialized." << std::endl;
 
-	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
-	if(error != ARLib::ARLIB_TRACKING_OK){
-		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
-		mTrackingAvailable = false;
-		mTracker->uninitialize();
-        delete mTracker;
-        mTracker = false;
-	}else{
-        std::cout<<"Tracking initialized"<<std::endl;
-		mTrackingAvailable = true;	
+	if (error == ARLib::ARLIB_NATNET)
+	{
+		error = initTracking(ARLib::ARLIB_RIFT); // Rift Tracking only
+		if (error == ARLib::ARLIB_TRACKING_OK)
+			std::cout << "Rift Tracking initialized." << std::endl;
 	}
+	else if (error == ARLib::ARLIB_RIFT)
+	{
+		error = initTracking(ARLib::ARLIB_NATNET); // NatNet Tracking only
+		if (error == ARLib::ARLIB_TRACKING_OK)
+			std::cout << "NatNet Tracking initialized." << std::endl;
+	}
+
+	if (error != ARLib::ARLIB_TRACKING_OK)
+		std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
 }
 		
 void BulletApp::quitTracking()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
-	//mTracker->uninitialize(); ::todo
-	if(mTracker) delete mTracker;
+	mTracker->uninitialize();
+	delete mTracker;
 }
 
 bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
