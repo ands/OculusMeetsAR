@@ -1,9 +1,9 @@
 #include "ARLib/Tracking/RigidBodyFrame.h"
+#include <assert.h>
 
 namespace ARLib{	
-	_RigidBody::_RigidBody(unsigned int nMarker, float x, float y, float z, float qx, float qy, float qz, float qw, int id)
-		: mNMarker(nMarker)
-		, mX(x)
+	_RigidBody::_RigidBody(int id, float x, float y, float z, float qx, float qy, float qz, float qw)
+		: mX(x)
 		, mY(y)
 		, mZ(z)
 		, mqX(qx)
@@ -11,46 +11,31 @@ namespace ARLib{
 		, mqZ(qz)
 		, mqW(qw)
 		, mID(id){
-		mMarkers = new Marker[mNMarker];
-	}
 
-	_RigidBody::~_RigidBody(){
-		if(mNMarker > 0 && mMarkers != nullptr){
-			delete [] mMarkers;
-		}
 	}
-
-	void _RigidBody::addMarker(unsigned int index, int markerID, float markerSize, float x, float y, float z){
-		mMarkers[index].mMarkerID = markerID;
-		mMarkers[index].mMarkerSize = markerSize;
-		mMarkers[index].mX = x;
-		mMarkers[index].mY = y;
-		mMarkers[index].mZ = z;
-	};
 
 	_RBFrame::_RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool ownership)
-		: mNRigidBodys(nRigidBodys)
+		: mNRigidBodies(nRigidBodys)
 		, mFrameID(frameID) 
 		, mTimestamp(timestamp)
 		, mLatency(latency)
-		, mChange(true)
         , mValid(valid)
         , mOwnership(ownership){
-			mRbs = new RigidBody*[mNRigidBodys];
+		mRbs = new RigidBody*[mNRigidBodies];
 	}
 
 	_RBFrame::~_RBFrame(){
         if(mOwnership){
-            for(unsigned int i = 0; i < mNRigidBodys ; i++){
+            for(unsigned int i = 0; i < mNRigidBodies ; i++){
                 delete mRbs[i];
             }
-            delete [] mRbs;
         }
+        delete [] mRbs;
 	}
 
-	void _RBFrame::addRigidBody(unsigned int index, RigidBody* rb){
-		//test index out of range
-		mRbs[index] = rb;
+	RigidBody*& _RBFrame::operator[](unsigned int index){
+		assert(index >= mNRigidBodies);
+		return mRbs[index];
 	}
 
 	RigidBody *interpolateRigidBodies(RigidBody *lRigidBody, RigidBody *rRigidBody, float weight){

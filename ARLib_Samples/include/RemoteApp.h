@@ -38,7 +38,7 @@ class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitOIS();
 		void initRift();
 		void quitRift();
-		void initTracking();
+		void initTracking(bool enableDebugLog);
 		void quitTracking();
 
 		OIS::Keyboard* mKeyboard;

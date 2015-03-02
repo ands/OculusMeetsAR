@@ -31,7 +31,7 @@ RemoteApp::RemoteApp(bool showDebugWindow)
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
 	initRift();
-	initTracking();
+	initTracking(showDebugWindow);
 
 	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
 	
@@ -204,16 +204,9 @@ void RemoteApp::quitRift()
 	ARLib::Rift::shutdown();
 }
 		
-void RemoteApp::initTracking()
+void RemoteApp::initTracking(bool enableDebugLog)
 {
-	/*
-	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
-	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
-		*/
-
-	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
+	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, enableDebugLog);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
 	mTracker->setNatNetServerIP("128.176.181.34"); //local machine

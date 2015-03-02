@@ -39,12 +39,10 @@ LaserBullet::LaserBullet(Ogre::SceneManager* sceneMgr, OgreBulletDynamics::Dynam
 }
 
 LaserBullet::~LaserBullet(){
-    if(mBody != nullptr)
-        delete mBody;
-    if(mShape != nullptr)
-        delete mShape;
-	if(mSceneNode != nullptr)
-		delete mSceneNode;
+	delete mBody;
+	delete mShape;
+	mSceneNode->getParent()->removeChild(mSceneNode);
+	delete mSceneNode;
 }
 
 bool LaserBullet::update(float dt){
