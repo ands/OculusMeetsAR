@@ -38,6 +38,8 @@ class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitOIS();
 		void initRift();
 		void quitRift();
+
+		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog);
 		void initTracking(bool enableDebugLog);
 		void quitTracking();
 
