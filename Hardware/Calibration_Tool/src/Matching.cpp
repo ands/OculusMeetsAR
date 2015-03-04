@@ -19,11 +19,38 @@ Matching::~Matching(void)
 
 vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imageRightUndistort, int method){
 	//Note: rotate BEFORE computing homographies!
-	//Find points of interest via SIFT
+	//Copy both images into one
+	Mat bothImagesG(imageLeftUndistort->rows,imageLeftUndistort->cols+imageRightUndistort->cols,imageLeftUndistort->type());
+	Rect rectleft= Rect(0, 0, imageLeftUndistort->cols, imageLeftUndistort->rows);
+	Mat left(bothImagesG, rectleft);
+    imageLeftUndistort->copyTo(left);
+    Rect rectright(imageLeftUndistort->cols, 0, imageRightUndistort->cols, imageRightUndistort->rows);
+	Mat right(bothImagesG, rectright);
+    imageRightUndistort->copyTo(right);
+	//gray to color conversion for showing colored lines
+	Mat bothImages;
+	cvtColor(bothImagesG,bothImages,CV_GRAY2RGB);
+	//for imshow purpose
+	Scalar color(50,50,255);
+	Point2f addPoint = Point2f(imageLeftUndistort->cols,0);
+
+	vector<Point2f> matchLeft, matchRight, matchCandidateLeft, matchCandidateRight, badMatchLeft, badMatchRight;
+
+	//optional chessboard matching
+	int numOfChessmatches=0;
+	if(method==4||method==5){
+		vector<vector<Point2f>> corners = computeChessboardMatches(imageLeftUndistort,imageRightUndistort);
+		if(corners.size()!=0){
+			matchLeft=corners[0];
+			matchRight=corners[1];
+			numOfChessmatches=matchLeft.size();
+		}
+	}
+
+	//Find points of interest via SIFT using the ROIs given by ocam-undistortion
 	vector<KeyPoint> pointsleft;
 	SIFT sift(0,3,0.08,4.0,1.6);
 	Mat mask = Mat::zeros(imageLeftUndistort->size(), CV_8U);
-	//todo
 	mask(roiLeft).setTo(Scalar::all(255.0));
 	Mat descriptors1;
 	sift.operator()(*imageLeftUndistort,mask,pointsleft,descriptors1,false);
@@ -54,81 +81,119 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 			}
 		}
 	}
+
+	//save SIFT-matches as Point2f-vectors
+	for(int i=0;i<acceptable_matches.size();i++){
+		DMatch current = acceptable_matches[i];
+		matchCandidateLeft.push_back(pointsleft[current.queryIdx].pt);
+		matchCandidateRight.push_back(pointsright[current.trainIdx].pt);
+	}
+
+	int numOfMatches = matchCandidateLeft.size();
+
 	namedWindow("current match",CV_WINDOW_NORMAL);
 	resizeWindow("current match",1200,800);
 
 	//manual selection
-	vector<DMatch> goodmatches, badmatches;
-	if(method==1){
-		for(int i=0;i<acceptable_matches.size();i++){
-			DMatch current = acceptable_matches[i];
+	if(method==1||method==4){
+		for(int i=0;i<numOfMatches;i++){
+			Point2f curPointL = matchCandidateLeft[i];
+			Point2f curPointR = matchCandidateRight[i];
 			bool nearby=false;
-			for(int j=0;j<goodmatches.size();j++){
-				DMatch currentgood = goodmatches[j];
-				if(pointdistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx])<50 && vectordistance(pointsleft[current.queryIdx],pointsleft[currentgood.queryIdx],pointsright[current.trainIdx],pointsright[currentgood.trainIdx])<10){
+			//Test whether there are similar good matches nearby
+			for(int j=0;j<matchLeft.size();j++){
+				if(pointdistance(matchLeft[j],curPointL)<50 && pointdistance(curPointL-matchLeft[j],curPointR-matchRight[j])<10){
 					nearby=true;
 					break;
 				}
 			}
+			//Test whether there are similar bad matches nearby
+			for(int j=0;j<badMatchLeft.size();j++){
+				if(pointdistance(badMatchLeft[j],curPointL)<50 && pointdistance(curPointL-badMatchLeft[j],curPointR-badMatchRight[j])<5){
+					nearby=true;
+					break;
+				}
+			}
+			if(nearby){//if there are bad/good matches near the current match, it is useless (either too bad for estimation of the fundamental matrix or too similar to an already saved match)
+				badMatchLeft.push_back(curPointL);
+				badMatchRight.push_back(curPointR);
+			}
+			else{//show current match
+				Mat bothImagesCopy = bothImages.clone();
 
-			for(int j=0;j<badmatches.size();j++){
-				DMatch currentbad = badmatches[j];
-				if(pointdistance(pointsleft[current.queryIdx],pointsleft[currentbad.queryIdx])<50 && vectordistance(pointsleft[current.queryIdx],pointsleft[currentbad.queryIdx],pointsright[current.trainIdx],pointsright[currentbad.trainIdx])<5){
-					nearby=true;
-					break;
+				line(bothImagesCopy,curPointL,curPointR+addPoint,color,2);
+				circle(bothImagesCopy,curPointL,10,color,1);
+				circle(bothImagesCopy,curPointR+addPoint,10,color,1);
+				imshow("current match", bothImagesCopy);
+
+				if(waitKey(0)==2555904){//press right arrow key to accept
+					matchLeft.push_back(curPointL);
+					matchRight.push_back(curPointR);
 				}
-			}
-			if(nearby){
-				badmatches.push_back(current);
-			}
-			else{
-				Mat currentmatchimage;
-				vector<DMatch> currentMatch;
-				currentMatch.push_back(current);
-				drawMatches(*imageLeftUndistort,pointsleft,*imageRightUndistort,pointsright,currentMatch,currentmatchimage);
-				imshow("current match",currentmatchimage);
-				if(waitKey(0)==2555904){
-					goodmatches.push_back(current);
-				}
-				else{
-					badmatches.push_back(current);
+				else{//or any other key to reject the match
+					badMatchLeft.push_back(curPointL);
+					badMatchRight.push_back(curPointR);
 				}
 			}
 		}
 	}
-	else if(method==2){
-		goodmatches=acceptable_matches;
+	else if(method==2||method==5){//no manual selection
+		for(int i=0;i<matchCandidateLeft.size();i++){
+			Point2f curPointL = matchCandidateLeft[i];
+			Point2f curPointR = matchCandidateRight[i];
+			bool nearby=false;
+			for(int j=0;j<numOfChessmatches;j++){
+				if(pointdistance(matchLeft[j],curPointL)<50){
+					nearby=true;
+					break;
+				}
+			}
+			for(int j=numOfChessmatches;j<matchLeft.size();j++){
+				if(pointdistance(matchLeft[j],curPointL)<50 && pointdistance(curPointL-matchLeft[j],curPointR-matchRight[j])<10){
+					nearby=true;
+					break;
+				}
+			}
+			if(!nearby){
+				matchLeft.push_back(curPointL);
+				matchRight.push_back(curPointR);
+			}
+		}
 	}
-
-	vector<Point2f> pointsL, pointsR;
-	vector<vector<Point2f>> result;
-	for(int i=0;i<goodmatches.size();i++){
-		pointsL.push_back(pointsleft[goodmatches.at(i).queryIdx].pt);
-		pointsR.push_back(pointsright[goodmatches.at(i).trainIdx].pt);
-	}
-	result.push_back(pointsL);
-	result.push_back(pointsR);
 	destroyWindow("current match");
 
+	//show all matches
+	Mat bothImagesCopy = bothImages.clone();
+	RNG rng;
+	for(int i=0;i<matchLeft.size();i++){
+		Point2f curPointL = matchLeft[i];
+		Point2f curPointR = matchRight[i];
+		color=Scalar(rng(255),rng(255),rng(255));
+		line(bothImagesCopy,curPointL,curPointR+addPoint,color,2);
+		circle(bothImagesCopy,curPointL,10,color,1);
+		circle(bothImagesCopy,curPointR+addPoint,10,color,1);
+	}
+	namedWindow("All matches",CV_WINDOW_NORMAL);
+	resizeWindow("All matches",1200,800);
+	imshow("All matches", bothImagesCopy);
+	waitKey(0);
+	destroyWindow("All matches");
+
+	vector<vector<Point2f>> result;
+	result.push_back(matchLeft);
+	result.push_back(matchRight);
 	return result;
 }
 
-double Matching::pointdistance(KeyPoint p, KeyPoint q){
-	return std::sqrt((p.pt.x-q.pt.x)*(p.pt.x-q.pt.x)+(p.pt.y-q.pt.y)*(p.pt.y-q.pt.y));
+double Matching::pointdistance(Point2f p, Point2f q){
+	return std::sqrt((p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y));
 }
-
-double Matching::vectordistance(KeyPoint p1, KeyPoint p2, KeyPoint q1, KeyPoint q2){
-	double x = p1.pt.x-p2.pt.x;
-	double y = p1.pt.y-p2.pt.y;
-	double x2 = q1.pt.x-q2.pt.x;
-	double y2 = q1.pt.y-q2.pt.y;
-	return std::sqrt((x-x2)*(x-x2)+(y-y2)*(y-y2));
-} 
 
 vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndistort, Mat *imageRightUndistort){
 	Size patternsize(8,6);
 	vector<Point2f> cornersLeft, cornersRight;
 
+	//use opencv chessboard detection on the undistorted images
 	bool patternfoundLeft = findChessboardCorners(*imageLeftUndistort, patternsize, cornersLeft,
 		CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE
 		+ CALIB_CB_FAST_CHECK);
@@ -137,7 +202,7 @@ vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndisto
 		+ CALIB_CB_FAST_CHECK);
 
 	vector<vector<Point2f>> result;
-	if(patternfoundLeft && patternfoundRight){
+	if(patternfoundLeft && patternfoundRight){//both patterns found
 		cornerSubPix(*imageLeftUndistort, cornersLeft, Size(11, 11), Size(-1, -1),
 		TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 		cornerSubPix(*imageRightUndistort, cornersRight, Size(11, 11), Size(-1, -1),
@@ -147,6 +212,7 @@ vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndisto
 
 		vector<DMatch> chessmatches;
 		vector<KeyPoint> keypointsleft, keypointsright;
+		//save the matches
 		for(int i=0;i<cornersLeft.size();i++){
 			KeyPoint keyleft(cornersLeft[i],1);
 			keypointsleft.push_back(keyleft);
@@ -163,8 +229,6 @@ vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndisto
 		waitKey(0);
 		destroyWindow("chessboardmatches");
 	}
-	else{
-		//result=computeMatches();
-	}
+
 	return result;
 }

@@ -11,8 +11,7 @@ public:
 	vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndistort, Mat *imageRightUndistort);
 
 private:
-	double Matching::pointdistance(KeyPoint p, KeyPoint q);
-	double Matching::vectordistance(KeyPoint p1, KeyPoint p2, KeyPoint q1, KeyPoint q2);
+	double Matching::pointdistance(Point2f p, Point2f q);
 	Rect roiLeft;
 	Rect roiRight;
 };

@@ -4,9 +4,8 @@
 
 using namespace std;
 
-
-vector<string> getFileNames(LPCWSTR folder)
-{
+//returns all filenames of files in input folder
+vector<string> getFileNames(LPCWSTR folder){
     vector<string> names;
     WIN32_FIND_DATA fd; 
     HANDLE hFind = ::FindFirstFile(folder, &fd); 
@@ -25,12 +24,12 @@ vector<string> getFileNames(LPCWSTR folder)
     return names;
 }
 
-
-vector<int> getSelectedNumbers(string input, int numofimgpairs){
+//returns the selected Numbers from an inputstring like "1,3-7,14" with numofimgpairs as upper limit
+vector<int> getSelectedNumbers(string input, int numOfImgPairs){
 	int size = input.size();
 	vector<int> result;
 	if(size==0){//return all
-		for(int i=0;i<numofimgpairs;i++){
+		for(int i=0;i<numOfImgPairs;i++){
 			result.push_back(i);
 		}
 	}
@@ -63,30 +62,35 @@ vector<int> getSelectedNumbers(string input, int numofimgpairs){
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-	ImageHandler hand = ImageHandler();
+	ImageHandler hand = ImageHandler();//interface between userinput and calibration classes
 	int input=0;
 	cout<<"Oculus Rift meets AR - Calibration Tool"<<"\n"<<"\n";
 	bool done=false;
 	while(!done){
 		input=0;
+		//Main menu
 		cout<<"\n1 - Take snapshots \n2 - Load images \n3 - Keypoint extraction and matching \n4 - Approximating the epipolar geometry \n5 - Visualize epipolar geometry \nx - Exit\n";
 		char c;
 		cin>>c;
-		if(c=='x'){
+		if(c=='x'){//exit
 			done=true;
 			continue;
 		}
-		else{
+		else{//get int from c
 			input=c-'0';
 		}
 
 		
-		if(input==1){
+		if(input==1){//Take snapshots
 			Snapshot snap;
-			cout<<"Starting snapshot tool...\n";
-			snap.startCapture();
+			cout<<"\nStarting snapshot tool...\n";
+			if(snap.startCapture()==-1){
+				cout<<"\nPlease connect both cameras to your system. Press Enter\n";
+				cin.ignore();
+				cin.get();
+			}
 		}
-		else if(input==2){
+		else if(input==2){//Load images
 			cout<<"\nSearching for images in ../media/images \n";
 			vector<string> filenames = getFileNames(L"..\\media\\images\\*.*");
 			cout<<filenames.size()/2<<" image pairs found: \n";
@@ -121,16 +125,15 @@ int _tmain(int argc, _TCHAR* argv[])
 				cin.ignore();
 				cin.get();
 			}
-			else{
+			else{//No files found
 				cout<<"To create image pairs for calibration use option 1.\nPress Enter\n";
 				cin.ignore();
 				cin.get();
 			}
 		}
-		else if(input==3){
+		else if(input==3){//Keypoint extraction and matching
 			int method;
 			cout<<"\n1 - Load matches\n2 - Find new keypoints and matches\n3 - Save matches\nx - Exit\n";
-
 			cin>>c;
 			if(c=='x'){
 				continue;
@@ -142,13 +145,13 @@ int _tmain(int argc, _TCHAR* argv[])
 				hand.loadMatches();
 			}
 			else if(method==2){
-				if(hand.numOfImages==0){
+				if(hand.numOfImages==0){//You need images to extract keypoints from
 					cout<<"\nNo images have been loaded - use option 2 before matching.\nPress Enter\n";
 					cin.ignore();
 					cin.get();
 				}
 				else{
-					cout<<"\nChoose a method for keypoint extraction and (basic) matching:\n"<<"1 - SIFT features + kNN-Matcher\n"<<"2 - Chessboardmatching\n";
+					cout<<"\nChoose a method for keypoint extraction and (basic) matching:\n"<<"1 - SIFT features + kNN-Matcher\n"<<"2 - Chessboardmatching\n3 - Chessboard + SIFT + kNN-Matcher\n";
 					cin>>method;
 					if(method==1){
 						cout<<"\nDo you want to check the matches manually? (1=Yes,2=No)\n";
@@ -163,6 +166,19 @@ int _tmain(int argc, _TCHAR* argv[])
 					else if(method==2){
 						hand.calculateMatches(3);
 					}
+					else if(method==3){//Todo chessboard+sift
+						cout<<"\nDo you want to check the matches manually? (1=Yes,2=No)\n";
+						cin>>method;
+						if(method==1){
+							hand.calculateMatches(4);
+						}
+						else if(method==2){
+							hand.calculateMatches(5);
+						}
+					}
+					cout<<"Press Enter\n";
+					cin.ignore();
+					cin.get();
 				}
 			}
 			else if(method==3){
@@ -172,7 +188,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				cin.get();
 			}
 		}
-		else if(input==4){
+		else if(input==4){//Epipolar geometry estimation
 			cout<<"\n1 - Load previously determined epipolar geometry\n2 - New approximation of epipolar geometry\n3 - Save current epipolar geometry\nx - Exit\n";
 			cin>>c;
 			if(c=='x'){
@@ -204,7 +220,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			cin.ignore();
 			cin.get();
 		}
-		else if(input==5){
+		else if(input==5){//Show epipolarlines and save one rectified image pair in media folder
 			hand.visualize();
 		}
 	}

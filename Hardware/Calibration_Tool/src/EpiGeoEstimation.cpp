@@ -299,7 +299,7 @@ bool EpiGeoEstimation::saveMatrix(const char *fileName, Mat A){
 	}
 	else{
 		success=false;
-		std::cout<<"\nERROR: Epipolar geometry have not been estimated yet.\n";
+		std::cout<<"\nERROR: Epipolar geometry has not been estimated yet.\n";
 	}
 	return success;
 }

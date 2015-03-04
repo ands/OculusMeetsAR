@@ -29,22 +29,24 @@ void ImageHandler::undistortAndRotate(){
 }
 
 void ImageHandler::calculateMatches(int method){
+	std::cout<<"\nPlease wait...\n";
 	rightMatch.clear();
 	leftMatch.clear();
+	int prevMatches=0;
 	for(int i=0;i<numOfImages;i++){
 		vector<vector<Point2f>> pairMatches;
+		int matchesFound=0;
 		Mat currentLeft = leftImages[i];
 		Mat currentRight = rightImages[i];
 		if(method==3){//Chessboardmatching
 			pairMatches=matcher.computeChessboardMatches(&currentLeft,&currentRight);
 		}
-		else if(method==2){//SIFT+Ransac Automatching
-			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,2);
+		else if(method==1||method==2||method==4||method==5){//SIFT+Ransac
+			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,method);
 		}
-		else if(method==1){//SIFT+Ransac manual selection
-			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,1);
-		}
+		//enforce distance constraints, to many similar matches bias the estimation of the epipolar geometry
 		if(pairMatches.size()!=0){
+			matchesFound=pairMatches[0].size();
 			for(int j=0;j<pairMatches[0].size();j++){
 				//set min distance of matchpairs
 				if(leftMatch.size()==0){
@@ -54,26 +56,27 @@ void ImageHandler::calculateMatches(int method){
 				bool nearby=false;
 				for(int k=0;k<leftMatch.size();k++){
 					if(dist(leftMatch[k],pairMatches[0][j])<70 && dist(leftMatch[k]-pairMatches[0][j],rightMatch[k]-pairMatches[1][j])<10)
-					{
+					{//distance between left points of compared matches is <70 and distance between vectors given by (leftMatchPoint-rightMatchPoint) is <10
 						nearby=true;
 						break;
 					}
 				}
-				if(!nearby){
+				if(!nearby){//none of the so far accepted matches lies nearby
 					leftMatch.push_back(pairMatches[0][j]);
 					rightMatch.push_back(pairMatches[1][j]);
 				}
 			}
 		}
+		std::cout<<i+1<<"/"<<numOfImages<<" Matches found: "<<matchesFound<<" New matches added: "<<leftMatch.size()-prevMatches<<"\n";
+		prevMatches = leftMatch.size();
 	}
+	std::cout<<"\nTotal number of Matches: "<<leftMatch.size()<<"\n";
 }
 
 double ImageHandler::dist(Point2f p, Point2f q){
 	return sqrt((p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y));
 }
 
-
-//TODO: HOMOGRAPHIEN NORMALISIEREN
 void ImageHandler::estimateGeometry(int method){
 	if(method==2){//method after Zilly, Müller, Eisert, Kauff
 		epigeo.fundamentalZMEK(leftMatch,rightMatch);
@@ -106,7 +109,7 @@ void ImageHandler::visualize(){
 		saveImg(imageRightRectified,"RightRectified.jpg");
 
 		//draw epipolarlines corresponding to the approximated fundamental matrix F
-		drawEpipolarLines("test",epigeo.F,leftImages[0],rightImages[0],leftMatch,rightMatch,5);
+		drawEpipolarLines(epigeo.F,leftImages[0],rightImages[0],leftMatch,rightMatch);
 		std::cout<<"\nRectified examples and image containing epipolar lines have been saved.";
 	}
 	std::cout<<"\nPress Enter\n";
@@ -200,15 +203,15 @@ float ImageHandler::distancePointLine(const cv::Point2f point, const Vec<float,3
 		/ std::sqrt(line(0)*line(0)+line(1)*line(1));
 }
 
-void ImageHandler::drawEpipolarLines(const std::string& title, const Mat F,
+void ImageHandler::drawEpipolarLines(const Mat F,
 	const cv::Mat& img1, const cv::Mat& img2,
 	const std::vector<cv::Point2f> points1,
-	const std::vector<cv::Point2f> points2,
-	const float inlierDistance)
+	const std::vector<cv::Point2f> points2)
 {
 	cv::Mat outImg(img1.rows, img1.cols*2, CV_8UC3);
 	cv::Rect rect1(0,0, img1.cols, img1.rows);
 	cv::Rect rect2(img1.cols, 0, img1.cols, img1.rows);
+	float inlierDistance = 5.0;
 	/*
 	* Allow color drawing
 	*/
