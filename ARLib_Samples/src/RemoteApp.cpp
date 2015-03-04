@@ -1,7 +1,7 @@
-#include "BulletApp.h"
+#include "RemoteApp.h"
 #include "NatNetTypes.h"
 
-BulletApp::BulletApp(bool showDebugWindow)
+RemoteApp::RemoteApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
 	, mMouse(nullptr)
@@ -31,29 +31,29 @@ BulletApp::BulletApp(bool showDebugWindow)
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
 	initRift();
-	initTracking();
+	initTracking(showDebugWindow);
 
 	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
 	
 	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
 	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
 
-    mScene = new BulletScene(mRift, mTracker, mRoot,
+    mScene = new RemoteScene(mRift, mTracker, mRoot,
 						mWindow, mSmallWindow, mSceneMgr, 
 						mDynamicsWorld, mMouse, mKeyboard,
 						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
 
-BulletApp::~BulletApp()
+RemoteApp::~RemoteApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
-	if (mRenderTarget) delete mRenderTarget;
-	if (mSmallRenderTarget) delete mSmallRenderTarget;
+	delete mRenderTarget;
+	delete mSmallRenderTarget;
 	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
-	if(mScene) delete mScene;
+	delete mScene;
 	std::cout << "Closing OIS:" << std::endl;
 	quitOIS();
     std::cout << "Closing Bullet:" << std::endl;
@@ -65,7 +65,7 @@ BulletApp::~BulletApp()
 	delete mVideoPlayerRight;
 }
 
-void BulletApp::initOgre(bool showDebugWindow)
+void RemoteApp::initOgre(bool showDebugWindow)
 {
 	Ogre::ConfigFile cf;
 	mRoot = new Ogre::Root("plugins.cfg");
@@ -88,12 +88,8 @@ void BulletApp::initOgre(bool showDebugWindow)
 	Ogre::ConfigOptionMap cfgMap = pRS->getConfigOptions();
 	cfgMap["Full Screen"].currentValue = "No";
 	cfgMap["VSync"].currentValue = "Yes";
-	#ifdef _DEBUG
-		cfgMap["FSAA"].currentValue = "0";
-	#else
-		cfgMap["FSAA"].currentValue = "8";
-	#endif
-	cfgMap["Video Mode"].currentValue = "1200 x 800";
+	cfgMap["FSAA"].currentValue = "8";
+	cfgMap["Video Mode"].currentValue = "1200 x 800"; // will be overriden
 	for(Ogre::ConfigOptionMap::iterator iter = cfgMap.begin(); iter != cfgMap.end(); iter++)
 		pRS->setConfigOption(iter->first, iter->second.currentValue);
 	mRoot->setRenderSystem(pRS);
@@ -118,12 +114,12 @@ void BulletApp::initOgre(bool showDebugWindow)
 
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
 }
-void BulletApp::quitOgre()
+void RemoteApp::quitOgre()
 {
-	if(mRoot) delete mRoot;
+	delete mRoot;
 }
 
-void BulletApp::initBullet(bool enableDebugDrawing){
+void RemoteApp::initBullet(bool enableDebugDrawing){
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
    
@@ -140,16 +136,13 @@ void BulletApp::initBullet(bool enableDebugDrawing){
 
 }
 
-void BulletApp::quitBullet(){
-    if(mGroundShape != nullptr)
-        delete mGroundShape;
-    if(mDebugDrawer != nullptr)
-        delete mDebugDrawer;
-    if(mDynamicsWorld != nullptr)
-        delete mDynamicsWorld;
+void RemoteApp::quitBullet(){
+    delete mGroundShape;
+    delete mDebugDrawer;
+    delete mDynamicsWorld;
 }
 
-void BulletApp::initOIS()
+void RemoteApp::initOIS()
 {
 	OIS::ParamList pl;
     size_t windowHnd = 0;
@@ -177,13 +170,13 @@ void BulletApp::initOIS()
 	mKeyboard->setEventCallback(this);
 	mMouse->setEventCallback(this);
 }
-void BulletApp::quitOIS()
+void RemoteApp::quitOIS()
 {
-	if(mKeyboard) delete mKeyboard;
-	if(mMouse) delete mMouse;
+	delete mKeyboard;
+	delete mMouse;
 }
 
-void BulletApp::initRift()
+void RemoteApp::initRift()
 {
 	// try to initialize the Oculus Rift (ID 0):
 	if (mRiftAvailable)
@@ -197,49 +190,67 @@ void BulletApp::initRift()
 		}
 	}
 }
-void BulletApp::quitRift()
+void RemoteApp::quitRift()
 {
 	std::cout << "Shutting down Oculus Rifts:" << std::endl;
-	if(mRift) delete mRift;
+	delete mRift;
 	ARLib::Rift::shutdown();
 }
-		
-void BulletApp::initTracking()
-{
-	/*
-	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
-	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET, 1000);
-		*/
 
-	mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, 1000, mRift);
+ARLib::TRACKING_ERROR_CODE RemoteApp::initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog)
+{
+	mTracker = new ARLib::TrackingManager(method, 100, enableDebugLog);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
-	mTracker->setNatNetServerIP("128.176.181.34"); //local machine
-    mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
+	mTracker->setNatNetClientIP("128.176.181.34"); 
+	mTracker->setNatNetServerIP("128.176.181.34");
+	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
-	if(error != ARLib::ARLIB_TRACKING_OK){
-		std::cout<<"Failed to Initialize Tracking Manager. ErrorCode:"<<error<<std::endl;
-		mTrackingAvailable = false;
+	mTrackingAvailable = (error == ARLib::ARLIB_TRACKING_OK);
+
+	if(!mTrackingAvailable)
+	{
 		mTracker->uninitialize();
-        delete mTracker;
-        mTracker = false;
-	}else{
-        std::cout<<"Tracking initialized"<<std::endl;
-		mTrackingAvailable = true;	
+		delete mTracker;
+		mTracker = nullptr;
 	}
+	
+	return error;
 }
 		
-void BulletApp::quitTracking()
+void RemoteApp::initTracking(bool enableDebugLog)
+{
+	ARLib::TRACKING_ERROR_CODE error;
+
+	error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, enableDebugLog); // Try both first
+	if (error == ARLib::ARLIB_TRACKING_OK)
+		std::cout << "NatNet + Rift Tracking initialized." << std::endl;
+
+	if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
+	{
+		error = initTracking(ARLib::ARLIB_RIFT, enableDebugLog); // Rift Tracking only
+		if (error == ARLib::ARLIB_TRACKING_OK)
+			std::cout << "Rift Tracking initialized." << std::endl;
+	}
+	else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
+	{
+		error = initTracking(ARLib::ARLIB_NATNET, enableDebugLog); // NatNet Tracking only
+		if (error == ARLib::ARLIB_TRACKING_OK)
+			std::cout << "NatNet Tracking initialized." << std::endl;
+	}
+
+	if (error != ARLib::ARLIB_TRACKING_OK)
+		std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
+}
+		
+void RemoteApp::quitTracking()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
-	//mTracker->uninitialize(); ::todo
-	if(mTracker) delete mTracker;
+	mTracker->uninitialize();
+	delete mTracker;
 }
 
-bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
+bool RemoteApp::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
 	if (mShutdown) return false;
 
@@ -255,7 +266,7 @@ bool BulletApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	return true; 
 }
 
-bool BulletApp::keyPressed(const OIS::KeyEvent& e)
+bool RemoteApp::keyPressed(const OIS::KeyEvent& e)
 {
 	mScene->keyPressed(e);
 
@@ -266,28 +277,28 @@ bool BulletApp::keyPressed(const OIS::KeyEvent& e)
 
 	return true;
 }
-bool BulletApp::keyReleased(const OIS::KeyEvent& e)
+bool RemoteApp::keyReleased(const OIS::KeyEvent& e)
 {
 	mScene->keyReleased(e);
 	return true;
 }
-bool BulletApp::mouseMoved(const OIS::MouseEvent& e)
+bool RemoteApp::mouseMoved(const OIS::MouseEvent& e)
 {
 	mScene->mouseMoved(e);
 	return true;
 }
-bool BulletApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
-bool BulletApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
+bool RemoteApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
 {
 	mScene->mouseReleased(e, id);
 	return true;
 }
 
-void BulletApp::quit()
+void RemoteApp::quit()
 {
 	std::cout << "QUIT." << std::endl;
 	mShutdown = true;

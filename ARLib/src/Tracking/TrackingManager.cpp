@@ -6,9 +6,9 @@
 
 namespace ARLib{
 	
-TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD)
+TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, bool DebugOutput = false)
 	: mTracking(tracking)
-	, mRiftHandle(oculusHMD)
+	, mDebugOutput(DebugOutput)
 	, mEvaluator(nullptr)
 	, mNatNetHandler(nullptr)
 	, mFrameBufferSize(frameBufferSize)
@@ -20,17 +20,15 @@ TrackingManager::TrackingManager(TRACKING_METHOD tracking, unsigned int frameBuf
 }
 
 TrackingManager::~TrackingManager(){
-	if(mNatNetHandler != nullptr)
-		delete mNatNetHandler;
+	delete mNatNetHandler;
 	delete mEvaluator;
 }
 
 TRACKING_ERROR_CODE TrackingManager::initialize(){
 	TRACKING_ERROR_CODE errorCode = NONE;
 	if((mTracking == (ARLIB_NATNET | ARLIB_RIFT))){
-		delete mEvaluator;
 		mEvaluator = new NatNetRiftEvaluator(mFrameBufferSize);
-		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
+		mNatNetHandler = new NatNetHandler(mNatNetConnectionType, mDebugOutput);
 		mNatNetHandler->registerFrameEvaluator(dynamic_cast<GenericNatNetEvaluator*>(mEvaluator));
 		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str(), mNatNetHostCommandPort, mNatNetHostDataPort);
 		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
@@ -38,9 +36,8 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
 		}
 	}else if(mTracking & ARLIB_NATNET){
-		delete mEvaluator;
 		mEvaluator = new NatNetEvaluator(mFrameBufferSize);
-		mNatNetHandler = new NatNetHandler(mNatNetConnectionType);
+		mNatNetHandler = new NatNetHandler(mNatNetConnectionType, mDebugOutput);
 		mNatNetHandler->registerFrameEvaluator(dynamic_cast<GenericNatNetEvaluator*>(mEvaluator));
 		mNatNetHandler->connect(mNatNetServerIP.c_str(), mNatNetClientIP.c_str(), mNatNetHostCommandPort, mNatNetHostDataPort);
 		if(mNatNetHandler->connected() & NATNET_DISCONNECTED ||
@@ -48,15 +45,15 @@ TRACKING_ERROR_CODE TrackingManager::initialize(){
 				errorCode = errorCode | ARLIB_TRACKING_NATNET_ERROR;
 		}
 	}else if(mTracking & ARLIB_RIFT){
-		delete mEvaluator;
 		mEvaluator = new RiftEvaluator(mFrameBufferSize);
-		if(!mRiftHandle){
+		if(!Rift::available(0)){
 			errorCode = errorCode | ARLIB_TRACKING_RIFT_ERROR;
 		}
 	}
 	if(mEvaluator != nullptr){
 		mEvaluator->setEvaluationMethod(mEval);
 	}
+
 	if(errorCode == NONE){
 		mInitialized = true;
 		return ARLIB_TRACKING_OK;	
@@ -70,6 +67,8 @@ void TrackingManager::uninitialize(){
 	if(mNatNetHandler != nullptr){
 		delete mNatNetHandler;
 		mNatNetHandler = nullptr;
+		delete mEvaluator;
+		mEvaluator = nullptr;
 	}
 	mInitialized = false;
 }
@@ -113,13 +112,16 @@ void TrackingManager::setNatNetHostDataPort(int hostDataPort){
 }
 
 void TrackingManager::setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval){
-	if(mEvaluator != nullptr)
+	if(mInitialized == true){
 		mEvaluator->setEvaluationMethod(eval);
+	}
 	mEval = eval;
 }
 
 void TrackingManager::addRigidBodyEventListener(RigidBodyEventListener* listener){
-	mEvaluator->addRigidBodyEventListener(listener);
+	if(mInitialized == true){
+		mEvaluator->addRigidBodyEventListener(listener);
+	}
 }
 
 };

@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\ARLib\General\InfoLog.h" />
     <ClInclude Include="include\ARLib\Tracking\FrameEvaluator.h" />
     <ClInclude Include="include\ARLib\Tracking\NatNetHandler.h" />
     <ClInclude Include="include\ARLib\Tracking\RigidBodyEventListener.h" />
@@ -19,7 +18,6 @@
     <ClInclude Include="include\ARLib\Tracking\TrackingManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\General\InfoLog.cpp" />
     <ClCompile Include="src\Tracking\FrameEvaluator.cpp" />
     <ClCompile Include="src\Tracking\NatNetHandler.cpp" />
     <ClCompile Include="src\Tracking\RigidBodyEventListener.cpp" />

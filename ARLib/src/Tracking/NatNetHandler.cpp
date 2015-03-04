@@ -4,13 +4,15 @@
 
 namespace ARLib{
 
-const std::string NatNetHandler::invalidIP = "-1.-1.-1.-1";
-
-NatNetHandler::NatNetHandler(ConnectionType iCType, std::string logFile)
+NatNetHandler::NatNetHandler(ConnectionType iCType, bool DebugPrintf)
 	: mConnectionState(NATNET_PENDING){
 	mClientHandle = new NatNetClient(iCType);
 
-	mClientHandle->SetMessageCallback(MessageHandler);
+	if(DebugPrintf){
+		mClientHandle->SetMessageCallback(NatNetHandler::MessageHandler);
+	}else{
+		mClientHandle->SetMessageCallback(nullptr);
+	}
 	mClientHandle->SetVerbosityLevel(Verbosity_Info);
 	mClientHandle->SetDataCallback(NatNetHandler::DataHandler, this);
 }
@@ -58,14 +60,10 @@ CONNECTION_STATE NatNetHandler::connected()const{
 }
 
 const std::string& NatNetHandler::getServerIP() const{
-	if(mConnectionState != NATNET_CONNECTED)
-		return invalidIP;
 	return mServerIP;
 }
 
 const std::string& NatNetHandler::getClientIP() const{
-	if(mConnectionState != NATNET_CONNECTED)
-		return invalidIP;
 	return mClientIP;
 }
 
@@ -88,26 +86,20 @@ double NatNetHandler::getPing() const{
 }
 
 void NatNetHandler::MessageHandler(int iId, char* pMsg){
-
+	printf("Message %d: %s\n", iId, pMsg);
 }
 
 void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 	NatNetHandler *pHandler = (NatNetHandler*) pClient;
     double serverLatency = pHandler->getPing();
    
-	bool change = true;//(bool)(pFrame->params & 0x02);
-	if(!change){
-		return;
-	}
 	RBFrame *frame = new RBFrame(pFrame->nRigidBodies, pFrame->iFrame, pFrame->fTimestamp, pFrame->fLatency, true, true);
-	frame->mChange = change;
 
 	for(int i = 0; i < pFrame->nRigidBodies; i++){
 		sRigidBodyData& pRB = pFrame->RigidBodies[i];
 		RigidBody *rb = new RigidBody(pRB.nMarkers);
 		rb->mVisible = pRB.params & 0x01;
 		rb->mID = pRB.ID;
-		rb->mError = pRB.MeanError;
 		rb->mX = pRB.x;
 		rb->mY = pRB.y;
 		rb->mZ = pRB.z;
@@ -115,15 +107,7 @@ void NatNetHandler::DataHandler(sFrameOfMocapData *pFrame, void *pClient){
 		rb->mqY = pRB.qy;
 		rb->mqZ = pRB.qz;
 		rb->mqW = pRB.qw;
-		for(unsigned int j = 0; j < rb->mNMarker; j++){
-			int markerID = pRB.MarkerIDs ? pRB.MarkerIDs[j] : -1;
-			float markerSize = pRB.MarkerSizes ? pRB.MarkerSizes[j] : 0.0f;
-			float x = pRB.Markers ? pRB.Markers[j][0] : 0.0f;
-			float y = pRB.Markers ? pRB.Markers[j][1] : 0.0f;
-			float z = pRB.Markers ? pRB.Markers[j][2] : 0.0f;
-			rb->addMarker(j, markerID, markerSize, x, y, z);
-		}
-		frame->addRigidBody(i, rb);
+		(*frame)[i] = rb;
 	}
 
 	if(pHandler->mEvaluator){

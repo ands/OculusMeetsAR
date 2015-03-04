@@ -1,15 +1,14 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "Sword.h"
-#include "Remote.h"
 #include "OIS/OIS.h"
-#include "PFXSSAO.h"
 #include "OGRE/Ogre.h"
-#include "RemotePuppet.h"
-#include "GlowRenderTarget.h"
+#include "StarWarsRemote.h"
 #include "ARLib/ARLibOgre.h"
+#include "GlowRenderTarget.h"
 #include "RigidListenerNode.h"
+#include "StarWarsLightSaber.h"
+#include "StarWarsRemotePuppet.h"
 #include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
@@ -19,13 +18,13 @@
 
 class NPRWatercolorRenderTarget;
 
-class BulletScene
+class RemoteScene
 {
 	public:
-		BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
+		RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
             Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard,
 			ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer);
-		~BulletScene();
+		~RemoteScene();
 
 		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
 		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
@@ -61,11 +60,6 @@ class BulletScene
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
 		ARLib::RiftSceneNode* mRiftNode;
-        
-        PFXSSAO *mDebugLeftSSAO;
-        PFXSSAO *mDebugRightSSAO;
-        PFXSSAO *mLeftSSAO;
-        PFXSSAO *mRightSSAO;
 
         Ogre::CompositorInstance *mGlow[2];
 
@@ -78,7 +72,7 @@ class BulletScene
 		double additionalLatency;
 
 		Ogre::Vector2 mVideoOffset[2];
-		Ogre::Vector2 mVideoScale;
+		Ogre::Vector2 mVideoScale[2];
 
         ARLib::RenderTarget* mRenderTarget;
         ARLib::RenderTarget* mSmallRenderTarget;

@@ -1,22 +1,20 @@
-#include "BulletScene.h"
+#include "RemoteScene.h"
 #include "LaserBulletManager.h"
 #include "GlowMaterialListener.h"
-#include "ARLib/Sound/SoundListener.h"
-#include "ARLib/Sound/SoundManager.h"
 #include "NPRWatercolorRenderTarget.h"
 
-BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
+RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
     OgreBulletDynamics::DynamicsWorld *dyWorld, 
     OIS::Mouse *mouse, OIS::Keyboard *keyboard,
 	ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer)
-    : mRenderTarget(nullptr)
-    , mSmallRenderTarget(nullptr)
-    , mToggle(true)
+    : mToggle(true)
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
-	, mRiftVideoScreens(nullptr)
 	, additionalLatency(0.048)
 	, enabledNPRRenderer(false)
+    , mRenderTarget(nullptr)
+	, mRiftVideoScreens(nullptr)
+    , mSmallRenderTarget(nullptr)
 	, mWatercolorRenderTarget(nullptr)
 	, mSmallWatercolorRenderTarget(nullptr)
 	, mSmallGlowRenderTarget(nullptr)
@@ -99,7 +97,9 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	light->setDiffuseColour( 0.7f, 0.54f, 0.46f );
 	mRiftNode->getBodyNode()->attachObject(light); 
 
-    mSwordParentNode = new RigidListenerNode(mSceneMgr->getRootSceneNode(), mSceneMgr, 2);
+	Ogre::SceneNode *swordOffsetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	swordOffsetNode->setPosition(0,0,-0.2f);
+    mSwordParentNode = new RigidListenerNode(swordOffsetNode, mSceneMgr, 2);
     mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
     if(tracker){
         tracker->addRigidBodyEventListener(mSwordParentNode);
@@ -109,16 +109,17 @@ BulletScene::BulletScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 2.0f);
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
 	
-	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
-	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
-	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mVideoOffset[0] = Ogre::Vector2(0.060f, -0.016f);
+	mVideoOffset[1] = Ogre::Vector2(0.004f, -0.016f);
+	mVideoScale[0] = Ogre::Vector2(1.02f, 1.11f);
+	mVideoScale[1] = Ogre::Vector2(1.00f, 1.11f);
 	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
-	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+	mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
 
 	setAdditionalLatency(additionalLatency);
 }
 
-BulletScene::~BulletScene()
+RemoteScene::~RemoteScene()
 {
     delete mRenderTarget;
     delete mSmallRenderTarget;
@@ -142,14 +143,14 @@ BulletScene::~BulletScene()
 	delete mRiftNode;
 }
 
-void BulletScene::toggleGlow()
+void RemoteScene::toggleGlow()
 {
     mToggle = !mToggle;
     mGlow[0]->setEnabled(mToggle);
     mGlow[1]->setEnabled(mToggle);
 }
 
-void BulletScene::toggleNPRRenderer()
+void RemoteScene::toggleNPRRenderer()
 {
 	mRiftNode->removeAllRenderTargets();
 
@@ -171,7 +172,7 @@ void BulletScene::toggleNPRRenderer()
 	}
 }
 
-void BulletScene::update(float dt)
+void RemoteScene::update(float dt)
 {
     mRemotePuppet->update(dt);
 	mRemote->update(dt);
@@ -181,7 +182,7 @@ void BulletScene::update(float dt)
 	mRiftVideoScreens->update();
 }
 
-void BulletScene::setAdditionalLatency(double seconds)
+void RemoteScene::setAdditionalLatency(double seconds)
 {
 	LARGE_INTEGER frequency, additionalLatency;
 	QueryPerformanceFrequency(&frequency);
@@ -195,7 +196,7 @@ void BulletScene::setAdditionalLatency(double seconds)
 // Handle Input:
 //////////////////////////////////////////////////////////////
 
-bool BulletScene::keyPressed( const OIS::KeyEvent& e )
+bool RemoteScene::keyPressed( const OIS::KeyEvent& e )
 {
     if(e.key == OIS::KC_C){
 		mRiftNode->calibrate();
@@ -235,15 +236,16 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 	const float scaleStep = 0.01f;
 	bool setScalings = false;
 	// same for both for now...?
-	if (e.key == OIS::KC_RIGHT) { mVideoScale.x -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_LEFT ) { mVideoScale.x += scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_UP   ) { mVideoScale.y -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_DOWN ) { mVideoScale.y += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_RIGHT) { mVideoScale[0].x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { mVideoScale[0].x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { mVideoScale[0].y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { mVideoScale[0].y += scaleStep; setScalings = true; }
+	mVideoScale[1] = mVideoScale[0]; // TODO: scaling for both!!!
 
 	if (setScalings)
 	{
-		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
-		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
+		mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
+		printf("scale: %02f x %02f\n", mVideoScale[0].x, mVideoScale[0].y);
 	}
 
 	// video latency
@@ -255,12 +257,12 @@ bool BulletScene::keyPressed( const OIS::KeyEvent& e )
 
 	return true;
 }
-bool BulletScene::keyReleased( const OIS::KeyEvent& e )
+bool RemoteScene::keyReleased( const OIS::KeyEvent& e )
 {
 	return true;
 }
 
-bool BulletScene::mouseMoved( const OIS::MouseEvent& e )
+bool RemoteScene::mouseMoved( const OIS::MouseEvent& e )
 {
 	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
 	{
@@ -270,12 +272,12 @@ bool BulletScene::mouseMoved( const OIS::MouseEvent& e )
 	return true;
 }
 
-bool BulletScene::mousePressed( const OIS::MouseEvent& e, OIS::MouseButtonID id )
+bool RemoteScene::mousePressed( const OIS::MouseEvent& e, OIS::MouseButtonID id )
 {
 	return true;
 }
 
-bool BulletScene::mouseReleased( const OIS::MouseEvent& e, OIS::MouseButtonID id )
+bool RemoteScene::mouseReleased( const OIS::MouseEvent& e, OIS::MouseButtonID id )
 {
 	return true;
 }

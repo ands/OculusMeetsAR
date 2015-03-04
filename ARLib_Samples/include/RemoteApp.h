@@ -7,15 +7,15 @@
 #include "ARLib/Tracking/TrackingManager.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Webcam/VideoPlayer.h"
-#include "BulletScene.h"
+#include "RemoteScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 
 
-class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
+class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
 {
 	public:
-		BulletApp(bool showDebugWindow);
-		~BulletApp();
+		RemoteApp(bool showDebugWindow);
+		~RemoteApp();
 
 		void quit();
 
@@ -38,7 +38,9 @@ class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitOIS();
 		void initRift();
 		void quitRift();
-		void initTracking();
+
+		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog);
+		void initTracking(bool enableDebugLog);
 		void quitTracking();
 
 		OIS::Keyboard* mKeyboard;
@@ -52,7 +54,7 @@ class BulletApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 
 		bool mShutdown;
 
-		BulletScene* mScene;
+		RemoteScene* mScene;
 
 		bool mRiftAvailable;
 		bool mTrackingAvailable;
