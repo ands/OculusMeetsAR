@@ -1,17 +1,32 @@
 #ifndef APP_H
 #define APP_H
 
-#include "OGRE/Ogre.h"
-#include "OGRE/Overlay/OgreOverlaySystem.h"
-#include "OIS/OIS.h"
-#include "ARLib/Oculus/Rift.h"
-#include "ARLib/Tracking/TrackingManager.h"
-#include "ARLib/Video/VideoPlayer.h"
-#include "ARLib/ARLibOgre.h"
-#include "WebcamScene.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "OGRE/OgreFrameListener.h"
+#include "OIS/OISKeyboard.h"
 
-class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
+namespace Ogre
+{
+	struct FrameEvent;
+};
+
+namespace OIS
+{
+	class KeyEvent;
+	class Keyboard;
+};
+
+namespace ARLib
+{
+	enum TRACKING_METHOD;
+	enum TRACKING_ERROR_CODE;
+	class Rift;
+	class TrackingManager;
+	class VideoPlayer;
+};
+
+class WebcamScene;
+
+class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener
 {
 	public:
 		WebcamApp(bool showDebugWindow);
@@ -21,9 +36,6 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 
 		bool keyPressed(const OIS::KeyEvent& e);
 		bool keyReleased(const OIS::KeyEvent& e);
-		bool mouseMoved(const OIS::MouseEvent& e);
-		bool mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id);
-		bool mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id);
 
 		bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
@@ -32,42 +44,31 @@ class WebcamApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 	private:
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
-        void initBullet(bool enableDebugDrawing);
-        void quitBullet();
 		void initOIS();
 		void quitOIS();
 		void initRift();
 		void quitRift();
-		void initTracking();
+		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog);
+		void initTracking(bool enableDebugLog);
 		void quitTracking();
 		void createViewports();
 
-		OIS::Keyboard* mKeyboard;
-		OIS::Mouse* mMouse;
-
-		Ogre::Root* mRoot;
-        Ogre::SceneManager *mSceneMgr;
-
-		Ogre::RenderWindow* mWindow;
-		Ogre::RenderWindow* mSmallWindow;
-
-		ARLib::VideoPlayer* mVideoPlayerLeft;
-		ARLib::VideoPlayer* mVideoPlayerRight;
-
-		Ogre::OverlaySystem* mOverlaySystem;
-
 		bool mShutdown;
 
-		WebcamScene* mScene;
+		OIS::Keyboard* mKeyboard;
+		Ogre::Root* mRoot;
+        Ogre::SceneManager *mSceneMgr;
+		Ogre::RenderWindow* mWindow;
+		Ogre::RenderWindow* mSmallWindow;
 
 		bool mRiftAvailable;
 		bool mTrackingAvailable;
 		ARLib::Rift* mRift;
 		ARLib::TrackingManager* mTracker;
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
 
-        OgreBulletCollisions::DebugDrawer *mDebugDrawer;
-        OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
-        OgreBulletCollisions::CollisionShape *mGroundShape;
+		WebcamScene* mScene;
 };
 
 #endif

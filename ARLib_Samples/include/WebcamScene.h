@@ -1,16 +1,33 @@
 #ifndef SCENE_H
 #define SCENE_H
 
-#include "OGRE/Ogre.h"
-#include "OGRE/Overlay/OgreTextAreaOverlayElement.h"
-#include "OIS/OIS.h"
-#include "ARLib/ARLibOgre.h"
-#include "ARLib/Tracking/TrackingManager.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
+#include "OGRE/OgreVector2.h"
+
+namespace ARLib
+{
+	class Rift;
+	class TrackingManager;
+	class VideoPlayer;
+	class RiftVideoScreens;
+	class RenderTarget;
+	class RiftSceneNode;
+};
+
+namespace Ogre
+{
+	class Root;
+	class RenderWindow;
+	class SceneManager;
+};
+
+namespace OIS
+{
+	class Keyboard;
+	class KeyEvent;
+};
 
 class NPRWatercolorRenderTarget;
+class RigidListenerNode;
 
 class WebcamScene
 {
@@ -18,37 +35,22 @@ class WebcamScene
 		WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 			Ogre::Root *root, Ogre::SceneManager *sceneMgr,
 			Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
-			OgreBulletDynamics::DynamicsWorld *dyWorld,
-			OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+			OIS::Keyboard *keyboard,
 			ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight);
 		~WebcamScene();
 
-		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
-		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
-
 		void update(float dt);
 
-		// Keyboard and mouse events:
 		bool keyPressed(const OIS::KeyEvent&);
 		bool keyReleased(const OIS::KeyEvent&);
-		bool mouseMoved(const OIS::MouseEvent&);
-		bool mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID);
-		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 
 	private:
 		void toggleNPRRenderer();
 		void setAdditionalLatency(double seconds);
 
-        OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
-
-        std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
-        std::deque<OgreBulletDynamics::RigidBody *> mRigidBodies;
-
 		Ogre::Root* mRoot;
-		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
-		Ogre::TextAreaOverlayElement* mTextArea;
 		ARLib::RiftSceneNode* mRiftNode;
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;

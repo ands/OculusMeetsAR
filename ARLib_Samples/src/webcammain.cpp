@@ -1,4 +1,6 @@
+#include <windows.h>
 #include <iostream>
+#include "OGRE/OgreException.h"
 #include "WebcamApp.h"
 
 extern "C" int main(int argc, char *argv[])

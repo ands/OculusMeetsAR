@@ -13,6 +13,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7E5F3AC8-3CF0-408C-9671-C1B33D1DC1D2}</ProjectGuid>
     <RootNamespace>ARLib_WebcamTex</RootNamespace>
+    <ProjectName>SimpleScene</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

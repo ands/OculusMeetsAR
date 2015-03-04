@@ -47,9 +47,6 @@ class RemoteScene
 			ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer);
 		~RemoteScene();
 
-		Ogre::SceneManager* getSceneMgr() { return mSceneMgr; }
-		ARLib::RiftSceneNode* getRiftSceneNode() { return mRiftNode; }
-
         void toggleGlow();
 
 		void update(float dt);
