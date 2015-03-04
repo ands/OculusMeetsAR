@@ -6,7 +6,7 @@
 #include "OIS/OIS.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
-#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Video/VideoPlayer.h"
 #include "ARLib/ARLibOgre.h"
 #include "WebcamScene.h"
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"

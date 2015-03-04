@@ -206,9 +206,9 @@ void WebcamApp::quitRift()
 void WebcamApp::initTracking()
 {
 	if(mRiftAvailable)
-		mTracker = new ARLib::TrackingManager(/*ARLib::ARLIB_NATNET |*/ ARLib::ARLIB_RIFT, 1000, mRift);
+		mTracker = new ARLib::TrackingManager(/*ARLib::ARLIB_NATNET |*/ ARLib::ARLIB_RIFT, 1000, true);
 	else
-		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET ,1000);
+		mTracker = new ARLib::TrackingManager(ARLib::ARLIB_NATNET ,1000, true);
 
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
 	mTracker->setNatNetClientIP(); //local machine

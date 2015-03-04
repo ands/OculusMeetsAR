@@ -5,7 +5,7 @@
 #include "OIS/OISKeyboard.h"
 #include "ARLib/ARLibOgre.h"
 #include "ARLib/Tracking/TrackingManager.h"
-#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Video/VideoPlayer.h"
 #include "RemoteScene.h"
 #include "LaserBulletManager.h"
 #include "GlowMaterialListener.h"

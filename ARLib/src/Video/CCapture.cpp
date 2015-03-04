@@ -1,7 +1,7 @@
 #include <new>
 #include <assert.h>
 #include <shlwapi.h>
-#include "ARLib/Webcam/CCapture.h"
+#include "ARLib/Video/CCapture.h"
 #include <strmif.h>
 #include <iostream>
 

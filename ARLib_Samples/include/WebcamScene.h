@@ -61,7 +61,7 @@ class WebcamScene
 		double additionalLatency;
 
 		Ogre::Vector2 mVideoOffset[2];
-		Ogre::Vector2 mVideoScale;
+		Ogre::Vector2 mVideoScale[2];
 };
 
 #endif

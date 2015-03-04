@@ -237,3 +237,5 @@ OgreMain_d.pdb
 /ARLib/lib/ARLibWebcam_d.lib
 /ARLib/lib/ARLibSound.lib
 /ARLib/lib/ARLibSound_d.lib
+/ARLib/lib/ARLibVideo.lib
+/ARLib/lib/ARLibVideo_d.lib

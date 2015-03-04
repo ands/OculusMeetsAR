@@ -6,7 +6,7 @@
 #include "OGRE/Overlay/OgreOverlayContainer.h"
 #include "OGRE/Overlay/OgreFontManager.h"
 
-#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Video/VideoPlayer.h"
 
 WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     Ogre::Root *root, Ogre::SceneManager *sceneMgr,
@@ -127,13 +127,12 @@ WebcamScene::WebcamScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	//mTextArea->hide(); // hide by default
 	mTextArea->show();*/
 
-	// TODO: save the configuration in a file?
-	// default video configuration
-	mVideoOffset[0] = Ogre::Vector2(-0.060f, 0.016f);
-	mVideoOffset[1] = Ogre::Vector2(-0.004f, 0.016f);
-	mVideoScale = Ogre::Vector2(0.98f, 0.90f);
+	mVideoOffset[0] = Ogre::Vector2(0.060f, -0.016f);
+	mVideoOffset[1] = Ogre::Vector2(0.004f, -0.016f);
+	mVideoScale[0] = Ogre::Vector2(1.02f, 1.11f);
+	mVideoScale[1] = Ogre::Vector2(1.00f, 1.11f);
 	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
-	mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
+	mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
 
 	setAdditionalLatency(additionalLatency);
 }
@@ -237,13 +236,6 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 {
 	if (e.key == OIS::KC_N)
 		toggleNPRRenderer();
-	/*if (e.key == OIS::KC_T)
-	{
-		if (mTextArea->isVisible())
-			mTextArea->hide();
-		else
-			mTextArea->show();
-	}*/
 
 	// video offsets
 	const float offsetStep = 0.004f;
@@ -272,15 +264,16 @@ bool WebcamScene::keyPressed( const OIS::KeyEvent& e )
 	const float scaleStep = 0.01f;
 	bool setScalings = false;
 	// same for both for now...?
-	if (e.key == OIS::KC_RIGHT) { mVideoScale.x -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_LEFT ) { mVideoScale.x += scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_UP   ) { mVideoScale.y -= scaleStep; setScalings = true; }
-	if (e.key == OIS::KC_DOWN ) { mVideoScale.y += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_RIGHT) { mVideoScale[0].x -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_LEFT ) { mVideoScale[0].x += scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_UP   ) { mVideoScale[0].y -= scaleStep; setScalings = true; }
+	if (e.key == OIS::KC_DOWN ) { mVideoScale[0].y += scaleStep; setScalings = true; }
+	mVideoScale[1] = mVideoScale[0]; // TODO: scaling for both!!!
 
 	if (setScalings)
 	{
-		mRiftVideoScreens->setScalings(mVideoScale, mVideoScale);
-		printf("scale: %02f x %02f\n", mVideoScale.x, mVideoScale.y);
+		mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
+		printf("scale: %02f x %02f\n", mVideoScale[0].x, mVideoScale[0].y);
 	}
 
 	// video latency

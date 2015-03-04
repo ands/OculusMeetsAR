@@ -11,5 +11,6 @@
     <ClCompile Include="..\src\webcammain.cpp" />
     <ClCompile Include="..\src\WebcamScene.cpp" />
     <ClCompile Include="..\src\NPRWatercolorRenderTarget.cpp" />
+    <ClCompile Include="..\src\RigidListenerNode.cpp" />
   </ItemGroup>
 </Project>

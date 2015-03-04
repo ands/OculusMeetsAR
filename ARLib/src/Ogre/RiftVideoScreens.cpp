@@ -6,7 +6,7 @@
 #include "ARLib/Ogre/RiftVideoScreens.h"
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/VideoTexture.h"
-#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Video/VideoPlayer.h"
 #include "ARLib/Tracking/TrackingManager.h"
 
 namespace ARLib {

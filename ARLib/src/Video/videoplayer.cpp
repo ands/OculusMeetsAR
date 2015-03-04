@@ -1,7 +1,7 @@
 #include <stdio.h>
-#include "ARLib/Webcam/CCapture.h"
-#include "ARLib/Webcam/VideoPlayer.h"
-#include "ARLib/Webcam/ocam.h"
+#include "ARLib/Video/CCapture.h"
+#include "ARLib/Video/VideoPlayer.h"
+#include "ARLib/Video/ocam.h"
 
 namespace ARLib {
 

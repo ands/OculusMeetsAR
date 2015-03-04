@@ -37,7 +37,6 @@ bool SoundManager::loadSound(const char* filename){
 	errno_t err = fopen_s(&fp,filename, "r");
 	if(err != 0){
 		printf("Could Not Open %s\n", filename);
-		fclose(fp);
 		return false;
 	}
 

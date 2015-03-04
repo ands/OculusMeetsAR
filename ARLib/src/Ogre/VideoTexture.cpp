@@ -1,6 +1,6 @@
 #include "OGRE/OgreTextureManager.h"
 #include "OGRE/OgreHardwarePixelBuffer.h"
-#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/Video/VideoPlayer.h"
 #include "ARLib/Ogre/VideoTexture.h"
 
 namespace ARLib {
