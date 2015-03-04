@@ -1,9 +1,13 @@
+#include "OGRE/OgreMeshManager.h"
+#include "OGRE/OgreMaterialManager.h"
+#include "OGRE/OgreCamera.h"
+#include "OGRE/OgreSceneManager.h"
+#include "OGRE/OgreEntity.h"
 #include "ARLib/Ogre/RiftVideoScreens.h"
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/VideoTexture.h"
 #include "ARLib/Webcam/VideoPlayer.h"
 #include "ARLib/Tracking/TrackingManager.h"
-#include "OGRE/OgreMeshManager.h"
 
 namespace ARLib {
 	RiftVideoScreens::RiftVideoScreens(Ogre::SceneManager *sceneManager, RiftSceneNode *_riftNode, VideoPlayer *videoPlayerLeft, VideoPlayer *videoPlayerRight, TrackingManager *_trackingManager)

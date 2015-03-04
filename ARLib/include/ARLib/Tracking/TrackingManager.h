@@ -8,26 +8,26 @@ and the Oculus Rift Handle
 #include <string>
 #include "FrameEvaluator.h"
 
-typedef enum ConnectionType ConnectionType;
+enum ConnectionType;
 
 namespace ARLib{
 
-	typedef enum FRAME_EVALUATION_METHOD;
+	enum FRAME_EVALUATION_METHOD;
 
-	typedef enum{
+	enum TRACKING_METHOD{
 		ARLIB_NATNET = 0x01,
 		ARLIB_RIFT = 0x02,
-	}TRACKING_METHOD;
+	};
 
-	typedef enum{
+	enum TRACKING_ERROR_CODE{
 		NONE = 0x00,
 		ARLIB_TRACKING_OK = 0x01,
 		ARLIB_TRACKING_NATNET_ERROR = 0x02,
 		ARLIB_TRACKING_RIFT_ERROR = 0x04,
 		ARLIB_TRACKING_NO_DEVICE_ERROR = 0x08
-	}TRACKING_ERROR_CODE;
+	};
 
-	typedef struct _RigidBody RigidBody;
+	struct RigidBody;
 	class RigidBodyEventListener;
 	class NatNetHandler;
 	class Rift;

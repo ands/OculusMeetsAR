@@ -1,8 +1,12 @@
 #ifndef DEBUGRENDERTARGET_H
 #define DEBUGRENDERTARGET_H
 
-#include "OGRE/Ogre.h"
 #include "ARLib/Ogre/RenderTarget.h"
+
+namespace Ogre {
+class RenderWindow;
+class Camera;
+};
 
 namespace ARLib {
 

@@ -1,11 +1,27 @@
 #ifndef REMOTE_H
 #define REMOTE_H
 
-#include "OGRE/Ogre.h"
-#include "Cannon.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include <random>
+
+namespace Ogre
+{
+	class SceneManager;
+	class SceneNode;
+	class Pass;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+	class RigidBody;
+};
+
+namespace OgreBulletCollisions
+{
+	class SphereCollisionShape;
+};
+
+class StarWarsLaserCannon;
 
 class StarWarsRemote{
 public:

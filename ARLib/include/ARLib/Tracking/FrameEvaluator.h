@@ -16,7 +16,7 @@ and the Oculus Rift Handle
 
 namespace ARLib{
 
-    typedef enum FRAME_EVALUATION_METHOD{
+    enum FRAME_EVALUATION_METHOD{
         FRAME_NONE = 0x00, 
         FRAME_ROUND = 0x01,
         FRAME_INTERPOLATE_LINEAR = 0x02,
@@ -26,11 +26,10 @@ namespace ARLib{
 
     const unsigned int RIFT_BODY_ID = 1;
 
-    typedef struct _TimedFrame{
+    struct TimedFrame{
         long long mTimestamp;
         RigidBody* mBody;
-    } TimedFrame;
-
+    };
 	
 	/**********************************************************************************************
 	Base class for all operations on tracking frames.

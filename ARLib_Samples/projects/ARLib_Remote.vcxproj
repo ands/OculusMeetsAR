@@ -22,6 +22,7 @@
     <ClCompile Include="..\src\StarWarsLightSaber.cpp" />
     <ClCompile Include="..\src\StarWarsRemote.cpp" />
     <ClCompile Include="..\src\StarWarsRemotePuppet.cpp" />
+    <ClCompile Include="GlowMaterialListener.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\Cannon.h" />

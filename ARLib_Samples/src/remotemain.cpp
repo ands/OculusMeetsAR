@@ -1,5 +1,7 @@
+#include <windows.h>
 #include <iostream>
 #include "RemoteApp.h"
+#include "OGRE/OgreException.h"
 
 extern "C" int main(int argc, char *argv[])
 {

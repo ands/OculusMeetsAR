@@ -1,14 +1,31 @@
+#include "OGRE/OgreRoot.h"
+#include "OGRE/OgreSceneManager.h"
+#include "OGRE/OgreCompositorInstance.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsWorld.h"
+#include "OIS/OISKeyboard.h"
+#include "ARLib/ARLibOgre.h"
+#include "ARLib/Tracking/TrackingManager.h"
+#include "ARLib/Webcam/VideoPlayer.h"
 #include "RemoteScene.h"
 #include "LaserBulletManager.h"
 #include "GlowMaterialListener.h"
+#include "GlowRenderTarget.h"
 #include "NPRWatercolorRenderTarget.h"
+#include "RigidListenerNode.h"
+#include "StarWarsLightSaber.h"
+#include "StarWarsRemote.h"
+#include "StarWarsRemotePuppet.h"
 
 RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
-    Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow, Ogre::SceneManager *sceneMgr,
-    OgreBulletDynamics::DynamicsWorld *dyWorld, 
-    OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+    Ogre::Root *root, Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
+	Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld,
+	OIS::Keyboard *keyboard,
 	ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer)
-    : mToggle(true)
+    : mRoot(root)
+	, mKeyboard(keyboard)
+	, mSceneMgr(sceneMgr)
+	, mDynamicsWorld(dyWorld)
+	, mToggle(true)
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
 	, additionalLatency(0.048)
 	, enabledNPRRenderer(false)
@@ -20,15 +37,10 @@ RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	, mSmallGlowRenderTarget(nullptr)
 	, mGlowRenderTarget(nullptr)
 {
-    LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
-
-    mGlow[0] = nullptr;
+	mGlow[0] = nullptr;
     mGlow[1] = nullptr;
-	mRoot = root;
-	mMouse = mouse;
-	mKeyboard = keyboard;
-	mSceneMgr = sceneMgr;
-    mDynamicsWorld = dyWorld;
+
+    LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
 
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f,0.1f,0.1f));
     mSceneMgr->setShadowTechnique(Ogre::SHADOWDETAILTYPE_TEXTURE);
@@ -82,13 +94,6 @@ RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	roomLight->setPosition( 3.f, 0.5f, 1.f );
 	mSceneMgr->getRootSceneNode()->attachObject( roomLight );
 
-    //ground-plane
-    OgreBulletCollisions::CollisionShape *shape = new OgreBulletCollisions::StaticPlaneCollisionShape(Ogre::Vector3(0.15f,0.9f,0.0f), -5.0f);
-    mShapes.push_back(shape);
-    OgreBulletDynamics::RigidBody *planeBody = new OgreBulletDynamics::RigidBody("GroundPlane", mDynamicsWorld);
-    planeBody->setStaticShape(shape, 0.1f, 0.8f);
-    mRigidBodies.push_back(planeBody);
-
 	Ogre::Light* light = mSceneMgr->createLight();
 	light->setType(Ogre::Light::LT_POINT);
 	light->setCastShadows( false );
@@ -125,21 +130,7 @@ RemoteScene::~RemoteScene()
     delete mSmallRenderTarget;
 	delete mWatercolorRenderTarget;
 	delete mSmallWatercolorRenderTarget;
-
 	mRoot->destroySceneManager(mSceneMgr);
-
-    std::deque<OgreBulletDynamics::RigidBody*>::iterator itBody = mRigidBodies.begin();
-    while(itBody != mRigidBodies.end()){
-        delete *itBody;
-        ++itBody;
-    }
-    mRigidBodies.clear();
-    std::deque<OgreBulletCollisions::CollisionShape*>::iterator itShapes = mShapes.begin();
-    while(itShapes != mShapes.end()){
-        delete *itShapes;
-        ++itShapes;
-    }
-    mShapes.clear();
 	delete mRiftNode;
 }
 
@@ -258,26 +249,6 @@ bool RemoteScene::keyPressed( const OIS::KeyEvent& e )
 	return true;
 }
 bool RemoteScene::keyReleased( const OIS::KeyEvent& e )
-{
-	return true;
-}
-
-bool RemoteScene::mouseMoved( const OIS::MouseEvent& e )
-{
-	if( mMouse->getMouseState().buttonDown( OIS::MB_Left ) )
-	{
-		mRiftNode->setYaw(Ogre::Degree(-0.3f*e.state.X.rel));
-		mRiftNode->setPitch(Ogre::Degree(-0.3f*e.state.Y.rel));
-	}
-	return true;
-}
-
-bool RemoteScene::mousePressed( const OIS::MouseEvent& e, OIS::MouseButtonID id )
-{
-	return true;
-}
-
-bool RemoteScene::mouseReleased( const OIS::MouseEvent& e, OIS::MouseButtonID id )
 {
 	return true;
 }

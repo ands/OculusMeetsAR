@@ -1,8 +1,16 @@
 #ifndef RIFTRENDERTARGET_H
 #define RIFTRENDERTARGET_H
 
-#include "OGRE/Ogre.h"
+#include "OGRE/OgreTexture.h"
+#include "OGRE/OgreMaterial.h"
 #include "ARLib/Ogre/RenderTarget.h"
+
+namespace Ogre {
+class Root;
+class RenderWindow;
+class Camera;
+class SceneManager;
+};
 
 namespace ARLib {
 

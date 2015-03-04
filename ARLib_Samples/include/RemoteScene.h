@@ -1,28 +1,49 @@
-#ifndef SCENE_H
-#define SCENE_H
+#ifndef REMOTESCENE_H
+#define REMOTESCENE_H
 
-#include "OIS/OIS.h"
-#include "OGRE/Ogre.h"
-#include "StarWarsRemote.h"
-#include "ARLib/ARLibOgre.h"
-#include "GlowRenderTarget.h"
-#include "RigidListenerNode.h"
-#include "StarWarsLightSaber.h"
-#include "StarWarsRemotePuppet.h"
-#include "ARLib/Webcam/VideoPlayer.h"
-#include "ARLib/Tracking/TrackingManager.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsStaticPlaneShape.h"
+#include "OGRE/OgreVector2.h"
+
+namespace ARLib
+{
+	class Rift;
+	class TrackingManager;
+	class VideoPlayer;
+	class RiftVideoScreens;
+	class RenderTarget;
+	class RiftSceneNode;
+};
+
+namespace Ogre
+{
+	class Root;
+	class RenderWindow;
+	class SceneManager;
+	class CompositorInstance;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+};
+
+namespace OIS
+{
+	class Keyboard;
+	class KeyEvent;
+};
 
 class NPRWatercolorRenderTarget;
+class GlowRenderTarget;
+class StarWarsRemotePuppet;
+class StarWarsRemote;
+class StarWarsLightSaber;
+class RigidListenerNode;
 
 class RemoteScene
 {
 	public:
 		RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
-            Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Mouse *mouse, OIS::Keyboard *keyboard,
+            Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Keyboard *keyboard,
 			ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer);
 		~RemoteScene();
 
@@ -33,20 +54,13 @@ class RemoteScene
 
 		void update(float dt);
 
-		// Keyboard and mouse events:
 		bool keyPressed(const OIS::KeyEvent&);
 		bool keyReleased(const OIS::KeyEvent&);
-		bool mouseMoved(const OIS::MouseEvent&);
-		bool mousePressed(const OIS::MouseEvent&, OIS::MouseButtonID);
-		bool mouseReleased(const OIS::MouseEvent&, OIS::MouseButtonID);
 	private:
 		void toggleNPRRenderer();
 		void setAdditionalLatency(double seconds);
 
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
-
-        std::deque<OgreBulletCollisions::CollisionShape *> mShapes;
-        std::deque<OgreBulletDynamics::RigidBody *> mRigidBodies;
 
         bool mToggle;
         StarWarsRemotePuppet *mRemotePuppet;
@@ -56,7 +70,6 @@ class RemoteScene
 		RigidListenerNode *mSwordParentNode;
 
 		Ogre::Root* mRoot;
-		OIS::Mouse* mMouse;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
 		ARLib::RiftSceneNode* mRiftNode;

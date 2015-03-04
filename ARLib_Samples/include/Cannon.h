@@ -1,7 +1,14 @@
 #ifndef CANNON_H
 #define CANNON_H
 
-#include "OGRE/Ogre.h"
+#include "OGRE/OgreVector3.h"
+
+namespace Ogre
+{
+	class SceneNode;
+	class SceneManager;
+	class Pass;
+};
 
 class StarWarsLaserCannon{
 public:

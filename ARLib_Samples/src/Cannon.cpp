@@ -1,3 +1,5 @@
+#include "OGRE/OgreSceneManager.h"
+#include "OGRE/OgreEntity.h"
 #include "Cannon.h"
 #include "LaserBulletManager.h"
 #include <float.h>

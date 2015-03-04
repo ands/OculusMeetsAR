@@ -1,16 +1,35 @@
 #ifndef SWORD_H
 #define SWORD_H
 
-#include "OGRE/Ogre.h"
-#include "ARLib/Sound/SoundSource.h"
-#include "ARLib/Tracking/RigidBodyEventListener.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsConvexHullShape.h"
+#include "OGRE/OgreVector3.h"
 
-class StarWarsLightSaber{
+namespace Ogre
+{
+	class SceneNode;
+	class SceneManager;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+	class RigidBody;
+};
+
+namespace OgreBulletCollisions
+{
+	class BoxCollisionShape;
+	class ConvexHullCollisionShape;
+};
+
+namespace ARLib
+{
+	class SoundSource;
+};
+
+class StarWarsLightSaber
+{
 public:
-    StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld * dynamicsWorl);
+    StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld * dynamicsWorld);
     ~StarWarsLightSaber();
 
     void draw();

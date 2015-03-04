@@ -1,8 +1,18 @@
 #ifndef NPRWATERCOLORRENDERTARGET_H
 #define NPRWATERCOLORRENDERTARGET_H
 
-#include "OGRE/Ogre.h"
+#include "OGRE/OgreTexture.h"
+#include "OGRE/OgreMaterial.h"
+#include "OGRE/OgreMath.h"
 #include "ARLib/Ogre/RenderTarget.h"
+
+namespace Ogre
+{
+	class Root;
+	class Camera;
+	class SceneManager;
+	class MultiRenderTarget;
+};
 
 class NPRWatercolorRenderTarget
 	: public ARLib::RenderTarget

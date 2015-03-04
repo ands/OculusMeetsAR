@@ -1,4 +1,4 @@
-#include <iostream> // TODO: replace this with the log file!
+#include <iostream>
 #include "OVR.h"
 #include "ARLib/Oculus/Rift.h"
 
@@ -6,7 +6,6 @@ namespace ARLib {
 
 /////////////////////////////////////////////////////////////////////////
 // statics
-
 bool Rift::isInitialized = false;
 
 void Rift::init()
@@ -27,7 +26,7 @@ void Rift::shutdown()
 }
 bool Rift::available(int id)
 {
-	if(!isInitialized) throw("Need to initialize first. Call Rift::init()!");
+	assert(isInitialized && "Need to initialize first. Call Rift::init()!");
 	ovrHmd hmd = ovrHmd_Create(id);
 	bool result = hmd ? true : false;
 	ovrHmd_Destroy(hmd);
@@ -50,7 +49,7 @@ Rift::Rift(int id)
 	indices[0] = indices[1] = nullptr;
 
 	// initialize hmd
-	if(!isInitialized) throw("Need to initialize first. Call Rift::init()!");
+	assert(isInitialized && "Need to initialize first. Call Rift::init()!");
 	std::cout << "Creating Rift (ID: " << id << ")" << std::endl;
 
 	hmdHandle = ovrHmd_Create(id);

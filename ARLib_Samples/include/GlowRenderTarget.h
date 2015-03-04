@@ -1,8 +1,13 @@
 #ifndef GLOWRENDERTARGET_H
 #define GLOWRENDERTARGET_H
 
-#include "OGRE/Ogre.h"
 #include "ARLib/Ogre/RenderTarget.h"
+
+namespace Ogre
+{
+	class Camera;
+	class CompositorInstance;
+};
 
 class GlowRenderTarget
 	: public ARLib::RenderTarget

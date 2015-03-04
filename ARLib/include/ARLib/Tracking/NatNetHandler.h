@@ -15,11 +15,11 @@ class NatNetClient;
 
 namespace ARLib{
 
-	typedef enum CONNECTION_STATE{
+	enum CONNECTION_STATE{
 		NATNET_CONNECTED = 0,	//all ok!
 		NATNET_PENDING,			//before first connection
 		NATNET_DISCONNECTED		//after first loss of connection
-	}CONNECTION_STATE;
+	};
 
 
 	class NatNetHandler{

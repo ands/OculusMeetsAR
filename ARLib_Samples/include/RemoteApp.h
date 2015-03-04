@@ -1,17 +1,42 @@
 #ifndef APP_H
 #define APP_H
 
-#include "OGRE/Ogre.h"
-#include "OIS/OIS.h"
-#include "ARLib/Oculus/Rift.h"
-#include "ARLib/Tracking/TrackingManager.h"
-#include "ARLib/ARLibOgre.h"
-#include "ARLib/Webcam/VideoPlayer.h"
-#include "RemoteScene.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "OGRE/OgreFrameListener.h"
+#include "OIS/OISKeyboard.h"
 
+namespace Ogre
+{
+	struct FrameEvent;
+};
 
-class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OIS::MouseListener
+namespace OgreBulletCollisions
+{
+	class DebugDrawer;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+};
+
+namespace OIS
+{
+	class KeyEvent;
+	class Keyboard;
+};
+
+namespace ARLib
+{
+	enum TRACKING_METHOD;
+	enum TRACKING_ERROR_CODE;
+	class Rift;
+	class TrackingManager;
+	class VideoPlayer;
+};
+
+class RemoteScene;
+
+class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener
 {
 	public:
 		RemoteApp(bool showDebugWindow);
@@ -21,9 +46,6 @@ class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 
 		bool keyPressed(const OIS::KeyEvent& e);
 		bool keyReleased(const OIS::KeyEvent& e);
-		bool mouseMoved(const OIS::MouseEvent& e);
-		bool mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id);
-		bool mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id);
 
 		bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
@@ -44,7 +66,6 @@ class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		void quitTracking();
 
 		OIS::Keyboard* mKeyboard;
-		OIS::Mouse* mMouse;
 
 		Ogre::Root* mRoot;
         Ogre::SceneManager *mSceneMgr;
@@ -60,15 +81,11 @@ class RemoteApp : public Ogre::FrameListener, public OIS::KeyListener, public OI
 		bool mTrackingAvailable;
 		ARLib::Rift* mRift;
 		ARLib::TrackingManager* mTracker;
-		ARLib::RenderTarget* mRenderTarget;
-		ARLib::RenderTarget* mSmallRenderTarget;
-
 		ARLib::VideoPlayer* mVideoPlayerLeft;
 		ARLib::VideoPlayer* mVideoPlayerRight;
 
         OgreBulletCollisions::DebugDrawer *mDebugDrawer;
         OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
-        OgreBulletCollisions::CollisionShape *mGroundShape;
 };
 
 #endif

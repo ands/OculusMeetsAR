@@ -1,5 +1,7 @@
 #include "LaserBulletManager.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsConvexHullShape.h"
 #include "OgreBullet/Collisions/Utils/OgreBulletCollisionsMeshToShapeConverter.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include "OgreBullet/Dynamics/Constraints/OgreBulletDynamicsHingeConstraint.h"
 
 extern ContactProcessedCallback gContactProcessedCallback;

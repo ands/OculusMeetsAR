@@ -1,3 +1,10 @@
+#include "OGRE/OgreRoot.h"
+#include "OGRE/OgreTextureManager.h"
+#include "OGRE/OgreMaterialManager.h"
+#include "OGRE/OgreManualObject.h"
+#include "OGRE/OgreRenderWindow.h"
+#include "OGRE/OgreRenderTexture.h"
+#include "OGRE/OgreHardwarePixelBuffer.h"
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/RiftRenderTarget.h"
 

@@ -1,5 +1,9 @@
-#include "StarWarsLightSaber.h"
+#include "OGRE/OgreSceneManager.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsConvexHullShape.h"
 #include "OgreBullet/Collisions/Utils/OgreBulletCollisionsMeshToShapeConverter.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsBoxShape.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "StarWarsLightSaber.h"
 
 StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneManager* sceneMgr, OgreBulletDynamics::DynamicsWorld * dynamicsWorld)
     : mDynamicsWorld(dynamicsWorld)

@@ -2,9 +2,15 @@
 #define RIFTSCENENODE_H
 
 #include <vector>
-#include "OGRE/Ogre.h"
+#include "OGRE/OgreMath.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/RigidBodyEventListener.h"
+
+namespace Ogre {
+class SceneManager;
+class SceneNode;
+class Camera;
+};
 
 namespace ARLib {
 

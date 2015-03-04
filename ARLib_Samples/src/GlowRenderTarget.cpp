@@ -1,3 +1,6 @@
+#include "OGRE/OgreCamera.h"
+#include "OGRE/OgreCompositorManager.h"
+#include "OGRE/OgreCompositorInstance.h"
 #include "GlowRenderTarget.h"
 
 GlowRenderTarget::GlowRenderTarget(ARLib::RenderTarget *_destination)

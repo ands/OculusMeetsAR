@@ -1,22 +1,25 @@
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "OIS/OIS.h"
+#include "ARLib/Oculus/Rift.h"
+#include "ARLib/Tracking/TrackingManager.h"
+#include "ARLib/Webcam/VideoPlayer.h"
+#include "ARLib/ARLibOgre.h"
+#include "RemoteScene.h"
 #include "RemoteApp.h"
 #include "NatNetTypes.h"
 
 RemoteApp::RemoteApp(bool showDebugWindow)
 	: mRoot(nullptr)
 	, mKeyboard(nullptr)
-	, mMouse(nullptr)
 	, mScene(nullptr)
 	, mShutdown(false)
 	, mWindow(nullptr)
 	, mSmallWindow(nullptr)
 	, mRiftAvailable(false)
 	, mRift(nullptr)
-	, mRenderTarget(nullptr)
-	, mSmallRenderTarget(nullptr)
 	, mTracker(nullptr)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
-    , mGroundShape(nullptr)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 
@@ -40,7 +43,7 @@ RemoteApp::RemoteApp(bool showDebugWindow)
 
     mScene = new RemoteScene(mRift, mTracker, mRoot,
 						mWindow, mSmallWindow, mSceneMgr, 
-						mDynamicsWorld, mMouse, mKeyboard,
+						mDynamicsWorld, mKeyboard,
 						mVideoPlayerLeft, mVideoPlayerRight);
 	mRoot->startRendering();
 }
@@ -48,8 +51,6 @@ RemoteApp::RemoteApp(bool showDebugWindow)
 RemoteApp::~RemoteApp()
 {
 	std::cout << "Deleting Ogre application." << std::endl;
-	delete mRenderTarget;
-	delete mSmallRenderTarget;
 	quitTracking();
 	quitRift();
 	std::cout << "Deleting Scene:" << std::endl;
@@ -84,15 +85,7 @@ void RemoteApp::initOgre(bool showDebugWindow)
 	}
 
 	// initialize render system
-	Ogre::RenderSystem* pRS = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
-	Ogre::ConfigOptionMap cfgMap = pRS->getConfigOptions();
-	cfgMap["Full Screen"].currentValue = "No";
-	cfgMap["VSync"].currentValue = "Yes";
-	cfgMap["FSAA"].currentValue = "8";
-	cfgMap["Video Mode"].currentValue = "1200 x 800"; // will be overriden
-	for(Ogre::ConfigOptionMap::iterator iter = cfgMap.begin(); iter != cfgMap.end(); iter++)
-		pRS->setConfigOption(iter->first, iter->second.currentValue);
-	mRoot->setRenderSystem(pRS);
+	mRoot->setRenderSystem(mRoot->getRenderSystemByName("OpenGL Rendering Subsystem"));
 	mRoot->initialise(false, "ARLib Example");
 
 	// create windows:
@@ -119,11 +112,13 @@ void RemoteApp::quitOgre()
 	delete mRoot;
 }
 
-void RemoteApp::initBullet(bool enableDebugDrawing){
+void RemoteApp::initBullet(bool enableDebugDrawing)
+{
     mSceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC);
     mDynamicsWorld = new OgreBulletDynamics::DynamicsWorld(mSceneMgr, Ogre::AxisAlignedBox(-10,-10,-10,10,10,10), Ogre::Vector3(0,0,0), true, true, 1000);
    
-    if(enableDebugDrawing == true){
+    if(enableDebugDrawing == true)
+	{
         mDebugDrawer = new OgreBulletCollisions::DebugDrawer();
         mDebugDrawer->setDrawWireframe(true);
 
@@ -133,62 +128,35 @@ void RemoteApp::initBullet(bool enableDebugDrawing){
         Ogre::SceneNode *node = mSceneMgr->getRootSceneNode()->createChildSceneNode("debugDrawer", Ogre::Vector3::ZERO);
         node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
     }
-
 }
 
-void RemoteApp::quitBullet(){
-    delete mGroundShape;
+void RemoteApp::quitBullet()
+{
     delete mDebugDrawer;
     delete mDynamicsWorld;
 }
 
 void RemoteApp::initOIS()
 {
-	OIS::ParamList pl;
     size_t windowHnd = 0;
-    std::ostringstream windowHndStr;
- 
-    // tell OIS about the Ogre window
     mWindow->getCustomAttribute("WINDOW", &windowHnd);
-    windowHndStr << windowHnd;
+    std::ostringstream windowHndStr;
+	windowHndStr << windowHnd;
+	OIS::ParamList pl;
     pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-
-	// setup the manager, keyboard and mouse to handle input
     OIS::InputManager* inputManager = OIS::InputManager::createInputSystem(pl);
     mKeyboard = static_cast<OIS::Keyboard*>(inputManager->createInputObject(OIS::OISKeyboard, true));
-    mMouse = static_cast<OIS::Mouse*>(inputManager->createInputObject(OIS::OISMouse, true));
- 
-    // tell OIS about the window's dimensions
-    unsigned int width, height, depth;
-    int top, left;
-    mWindow->getMetrics(width, height, depth, left, top);
-    const OIS::MouseState &ms = mMouse->getMouseState();
-    ms.width = width;
-    ms.height = height;
-
-	// make sure OIS calls callbacks (keyPressed, mouseMoved etc) of this class:
 	mKeyboard->setEventCallback(this);
-	mMouse->setEventCallback(this);
 }
 void RemoteApp::quitOIS()
 {
 	delete mKeyboard;
-	delete mMouse;
 }
 
 void RemoteApp::initRift()
 {
-	// try to initialize the Oculus Rift (ID 0):
 	if (mRiftAvailable)
-	{
-		try {
-			mRift = new ARLib::Rift(0);
-		} catch(const char* e) {
-			std::cout << ">> " << e << std::endl;
-			mRiftAvailable = false;
-			mRift = nullptr;
-		}
-	}
+		mRift = new ARLib::Rift(0); // try to initialize the Oculus Rift (ID 0):
 }
 void RemoteApp::quitRift()
 {
@@ -254,9 +222,7 @@ bool RemoteApp::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
 	if (mShutdown) return false;
 
-	// update the standard input devices
 	mKeyboard->capture();
-	mMouse->capture();
 
     if (mTrackingAvailable)
 		mTracker->update(); //right place?
@@ -280,21 +246,6 @@ bool RemoteApp::keyPressed(const OIS::KeyEvent& e)
 bool RemoteApp::keyReleased(const OIS::KeyEvent& e)
 {
 	mScene->keyReleased(e);
-	return true;
-}
-bool RemoteApp::mouseMoved(const OIS::MouseEvent& e)
-{
-	mScene->mouseMoved(e);
-	return true;
-}
-bool RemoteApp::mousePressed(const OIS::MouseEvent& e, OIS::MouseButtonID id)
-{
-	mScene->mouseReleased(e, id);
-	return true;
-}
-bool RemoteApp::mouseReleased(const OIS::MouseEvent& e, OIS::MouseButtonID id)
-{
-	mScene->mouseReleased(e, id);
 	return true;
 }
 

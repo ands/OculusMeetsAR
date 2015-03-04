@@ -2,7 +2,7 @@
 #include <assert.h>
 
 namespace ARLib{	
-	_RigidBody::_RigidBody(int id, float x, float y, float z, float qx, float qy, float qz, float qw)
+	RigidBody::RigidBody(int id, float x, float y, float z, float qx, float qy, float qz, float qw)
 		: mX(x)
 		, mY(y)
 		, mZ(z)
@@ -14,7 +14,7 @@ namespace ARLib{
 
 	}
 
-	_RBFrame::_RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool ownership)
+	RBFrame::RBFrame(unsigned int nRigidBodys, int frameID, double timestamp, float latency, bool valid, bool ownership)
 		: mNRigidBodies(nRigidBodys)
 		, mFrameID(frameID) 
 		, mTimestamp(timestamp)
@@ -24,7 +24,7 @@ namespace ARLib{
 		mRbs = new RigidBody*[mNRigidBodies];
 	}
 
-	_RBFrame::~_RBFrame(){
+	RBFrame::~RBFrame(){
         if(mOwnership){
             for(unsigned int i = 0; i < mNRigidBodies ; i++){
                 delete mRbs[i];
@@ -33,8 +33,8 @@ namespace ARLib{
         delete [] mRbs;
 	}
 
-	RigidBody*& _RBFrame::operator[](unsigned int index){
-		assert(index >= mNRigidBodies);
+	RigidBody*& RBFrame::operator[](unsigned int index){
+		assert(index < mNRigidBodies);
 		return mRbs[index];
 	}
 

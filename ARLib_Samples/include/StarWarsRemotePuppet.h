@@ -1,10 +1,21 @@
 #ifndef REMOTE_PUPPET_H
 #define REMOTE_PUPPET_H
 
-#include "OGRE/Ogre.h"
-#include "StarWarsRemote.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "OGRE/OgreVector3.h"
+#include "OGRE/OgreAxisAlignedBox.h"
+
+namespace Ogre
+{
+	class SceneManager;
+	class SceneNode;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+};
+
+class StarWarsRemote;
 
 class StarWarsRemotePuppet{
 public:

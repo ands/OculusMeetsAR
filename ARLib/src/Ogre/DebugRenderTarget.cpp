@@ -1,3 +1,4 @@
+#include "OGRE/OgreRenderWindow.h"
 #include "ARLib/Ogre/RiftSceneNode.h"
 #include "ARLib/Ogre/DebugRenderTarget.h"
 

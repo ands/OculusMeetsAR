@@ -1,8 +1,27 @@
 #ifndef LASER_BULLET_MANAGER_H
 #define LASER_BULLET_MANAGER_H
 
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsConvexHullShape.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include <deque>
+
+namespace Ogre
+{
+	class SceneManager;
+	class SceneNode;
+	class Vector3;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+	class RigidBody;
+};
+
+namespace OgreBulletCollisions
+{
+	class ConvexHullCollisionShape;
+};
+
+class btManifoldPoint;
 
 class LaserBullet{
 public:
@@ -11,7 +30,7 @@ public:
     bool update(float dt);
 
 private:
-	static bool HandleCollision(btManifoldPoint& cp, void* body0,void* body1);
+	static bool HandleCollision(btManifoldPoint& cp, void* body0, void* body1);
 
     OgreBulletCollisions::ConvexHullCollisionShape *mShape;
     OgreBulletDynamics::RigidBody *mBody;

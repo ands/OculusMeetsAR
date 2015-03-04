@@ -1,3 +1,13 @@
+#include "OGRE/OgreTextureManager.h"
+#include "OGRE/OgreMaterialManager.h"
+#include "OGRE/OgreRoot.h"
+#include "OGRE/OgreSceneManager.h"
+#include "OGRE/OgreManualObject.h"
+#include "OGRE/OgreHardwarePixelBuffer.h"
+#include "OGRE/OgreCompositorManager.h"
+#include "OGRE/OgreCompositorInstance.h"
+#include "OGRE/OgreCompositionPass.h"
+#include "OGRE/OgreCompositionTargetPass.h"
 #include "NPRWatercolorRenderTarget.h"
 
 NPRWatercolorRenderTarget::NPRWatercolorRenderTarget(

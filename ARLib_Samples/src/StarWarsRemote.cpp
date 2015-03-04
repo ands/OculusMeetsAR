@@ -1,5 +1,8 @@
+#include "OGRE/OgreSceneManager.h"
+#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
+#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
+#include "Cannon.h"
 #include "StarWarsRemote.h"
-
 
 StarWarsRemote::StarWarsRemote(Ogre::SceneNode *parentNode, Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dynamicsWorld, Ogre::SceneNode *player, float radius)
     : mSceneNode(nullptr)

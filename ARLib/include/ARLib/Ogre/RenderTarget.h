@@ -1,10 +1,9 @@
 #ifndef RENDERTARGET_H
 #define RENDERTARGET_H
 
-namespace Ogre
-{
+namespace Ogre {
 class Camera;
-}; // Ogre namespace
+};
 
 namespace ARLib {
 class RiftSceneNode;
