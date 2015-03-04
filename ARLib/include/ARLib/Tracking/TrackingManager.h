@@ -33,33 +33,45 @@ namespace ARLib{
 	class Rift;
 	class FrameEvaluator;
 
+	/**********************************************************************************************
+	Interface for Tracking Hardware such as Oculus Rift (DK1 and DK2) and any Tracking Server based
+	on the NatNet Software Development Kit.
+	**********************************************************************************************/
 	class TrackingManager{
 	public:
-		TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, Rift *oculusHMD = nullptr);
+		TrackingManager(TRACKING_METHOD tracking, unsigned int frameBufferSize, bool DebugOutput);
 		~TrackingManager();
         
+		//initializes the handles for tracking, thereby establishing a connection to a natnet server and or checking the availability of a rift
 		TRACKING_ERROR_CODE initialize(); 
+		//uninitialize the handles for tracking
 		void uninitialize();
+		//quick and fast uninitialize & initialize function
 		TRACKING_ERROR_CODE reinitialize(); 
 
+		//Retrieve the RigidBody with a certain ID at a particular Point in Time
         RigidBody *evaluateRigidBody(unsigned int ID, const long long& retroActiveQuery);
-		void update();
 
+		//Update all RigidBodyEventListeners i.e. call their onChange function if necessary
+		void update();
+		
 		void setNatNetConnectionType(ConnectionType cType);
 		void setNatNetServerIP(const std::string& sIP = "");
 		void setNatNetClientIP(const std::string& cIP = "");
 		void setNatNetHostCommandPort(int hostCommandPort);
 		void setNatNetHostDataPort(int hostDataPort);
-        void setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval);
 
+		//set the Frameevaluation method, used during a call of evaluateRigidBody
+        void setFrameEvaluationMethod(FRAME_EVALUATION_METHOD eval);
+		//adds a RigidBodyEventListener. Call this function only after a successful initialize!
 		void addRigidBodyEventListener(RigidBodyEventListener* listener);
 	private:
 		bool mInitialized;
+		bool mDebugOutput;
 		unsigned int mFrameBufferSize;
 
 		FRAME_EVALUATION_METHOD mEval;
 		TRACKING_METHOD mTracking;
-		Rift *mRiftHandle;
 		FrameEvaluator *mEvaluator;
 
 		int mNatNetHostCommandPort;

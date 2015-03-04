@@ -107,7 +107,7 @@ GenericNatNetEvaluator::GenericNatNetEvaluator(unsigned int frameBufferSize)
 void GenericNatNetEvaluator::evaluate(){
 	if(mCurrentFrame != nullptr){
 		for(unsigned int i = 0; i < mRigidBodies.size(); i++){
-			for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
+			for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodies; j++){
 				if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[j]->mID){
 					if(mRigidBodies[i]->isCalibrating()){
 						mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
@@ -148,25 +148,25 @@ NatNetRiftEvaluator::NatNetRiftEvaluator(unsigned int frameBufferSize)
 void NatNetRiftEvaluator::updateFrame(RBFrame *frame){
     tthread::lock_guard<tthread::mutex> guard(mMutex);
 
-	RBFrame *newFrame = new RBFrame(frame->mNRigidBodys + mRifts.size(), 0, 0, 0, true, true);
+	RBFrame *newFrame = new RBFrame(frame->mNRigidBodies + mRifts.size(), 0, 0, 0, true, true);
 	unsigned int index = 0;
-	for(; index < frame->mNRigidBodys ; index++){
-		newFrame->addRigidBody(index, new RigidBody(*frame->mRbs[index]));
+	for(; index < frame->mNRigidBodies ; index++){
+		(*newFrame).operator[](index) = new RigidBody(*frame->mRbs[index]);
 	}
 	//supplement the NatNetData with RiftData
 	for(unsigned int i = 0; i < mRifts.size() ; i++){
 		bool found = false;
-		for(unsigned int j = 0; j < frame->mNRigidBodys; j++){
+		for(unsigned int j = 0; j < frame->mNRigidBodies; j++){
 			if(mRifts[i].second == newFrame->mRbs[j]->mID){
 				found = true;
-				//if(!newFrame->mRbs[j]->mVisible){
-				float p[3]; float q[4];
-				mRifts[i].first->getPose(p,q);
-				newFrame->mRbs[j]->mqX = q[0];
-				newFrame->mRbs[j]->mqY = q[1];
-				newFrame->mRbs[j]->mqZ = q[2];
-				newFrame->mRbs[j]->mqW = q[3];
-				//}
+				if(!newFrame->mRbs[j]->mVisible){ //TEST
+					float p[3]; float q[4];
+					mRifts[i].first->getPose(p,q);
+					newFrame->mRbs[j]->mqX = q[0];
+					newFrame->mRbs[j]->mqY = q[1];
+					newFrame->mRbs[j]->mqZ = q[2];
+					newFrame->mRbs[j]->mqW = q[3];
+				}
 				break;
 			}
 		}
@@ -174,12 +174,12 @@ void NatNetRiftEvaluator::updateFrame(RBFrame *frame){
 			float p[3]; float q[4];
 			mRifts[i].first->getPose(p,q);
 			RigidBody *temp = new RigidBody(0, p[0], p[1], p[2], q[0], q[1], q[2], q[3]);
-			newFrame->addRigidBody(index, temp);
+			(*newFrame)[index] = temp;
 			index++;
 		}
 	}
-	for(; index < newFrame->mNRigidBodys; index++){
-		newFrame->addRigidBody(index, new RigidBody());
+	for(; index < newFrame->mNRigidBodies; index++){
+		(*newFrame)[index] = new RigidBody();
 	}
 
 
@@ -191,7 +191,7 @@ void NatNetRiftEvaluator::updateFrame(RBFrame *frame){
 		for(unsigned int i = mFrameBufferSize - 1; i > 0; i--){
 			t[i] = t[i-1];
 		}
-		for(unsigned int i = 0 ; i < mCurrentFrame->mNRigidBodys; i++){
+		for(unsigned int i = 0 ; i < mCurrentFrame->mNRigidBodies; i++){
 			if(mCurrentFrame->mRbs[i]->mID == (*it).first){
 				t[0].mBody = new RigidBody(*mCurrentFrame->mRbs[i]);
 				LARGE_INTEGER temp;
@@ -218,7 +218,7 @@ void NatNetEvaluator::updateFrame(RBFrame *frame){
 		for(unsigned int i = mFrameBufferSize - 1; i > 0; i--){
 			t[i] = t[i-1];
 		}
-		for(unsigned int i = 0 ; i < frame->mNRigidBodys; i++){
+		for(unsigned int i = 0 ; i < frame->mNRigidBodies; i++){
 			if(frame->mRbs[i]->mID == (*it).first){
 				t[0].mBody = new RigidBody(*frame->mRbs[i]);
 				LARGE_INTEGER temp;
@@ -245,14 +245,14 @@ void RiftEvaluator::evaluate(){
 		mRifts[i].first->getPose(pos, ori);
 		RigidBody *tempBody = new RigidBody(0, pos[0], pos[1], pos[2], ori[0], ori[1], ori[2], ori[3] );
 		tempBody->mID = mRifts[i].second;
-		tempFrame->addRigidBody(i, tempBody);
+		(*tempFrame)[i]= tempBody;
 	}
 	delete mCurrentFrame;
 	mCurrentFrame = tempFrame;
 
 	//fish out history data
 	for(std::map<unsigned int, TimedFrame*>::iterator it = mRigidBodyHistories.begin(); it != mRigidBodyHistories.end() ; ++it){
-		for(unsigned int i = 0; i < mCurrentFrame->mNRigidBodys; i++){
+		for(unsigned int i = 0; i < mCurrentFrame->mNRigidBodies; i++){
 			if((*it).first == mCurrentFrame->mRbs[i]->mID){
 				TimedFrame* t = (*it).second;
 				if(t[mFrameBufferSize-1].mBody != nullptr){
@@ -271,7 +271,7 @@ void RiftEvaluator::evaluate(){
 	}
 	//Let all RigidBodyEventListeners know
 	for(unsigned int i = 0; i < mRigidBodies.size(); i++){
-		for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodys; j++){
+		for(unsigned int j = 0; j < mCurrentFrame->mNRigidBodies; j++){
 			if(mRigidBodies[i]->getRigidBodyID() == mCurrentFrame->mRbs[j]->mID){
 				if(mRigidBodies[i]->isCalibrating()){
 					mRigidBodies[i]->setReferenceOrientation(mCurrentFrame->mRbs[j]->mqX, mCurrentFrame->mRbs[j]->mqY, mCurrentFrame->mRbs[j]->mqZ, mCurrentFrame->mRbs[j]->mqW);
@@ -281,20 +281,9 @@ void RiftEvaluator::evaluate(){
 				RigidBody rb = RigidBody();
 				RigidBodyEventListener* p = mRigidBodies[i];
 				RigidBody *q = mCurrentFrame->mRbs[j];
-				/*
-				rb.mqW = q->mqW * p->mRefQW - q->mqX * p->mRefQX - q->mqY * p->mRefQY - q->mqZ * p->mRefQZ;
-				rb.mqX = q->mqW * p->mRefQX + q->mqX * p->mRefQW + q->mqY * p->mRefQZ - q->mqZ * p->mRefQY;
-				rb.mqY = q->mqW * p->mRefQY - q->mqX * p->mRefQZ + q->mqY * p->mRefQW + q->mqZ * p->mRefQX;
-				rb.mqZ = q->mqW * p->mRefQZ + q->mqX * p->mRefQY - q->mqY * p->mRefQX + q->mqZ * p->mRefQW;
-
-				/*rb.mqW = p->mRefQW * q->mqW + p->mRefQX * q->mqX + p->mRefQY * q->mqY + p->mRefQZ * q->mqZ;
-				rb.mqX = p->mRefQW * q->mqX - p->mRefQX * q->mqW + p->mRefQY * q->mqZ - p->mRefQZ * q->mqY;
-				rb.mqY = p->mRefQW * q->mqY - p->mRefQX * q->mqZ - p->mRefQY * q->mqW + p->mRefQZ * q->mqX;
-				rb.mqZ = p->mRefQW * q->mqZ + p->mRefQX * q->mqY - p->mRefQY * q->mqX - p->mRefQZ * q->mqW;*/
 				rb.mX = mCurrentFrame->mRbs[j]->mX;
 				rb.mY = mCurrentFrame->mRbs[j]->mY;
 				rb.mZ = mCurrentFrame->mRbs[j]->mZ;
-				//mRigidBodies[i]->onChange(&rb);
 				mRigidBodies[i]->onChange(mCurrentFrame->mRbs[j]);
 				break;
 			}

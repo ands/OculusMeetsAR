@@ -8,7 +8,6 @@ Motive stream data more easily.
 
 #include "ARLib/Tracking/RigidBodyFrame.h"
 #include "ARLib/Tracking/FrameEvaluator.h"
-#include "ARLib/General/InfoLog.h"
 #include "NatNetTypes.h"
 #include <string>
 
@@ -25,7 +24,7 @@ namespace ARLib{
 
 	class NatNetHandler{
 	public:
-		NatNetHandler(ConnectionType iCType, std::string logFile = "NatNetHandler.info");
+		NatNetHandler(ConnectionType iCType, bool DebugPrintf);
 		~NatNetHandler();
 
 		int connect(const char* rClientIP, const char* rServerIP, int HostCommandPort = 1510, int HostDataPort = 1511);
@@ -39,8 +38,6 @@ namespace ARLib{
 		void registerFrameEvaluator(GenericNatNetEvaluator* evaluator);
         double getPing()const;
 	private:
-		static const std::string invalidIP;
-
 		static void MessageHandler(int iId, char* pMsg);
 		static void DataHandler(sFrameOfMocapData *pFrame, void *pClient);
 

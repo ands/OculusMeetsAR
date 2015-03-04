@@ -31,7 +31,7 @@ RemoteApp::RemoteApp(bool showDebugWindow)
     initBullet(showDebugWindow); //enable debug drawer
 	initOIS();
 	initRift();
-	initTracking();
+	initTracking(showDebugWindow);
 
 	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
 	
@@ -197,12 +197,12 @@ void RemoteApp::quitRift()
 	ARLib::Rift::shutdown();
 }
 
-ARLib::TRACKING_ERROR_CODE RemoteApp::initTracking(ARLib::TRACKING_METHOD method)
+ARLib::TRACKING_ERROR_CODE RemoteApp::initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog)
 {
-	mTracker = new ARLib::TrackingManager(method, 100, mRift);
+	mTracker = new ARLib::TrackingManager(method, 100, enableDebugLog);
 	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("128.176.181.34"); //local machine
-	mTracker->setNatNetServerIP("128.176.181.34"); //local machine
+	mTracker->setNatNetClientIP("128.176.181.34"); 
+	mTracker->setNatNetServerIP("128.176.181.34");
 	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
 
 	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
@@ -218,23 +218,23 @@ ARLib::TRACKING_ERROR_CODE RemoteApp::initTracking(ARLib::TRACKING_METHOD method
 	return error;
 }
 		
-void RemoteApp::initTracking()
+void RemoteApp::initTracking(bool enableDebugLog)
 {
 	ARLib::TRACKING_ERROR_CODE error;
 
-	error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT); // Try both first
+	error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, enableDebugLog); // Try both first
 	if (error == ARLib::ARLIB_TRACKING_OK)
 		std::cout << "NatNet + Rift Tracking initialized." << std::endl;
 
 	if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
 	{
-		error = initTracking(ARLib::ARLIB_RIFT); // Rift Tracking only
+		error = initTracking(ARLib::ARLIB_RIFT, enableDebugLog); // Rift Tracking only
 		if (error == ARLib::ARLIB_TRACKING_OK)
 			std::cout << "Rift Tracking initialized." << std::endl;
 	}
 	else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
 	{
-		error = initTracking(ARLib::ARLIB_NATNET); // NatNet Tracking only
+		error = initTracking(ARLib::ARLIB_NATNET, enableDebugLog); // NatNet Tracking only
 		if (error == ARLib::ARLIB_TRACKING_OK)
 			std::cout << "NatNet Tracking initialized." << std::endl;
 	}
