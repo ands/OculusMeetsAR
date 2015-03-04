@@ -33,8 +33,9 @@ private:
 	RiftSceneNode *riftNode;
 	TrackingManager *trackingManager;
 	VideoTexture *videoTexture[2];
+	Ogre::SceneNode *screenCalibrationNode[2];
 	Ogre::SceneNode *screenNode[2];
-	Ogre::Pass *materialPass[2];
+	float screenWidth, screenHeight;
 };
 
 }; // ARLib namespace
