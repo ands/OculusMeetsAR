@@ -1,5 +1,6 @@
 #include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"
 #include "OIS/OISKeyboard.h"
+#include "OIS/OISInputManager.h"
 #include "ARLib/Oculus/Rift.h"
 #include "ARLib/Tracking/TrackingManager.h"
 #include "ARLib/Video/VideoPlayer.h"
