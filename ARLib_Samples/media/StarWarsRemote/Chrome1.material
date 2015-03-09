@@ -1,5 +1,4 @@
-import diffuse_template from "diffuse.material"
-material Chrome1 : diffuse_template
+material Chrome1
 {
     receive_shadows on 
 

@@ -1,5 +1,4 @@
-import diffuse_template from "diffuse.material"
-material RemoteRed1.001 : diffuse_template
+material RemoteRed1.001
 {
     receive_shadows on 
 

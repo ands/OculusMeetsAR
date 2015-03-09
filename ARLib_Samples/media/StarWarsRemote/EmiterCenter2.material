@@ -1,5 +1,4 @@
-import diffuse_template from "diffuse.material"
-material EmiterCenter2 : diffuse_material
+material EmiterCenter2
 {
     receive_shadows on 
 

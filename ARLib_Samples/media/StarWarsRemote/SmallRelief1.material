@@ -1,5 +1,4 @@
-import diffuse_template from "diffuse.material"
-material SmallRelief1 : diffuse_template
+material SmallRelief1
 {
     receive_shadows on 
 
