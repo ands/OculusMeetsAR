@@ -5,12 +5,6 @@
 
 GlowRenderTarget::GlowRenderTarget(ARLib::RenderTarget *_destination)
 	: destination(_destination)
-	, glow(nullptr)
-{
-
-}
-
-GlowRenderTarget::~GlowRenderTarget()
 {
 }
 
@@ -24,8 +18,7 @@ void GlowRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
 		Ogre::Viewport *vp = camera[eyeNum]->getViewport();
-		if (!glow)
-			glow = Ogre::CompositorManager::getSingleton().addCompositor(vp, "GlowBig");
+		Ogre::CompositorInstance *glow = Ogre::CompositorManager::getSingleton().addCompositor(vp, "GlowBig");
 		glow->setEnabled(true);
 	}
 }

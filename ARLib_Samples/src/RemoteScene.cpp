@@ -25,65 +25,58 @@ RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	, mKeyboard(keyboard)
 	, mSceneMgr(sceneMgr)
 	, mDynamicsWorld(dyWorld)
-	, mToggle(true)
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
 	, additionalLatency(0.048)
-	, enabledNPRRenderer(false)
-    , mRenderTarget(nullptr)
 	, mRiftVideoScreens(nullptr)
-    , mSmallRenderTarget(nullptr)
-	, mWatercolorRenderTarget(nullptr)
-	, mSmallWatercolorRenderTarget(nullptr)
-	, mSmallGlowRenderTarget(nullptr)
-	, mGlowRenderTarget(nullptr)
+	, currentRenderTarget(RenderTargetIndex_Glow)
 {
-	mGlow[0] = nullptr;
-    mGlow[1] = nullptr;
+	// rift node
+	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1);
+	if (tracker)
+		tracker->addRigidBodyEventListener(mRiftNode);
+    
+    // render targets
+	for (int i = 0; i < RenderTargetIndex_Count; i++)
+	{
+		mRenderTargets[i] = nullptr;
+		mSmallRenderTargets[i] = nullptr;
+	}
+    if(window && rift)
+	{
+        mRenderTargets[RenderTargetIndex_Default] = new ARLib::RiftRenderTarget(rift, root, window);
+		mRenderTargets[RenderTargetIndex_Glow] = new GlowRenderTarget(mRenderTargets[RenderTargetIndex_Default]);
+		mRenderTargets[RenderTargetIndex_NPR] = new NPRWatercolorRenderTarget(root, mRenderTargets[RenderTargetIndex_Default], 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
+		mRenderTargets[RenderTargetIndex_Glow_NPR] = new GlowRenderTarget(mRenderTargets[RenderTargetIndex_NPR]);
+    }
+    if(smallWindow)
+	{
+        mSmallRenderTargets[RenderTargetIndex_Default] = new ARLib::DebugRenderTarget(smallWindow);
+		mSmallRenderTargets[RenderTargetIndex_Glow] = new GlowRenderTarget(mSmallRenderTargets[RenderTargetIndex_Default]);
+		mSmallRenderTargets[RenderTargetIndex_NPR] = new NPRWatercolorRenderTarget(root, mSmallRenderTargets[RenderTargetIndex_Default], 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
+		mSmallRenderTargets[RenderTargetIndex_Glow_NPR] = new GlowRenderTarget(mSmallRenderTargets[RenderTargetIndex_NPR]);
+    }
+	setRenderTargets(currentRenderTarget);
 
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
+	mVideoOffset[0] = Ogre::Vector2(0.060f, -0.016f);
+	mVideoOffset[1] = Ogre::Vector2(0.004f, -0.016f);
+	mVideoScale[0] = Ogre::Vector2(1.02f, 1.11f);
+	mVideoScale[1] = Ogre::Vector2(1.00f, 1.11f);
+	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
+	mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
+	setAdditionalLatency(additionalLatency);
+
+	// scene
     LaserBulletManager::getSingleton().setDynamicsWorld(dyWorld);
 
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f,0.1f,0.1f));
     mSceneMgr->setShadowTechnique(Ogre::SHADOWDETAILTYPE_TEXTURE);
 	mSceneMgr->setShadowFarDistance(30);
 
-	//rift node
-	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1); // TODO: set correct rigid body id!
-	//mRiftNode->getBodyNode()->setPosition(0.f,0.f,0.f);
-	if (tracker)
-		tracker->addRigidBodyEventListener(mRiftNode);
-    
-    //create viewports
-    if(window && rift){
-        mRenderTarget = new ARLib::RiftRenderTarget(rift, root, window);
-		mGlowRenderTarget = new GlowRenderTarget(mRenderTarget);
-		mWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mGlowRenderTarget, 1461, 1182, 1461 / 10, 1182 / 8, 0.1f);
-    }
-
-    if(smallWindow){
-        mSmallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
-		mSmallGlowRenderTarget = new GlowRenderTarget(mSmallRenderTarget);
-		mSmallWatercolorRenderTarget = new NPRWatercolorRenderTarget(root, mSmallGlowRenderTarget, 1461/2, 1182/2, 1461 / 10, 1182 / 8, 0.1f);
-    }
-
-	
-	mRiftNode->removeAllRenderTargets();
-
-	if (mRenderTarget && mRenderTarget != mSmallRenderTarget)
-			mRiftNode->addRenderTarget(mGlowRenderTarget);
-	if (mSmallRenderTarget)
-			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
-
 	GlowMaterialListener *gml = new GlowMaterialListener();
 	Ogre::MaterialManager::getSingleton().addListener(gml);
-	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 
-	/*Ogre::SceneNode *cubeNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	Ogre::Entity *cubeEntity = mSceneMgr->createEntity("cube.mesh");
-	cubeEntity->setMaterialName("CubeMaterialRed");
-	cubeNode->attachObject(cubeEntity);
-	cubeNode->setPosition(0,0,-10);*/
-
-    //roomLight
+    // roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
 	roomLight->setType(Ogre::Light::LT_POINT);
 	roomLight->setCastShadows( true );
@@ -106,61 +99,23 @@ RemoteScene::RemoteScene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	swordOffsetNode->setPosition(0,0,-0.2f);
     mSwordParentNode = new RigidListenerNode(swordOffsetNode, mSceneMgr, 2);
     mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
-    if(tracker){
+    if(tracker)
         tracker->addRigidBodyEventListener(mSwordParentNode);
-    }
 
 	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),2.0f);
     mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 2.0f);
     mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
-	
-	mVideoOffset[0] = Ogre::Vector2(0.060f, -0.016f);
-	mVideoOffset[1] = Ogre::Vector2(0.004f, -0.016f);
-	mVideoScale[0] = Ogre::Vector2(1.02f, 1.11f);
-	mVideoScale[1] = Ogre::Vector2(1.00f, 1.11f);
-	mRiftVideoScreens->setOffsets(mVideoOffset[0], mVideoOffset[1]);
-	mRiftVideoScreens->setScalings(mVideoScale[0], mVideoScale[1]);
-
-	setAdditionalLatency(additionalLatency);
 }
 
 RemoteScene::~RemoteScene()
 {
-    delete mRenderTarget;
-    delete mSmallRenderTarget;
-	delete mWatercolorRenderTarget;
-	delete mSmallWatercolorRenderTarget;
+	for (int i = 0; i < RenderTargetIndex_Count; i++)
+	{
+		delete mRenderTargets[i];
+		delete mSmallRenderTargets[i];
+	}
 	mRoot->destroySceneManager(mSceneMgr);
 	delete mRiftNode;
-}
-
-void RemoteScene::toggleGlow()
-{
-    mToggle = !mToggle;
-    mGlow[0]->setEnabled(mToggle);
-    mGlow[1]->setEnabled(mToggle);
-}
-
-void RemoteScene::toggleNPRRenderer()
-{
-	mRiftNode->removeAllRenderTargets();
-
-	if (enabledNPRRenderer)
-	{
-		if (mGlowRenderTarget && mGlowRenderTarget != mSmallGlowRenderTarget)
-			mRiftNode->addRenderTarget(mGlowRenderTarget);
-		if (mSmallGlowRenderTarget)
-			mRiftNode->addRenderTarget(mSmallGlowRenderTarget);
-		enabledNPRRenderer = false;
-	}
-	else
-	{
-		if (mGlowRenderTarget && mGlowRenderTarget != mSmallGlowRenderTarget)
-			mRiftNode->addRenderTarget(mWatercolorRenderTarget);
-		if (mSmallGlowRenderTarget)
-			mRiftNode->addRenderTarget(mSmallWatercolorRenderTarget);
-		enabledNPRRenderer = true;
-	}
 }
 
 void RemoteScene::update(float dt)
@@ -171,6 +126,23 @@ void RemoteScene::update(float dt)
     LaserBulletManager::getSingleton().update(dt);
 	
 	mRiftVideoScreens->update();
+}
+
+void RemoteScene::setRenderTargets(RenderTargetIndex renderTargetIndex)
+{
+	mRiftNode->removeAllRenderTargets();
+	if (mRenderTargets[renderTargetIndex] != mSmallRenderTargets[renderTargetIndex])
+		mRiftNode->addRenderTarget(mRenderTargets[renderTargetIndex]);
+	if (mSmallRenderTargets[renderTargetIndex])
+		mRiftNode->addRenderTarget(mSmallRenderTargets[renderTargetIndex]);
+	currentRenderTarget = renderTargetIndex;
+	switch(renderTargetIndex)
+	{
+		case RenderTargetIndex_Default:  printf("current render target: default\n"); break;
+		case RenderTargetIndex_Glow:     printf("current render target: Glow\n"); break;
+		case RenderTargetIndex_NPR:      printf("current render target: NPR\n"); break;
+		case RenderTargetIndex_Glow_NPR: printf("current render target: Glow + NPR\n"); break;
+	};
 }
 
 void RemoteScene::setAdditionalLatency(double seconds)
@@ -196,7 +168,7 @@ bool RemoteScene::keyPressed( const OIS::KeyEvent& e )
     }if(e.key == OIS::KC_V){
         mSword->draw();
     }if(e.key == OIS::KC_N){
-        toggleNPRRenderer(); //toggleGlow();
+        setRenderTargets((RenderTargetIndex)((currentRenderTarget + 1) % RenderTargetIndex_Count));
     }if(e.key == OIS::KC_D){
         mDynamicsWorld->setShowDebugShapes(!mDynamicsWorld->getShowDebugShapes());
     }
