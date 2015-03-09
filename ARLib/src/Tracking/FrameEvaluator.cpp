@@ -159,14 +159,14 @@ void NatNetRiftEvaluator::updateFrame(RBFrame *frame){
 		for(unsigned int j = 0; j < frame->mNRigidBodies; j++){
 			if(mRifts[i].second == newFrame->mRbs[j]->mID){
 				found = true;
-				if(!newFrame->mRbs[j]->mVisible){ //TEST
+				//if(!newFrame->mRbs[j]->mVisible){ //TEST
 					float p[3]; float q[4];
 					mRifts[i].first->getPose(p,q);
 					newFrame->mRbs[j]->mqX = q[0];
 					newFrame->mRbs[j]->mqY = q[1];
 					newFrame->mRbs[j]->mqZ = q[2];
 					newFrame->mRbs[j]->mqW = q[3];
-				}
+				//}
 				break;
 			}
 		}

@@ -6,7 +6,6 @@
 namespace Ogre
 {
 	class Camera;
-	class CompositorInstance;
 };
 
 class GlowRenderTarget
@@ -14,7 +13,6 @@ class GlowRenderTarget
 {
 	public:
 		GlowRenderTarget(ARLib::RenderTarget *_destination);
-		~GlowRenderTarget();
 
 		// sets the cameras that should render to this render target
 		virtual void setCameras(
@@ -24,7 +22,6 @@ class GlowRenderTarget
 	private:
 		ARLib::RenderTarget *destination;
 		Ogre::Camera *camera[2];
-		Ogre::CompositorInstance *glow;
 };
 
 #endif
