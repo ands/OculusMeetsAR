@@ -33,16 +33,32 @@ void ImageHandler::calculateMatches(int method){
 	rightMatch.clear();
 	leftMatch.clear();
 	int prevMatches=0;
+
+
+	int patternX=0;
+	int patternY=0;
+	if(method==3||method==4||method==5){
+		std::cout<<"\nChessboard x-size: ";
+		std::cin>>patternX;
+		std::cout<<"Chessboard y-size: ";
+		std::cin>>patternY;
+		std::cin.ignore();
+	}
+
 	for(int i=0;i<numOfImages;i++){
 		vector<vector<Point2f>> pairMatches;
 		int matchesFound=0;
 		Mat currentLeft = leftImages[i];
 		Mat currentRight = rightImages[i];
+
 		if(method==3){//Chessboardmatching
-			pairMatches=matcher.computeChessboardMatches(&currentLeft,&currentRight);
+			pairMatches=matcher.computeChessboardMatches(&currentLeft,&currentRight,patternX,patternY);
 		}
-		else if(method==1||method==2||method==4||method==5){//SIFT+Ransac
+		else if(method==1||method==2){//SIFT+Ransac
 			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,method);
+		}
+		else if(method==4||method==5){//SIFT+Ransac+Chessboard
+			pairMatches=matcher.siftMatcher(&currentLeft,&currentRight,method,patternX,patternY);
 		}
 		//enforce distance constraints, to many similar matches bias the estimation of the epipolar geometry
 		if(pairMatches.size()!=0){
@@ -113,7 +129,6 @@ void ImageHandler::visualize(){
 		std::cout<<"\nRectified examples and image containing epipolar lines have been saved.";
 	}
 	std::cout<<"\nPress Enter\n";
-	std::cin.ignore();
 	std::cin.get();
 }
 
@@ -174,7 +189,6 @@ void ImageHandler::loadMatches(){
 		std::cout<<"\nUnable to load matches.";
 	}
 	std::cout<<"\nPress Enter\n";
-	std::cin.ignore();
 	std::cin.get();
 }
 

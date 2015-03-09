@@ -4,6 +4,7 @@
 #define MAX_POL_LENGTH 64
 
 using namespace cv;
+//Undistortion class using Davide Scaramuzzas C++ functions (see OcamCalib Toolbox in our documentation)
 class Undistortion
 {
 public:
@@ -29,12 +30,15 @@ public:
 	Rect Undistortion::calculateROI();
 
 private:
+	//Calculates lookup table for image coordinate according to a previously loaded ocam model
 	void Undistortion::calculateLUT(float sf);
+	//Applies ocam model to point3D. The resulting image point is point2D
 	void Undistortion::worldToCam(double point2D[2], double point3D[3], struct ocamModel *myocam_model);
+	//Reads ocam model from file
 	void Undistortion::getOcamModel(char *filename);
 
 	ocamModel ocam;
-	Mat mapx;
-	Mat mapy;
+	Mat mapx;//lookuptable for x-coordinates
+	Mat mapy;//lookuptable for y-coordinates
 };
 

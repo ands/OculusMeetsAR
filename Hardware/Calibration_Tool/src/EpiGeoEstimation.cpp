@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include <conio.h>
 #include "EpiGeoEstimation.h"
 
 
@@ -42,6 +43,7 @@ void EpiGeoEstimation::fundamentalZMEK(vector<Point2f> leftmatch, vector<Point2f
 	Mat bestF;
 	int bestRound=0;
 
+	//RANSAC start
 	for(int i=0;i<ransacCycles;i++){
 		//generate 7 random numbers in the range 0..leftmatch.size()
 		int randomNumbers[7];
@@ -104,13 +106,12 @@ void EpiGeoEstimation::homographyEstimation(vector<Point2f> leftmatch,vector<Poi
 	else{
 		if(calculatedByZMEK){
 			std::cout<<"\nChoose a method for homography calculation\n1 - Hartley (recommended)\n2 - ZMEK11\n";
-			int input;
-			std::cin>>input;
-			if(input==1){
+			int input=_getch();
+			if(input=='1'){
 				Size size(960,1280);
 				stereoRectifyUncalibrated(leftmatch, rightmatch, F, size, leftHomography, rightHomography, 3.0);
 			}
-			else{
+			else if(input=='2'){
 				Mat hom1(3,3,CV_64FC1);
 				Mat hom2(3,3,CV_64FC1);
 				double ff = F.at<double>(2,2)/F.at<double>(1,1);

@@ -17,7 +17,7 @@ Matching::~Matching(void)
 }
 
 
-vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imageRightUndistort, int method){
+vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imageRightUndistort, int method,int patternX, int patternY){
 	//Note: rotate BEFORE computing homographies!
 	//Copy both images into one
 	Mat bothImagesG(imageLeftUndistort->rows,imageLeftUndistort->cols+imageRightUndistort->cols,imageLeftUndistort->type());
@@ -39,7 +39,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 	//optional chessboard matching
 	int numOfChessmatches=0;
 	if(method==4||method==5){
-		vector<vector<Point2f>> corners = computeChessboardMatches(imageLeftUndistort,imageRightUndistort);
+		vector<vector<Point2f>> corners = computeChessboardMatches(imageLeftUndistort,imageRightUndistort,patternX,patternY);
 		if(corners.size()!=0){
 			matchLeft=corners[0];
 			matchRight=corners[1];
@@ -101,7 +101,13 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 			Point2f curPointR = matchCandidateRight[i];
 			bool nearby=false;
 			//Test whether there are similar good matches nearby
-			for(int j=0;j<matchLeft.size();j++){
+			for(int j=0;j<numOfChessmatches;j++){//compare to chessboardmatches
+				if(pointdistance(matchLeft[j],curPointL)<50){
+					nearby=true;
+					break;
+				}
+			}
+			for(int j=numOfChessmatches;j<matchLeft.size();j++){//compare to non-chessboardmatches
 				if(pointdistance(matchLeft[j],curPointL)<50 && pointdistance(curPointL-matchLeft[j],curPointR-matchRight[j])<10){
 					nearby=true;
 					break;
@@ -189,8 +195,8 @@ double Matching::pointdistance(Point2f p, Point2f q){
 	return std::sqrt((p.x-q.x)*(p.x-q.x)+(p.y-q.y)*(p.y-q.y));
 }
 
-vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndistort, Mat *imageRightUndistort){
-	Size patternsize(8,6);
+vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndistort, Mat *imageRightUndistort, int patternX, int patternY){
+	Size patternsize(patternX, patternY);
 	vector<Point2f> cornersLeft, cornersRight;
 
 	//use opencv chessboard detection on the undistorted images
