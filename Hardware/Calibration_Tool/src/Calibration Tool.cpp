@@ -59,7 +59,7 @@ vector<int> getSelectedNumbers(string input, int numOfImgPairs){
 	}
 	vector<int> result;
 	for(int i=0;i<list.size();i++){
-		if(list[i]<=numOfImgPairs){
+		if(list[i]<=numOfImgPairs && list[i]>0){
 			result.push_back(list[i]);
 		}
 	}
@@ -119,34 +119,41 @@ int _tmain(int argc, _TCHAR* argv[])
 				vector<int> selected;
 				cin.clear();
 				//cin.ignore(numeric_limits<streamsize>::max(), '\n');
-				if(cin.peek() == '\n'){
-					for(int i=0;i<filenames.size()/2;i++){
-						selected.push_back(i+1);
+
+				input = _getch();
+				if(input!=27){
+					char firstnum = (char)input;
+					cout<<firstnum;
+					cin.putback(firstnum);
+					if(cin.peek() == 13){
+						for(int i=0;i<filenames.size()/2;i++){
+							selected.push_back(i+1);
+						}
 					}
-				}
-				else if(cin>>selection){
-					selected = getSelectedNumbers(selection, filenames.size()/2);
-				}
-
-				cin.ignore();
-
-				if(selected.size()==0){
-					cout<<"\nNo images loaded.\nPress Enter\n";
-					cin.get();
-				}
-				else{
-
-					cout<<"\nLoading selected images...";
-					for(int i=0;i<selected.size();i++){
-						string pathleft = "../media/images/"+filenames[2*(selected[i]-1)];
-						string pathright = "../media/images/"+filenames[2*selected[i]-1];
-						hand.loadImagePair(pathleft,pathright);
-						cout<<selected[i]<<", ";
+					else if(cin>>selection){
+						selected = getSelectedNumbers(selection, filenames.size()/2);
 					}
-					cout<<"\nUndistort the selected images according to the intrinsic calibration parameters in calib_results_CAM*.txt...";
-					hand.undistortAndRotate();
-					cout<<"  done.\nPress Enter\n";
-					cin.get();
+
+					cin.ignore();
+
+					if(selected.size()==0){
+						cout<<"\nNo images loaded.\nPress Enter\n";
+						cin.get();
+					}
+					else{
+
+						cout<<"\nLoading selected images...";
+						for(int i=0;i<selected.size();i++){
+							string pathleft = "../media/images/"+filenames[2*(selected[i]-1)];
+							string pathright = "../media/images/"+filenames[2*selected[i]-1];
+							hand.loadImagePair(pathleft,pathright);
+							cout<<selected[i]<<", ";
+						}
+						cout<<"\nUndistort the selected images according to the intrinsic calibration parameters in calib_results_CAM*.txt...";
+						hand.undistortAndRotate();
+						cout<<"  done.\nPress Enter\n";
+						cin.get();
+					}
 				}
 			}
 			else{//No files found
