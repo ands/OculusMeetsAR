@@ -42,12 +42,14 @@
     <IncludePath>$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include;..\Common\include;..\SimpleScene\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\SimpleScene\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
     <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
     <IncludePath>$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include;..\Common\include;..\SimpleScene\include;$(IncludePath)</IncludePath>
     <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\SimpleScene\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

@@ -70,12 +70,14 @@
     <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
     <IncludePath>$(OGRE_BULLET_PACK)\include;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;..\Common\include;..\RemoteGame\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+    <IntDir>..\RemoteGame\$(Configuration)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
     <IncludePath>$(OGRE_BULLET_PACK)\include;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;..\Common\include;..\RemoteGame\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+    <IntDir>..\RemoteGame\$(Configuration)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

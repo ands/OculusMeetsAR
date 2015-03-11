@@ -409,13 +409,12 @@ done:
 
 		if (m_pwszSymbolicLink)
 		{
-			size_t len = mbstowcs(nullptr, (char*) &pDi->dbcc_name[0], 0);
-			wchar_t* test = new wchar_t[len+1];
-			mbstowcs(&test[0], (char*) &pDi->dbcc_name[0], len);
+			size_t len;
+			mbstowcs_s(&len, nullptr, 0, (char*) &pDi->dbcc_name[0], 0);
+			wchar_t *test = (wchar_t*)_alloca((len+1) * sizeof(wchar_t));
+			mbstowcs_s(&len, test, len+1, (char*) &pDi->dbcc_name[0], len);
 			if (_wcsicmp(m_pwszSymbolicLink, test) == 0)
-			{
 				*pbDeviceLost = TRUE;
-			}
 		}
 
 done:
