@@ -20,7 +20,8 @@ ocam_model * ocam_get_model(const char *filename)
 	char buf[CMV_MAX_BUF];
 	
 	//Open file
-	FILE *f = fopen(filename,"r");
+	FILE *f;
+	fopen_s(&f, filename,"r");
 	if(!f)
 	{
 		printf("File %s cannot be opened\n", filename);	
@@ -30,32 +31,32 @@ ocam_model * ocam_get_model(const char *filename)
 	ocam_model *m = (ocam_model*)malloc(sizeof(ocam_model));
 
 	//Read polynomial coefficients // NOTE: ignored
-	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
+	fgets(buf, CMV_MAX_BUF, f);
+	fscanf_s(f, "\n");
 	int length_pol;
-	fscanf(f,"%d", &length_pol);
+	fscanf_s(f, "%d", &length_pol);
 	double pol_dummy;
 	for (int i = 0; i < length_pol; i++)
-		fscanf(f," %lf",&pol_dummy);
+		fscanf_s(f, " %lf", &pol_dummy);
 
 	//Read inverse polynomial coefficients
-	fscanf(f,"\n");
-	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%d", &m->length_invpol);
+	fscanf_s(f, "\n");
+	fgets(buf, CMV_MAX_BUF, f);
+	fscanf_s(f, "\n");
+	fscanf_s(f, "%d", &m->length_invpol);
 	for (int i = 0; i < m->length_invpol; i++)
-		fscanf(f," %lf",&m->invpol[i]);
+		fscanf_s(f, " %lf", &m->invpol[i]);
 
 	//Read center coordinates
-	fscanf(f,"\n");
+	fscanf_s(f, "\n");
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%lf %lf\n", &m->xc, &m->yc);
+	fscanf_s(f, "\n");
+	fscanf_s(f, "%lf %lf\n", &m->xc, &m->yc);
 
 	//Read affine coefficients
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%lf %lf %lf\n", &m->c,&m->d,&m->e);
+	fscanf_s(f, "\n");
+	fscanf_s(f, "%lf %lf %lf\n", &m->c,&m->d,&m->e);
 
 	//Read image size // NOTE: ignored
 	/*fgets(buf,CMV_MAX_BUF,f);

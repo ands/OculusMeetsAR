@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{7E5F3AC8-3CF0-408C-9671-C1B33D1DC1D2}</ProjectGuid>
+    <RootNamespace>SimpleScene</RootNamespace>
+    <ProjectName>SimpleScene</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
+    <IncludePath>$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include;..\Common\include;..\SimpleScene\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\SimpleScene\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
+    <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include;..\Common\include;..\SimpleScene\include;$(IncludePath)</IncludePath>
+    <LinkIncremental>true</LinkIncremental>
+    <IntDir>..\SimpleScene\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)\include;$(ARLIB)\include;$(NAT_NET)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>ARLibVideo_d.lib;OgreMain_d.lib;OIS_d.lib;OgreOverlay_d.lib;OgreBulletCollisions_d.lib;OgreBulletDynamics_d.lib;BulletCollision_d.lib;BulletDynamics_d.lib;LinearMath_d.lib;ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus_d.lib;ARLibOgre_d.lib;ARLibTracking_d.lib;mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>false</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)\include;$(ARLIB)\include;$(NAT_NET)\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>ARLibVideo.lib;OgreMain.lib;OIS.lib;OgreOverlay.lib;OgreBulletCollisions.lib;OgreBulletDynamics.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;libovr.lib;winmm.lib;ARLibOculus.lib;ARLibOgre.lib;ARLibTracking.lib;mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\Common\include\NPRWatercolorRenderTarget.h" />
+    <ClInclude Include="..\Common\include\RigidListenerNode.h" />
+    <ClInclude Include="..\SimpleScene\include\App.h" />
+    <ClInclude Include="..\SimpleScene\include\Scene.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\Common\src\NPRWatercolorRenderTarget.cpp" />
+    <ClCompile Include="..\Common\src\RigidListenerNode.cpp" />
+    <ClCompile Include="..\SimpleScene\src\App.cpp" />
+    <ClCompile Include="..\SimpleScene\src\main.cpp" />
+    <ClCompile Include="..\SimpleScene\src\Scene.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
