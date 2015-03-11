@@ -1,6 +1,3 @@
-/*#include "StarWarsRemote.h"
-#include "OgreBullet/Collisions/Shapes/OgreBulletCollisionsSphereShape.h"
-#include "OgreBullet/Dynamics/OgreBulletDynamicsRigidBody.h"*/
 #include "OGRE/OgreSceneManager.h"
 #include "StarWarsRemote.h"
 #include "StarWarsRemotePuppet.h"

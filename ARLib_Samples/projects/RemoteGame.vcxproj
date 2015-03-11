@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\RemoteGame\src\Cannon.cpp" />
+    <ClCompile Include="..\RemoteGame\src\GlowRenderTarget.cpp" />
+    <ClCompile Include="..\RemoteGame\src\LaserBulletManager.cpp" />
+    <ClCompile Include="..\Common\src\NPRWatercolorRenderTarget.cpp" />
+    <ClCompile Include="..\RemoteGame\src\App.cpp" />
+    <ClCompile Include="..\RemoteGame\src\main.cpp" />
+    <ClCompile Include="..\RemoteGame\src\Scene.cpp" />
+    <ClCompile Include="..\Common\src\RigidListenerNode.cpp" />
+    <ClCompile Include="..\RemoteGame\src\StarWarsLightSaber.cpp" />
+    <ClCompile Include="..\RemoteGame\src\StarWarsRemote.cpp" />
+    <ClCompile Include="..\RemoteGame\src\StarWarsRemotePuppet.cpp" />
+    <ClCompile Include="..\RemoteGame\src\GlowMaterialListener.cpp" />
+    <ClCompile Include="..\SoundTest\src\SimpleSoundController.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\RemoteGame\include\Cannon.h" />
+    <ClInclude Include="..\RemoteGame\include\GlowMaterialListener.h" />
+    <ClInclude Include="..\RemoteGame\include\GlowRenderTarget.h" />
+    <ClInclude Include="..\RemoteGame\include\LaserBulletManager.h" />
+    <ClInclude Include="..\Common\include\NPRWatercolorRenderTarget.h" />
+    <ClInclude Include="..\RemoteGame\include\App.h" />
+    <ClInclude Include="..\RemoteGame\include\Scene.h" />
+    <ClInclude Include="..\Common\include\RigidListenerNode.h" />
+    <ClInclude Include="..\RemoteGame\include\StarWarsLightSaber.h" />
+    <ClInclude Include="..\RemoteGame\include\StarWarsRemote.h" />
+    <ClInclude Include="..\RemoteGame\include\StarWarsRemotePuppet.h" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{A9F0EB2B-A528-4FB6-B232-6A6A53DDD947}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>RemoteGame</RootNamespace>
+    <ProjectName>RemoteGame</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
+    <IncludePath>$(OGRE_BULLET_PACK)\include;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;..\Common\include;..\RemoteGame\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+    <OutDir>$(SolutionDir)\..\bin\$(Configuration)\</OutDir>
+    <IncludePath>$(OGRE_BULLET_PACK)\include;$(OGRE_BULLET_PACK)\include\OGRE;$(OGRE_BULLET_PACK)\include\OIS;$(OGRE_BULLET_PACK)\include\OgreBullet\Collisions;$(OGRE_BULLET_PACK)\include\OgreBullet\Dynamics;..\Common\include;..\RemoteGame\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(OGRE_BULLET_PACK)\lib\$(Configuration);$(OGRE_BULLET_PACK)\lib\$(Configuration)\opt;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OGRE_BULLET_PACK)\include;$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;OgreMain_d.lib;OIS_d.lib;OgreOverlay_d.lib;OgreBulletCollisions_d.lib;OgreBulletDynamics_d.lib;BulletCollision_d.lib;BulletDynamics_d.lib;LinearMath_d.lib;ConvexDecomposition_d.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovrd.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus_d.lib;ARLibOgre_d.lib;ARLibTracking_d.lib;ARLibVideo_d.lib;ARLibSound_d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;OGRE_SHOW_CONSOLE;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ARLIB)\include;$(NAT_NET)\include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OgreMain.lib;OIS.lib;OgreOverlay.lib;OgreBulletCollisions.lib;OgreBulletDynamics.lib;BulletCollision.lib;BulletDynamics.lib;LinearMath.lib;ConvexDecomposition.lib;ws2_32.lib;opengl32.lib;Dbghelp.lib;libovr.lib;winmm.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;ARLibOculus.lib;ARLibOgre.lib;ARLibTracking.lib;ARLibSound.lib;ARLibVideo.lib;mfplat.lib;mf.lib;mfreadwrite.lib;mfuuid.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(LIBOVR)\Lib;$(ARLIB)\lib;$(OGRE_BULLET_PACK)\lib\release</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
