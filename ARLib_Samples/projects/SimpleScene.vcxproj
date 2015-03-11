@@ -93,7 +93,6 @@
     <ClCompile Include="..\SimpleScene\src\App.cpp" />
     <ClCompile Include="..\SimpleScene\src\main.cpp" />
     <ClCompile Include="..\SimpleScene\src\Scene.cpp" />
-    <ClCompile Include="..\SoundTest\src\SimpleSoundController.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

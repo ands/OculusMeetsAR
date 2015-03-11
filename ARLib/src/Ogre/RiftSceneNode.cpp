@@ -113,7 +113,9 @@ void RiftSceneNode::onChange(const RigidBody *rb)
 	headNode->setOrientation(rb->mqW, rb->mqX, rb->mqY, rb->mqZ);
 	bodyNode->setPosition(rb->mX, rb->mY, rb->mZ);
 
-	headCalibrationNode->setOrientation(Ogre::Quaternion(mRefQW, mRefQX, mRefQY, mRefQZ).UnitInverse());
+	// calibrate (the rift is rotated 180 degrees)
+	headCalibrationNode->setOrientation(Ogre::Quaternion(0, 0, 1, 0) * Ogre::Quaternion(mRefQW, mRefQX, mRefQY, mRefQZ).UnitInverse());
+
 	/*if (rift && renderTargets.size())
 	{
 		float s[2][16], e[2][16];

@@ -32,7 +32,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mSceneMgr->setShadowFarDistance(30);
 
 	// rift node:
-	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 0);
+	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1);
 	if (tracker)
 		tracker->addRigidBodyEventListener(mRiftNode);
 
@@ -166,6 +166,8 @@ void Scene::setAdditionalLatency(double seconds)
 
 bool Scene::keyPressed( const OIS::KeyEvent& e )
 {
+	if (e.key == OIS::KC_C)
+		mRiftNode->calibrate();
 	if (e.key == OIS::KC_N)
 		toggleNPRRenderer();
 

@@ -23,7 +23,6 @@
     <ClCompile Include="..\RemoteGame\src\StarWarsRemote.cpp" />
     <ClCompile Include="..\RemoteGame\src\StarWarsRemotePuppet.cpp" />
     <ClCompile Include="..\RemoteGame\src\GlowMaterialListener.cpp" />
-    <ClCompile Include="..\SoundTest\src\SimpleSoundController.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\RemoteGame\include\Cannon.h" />
