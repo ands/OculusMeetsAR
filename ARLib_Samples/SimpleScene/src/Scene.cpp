@@ -11,21 +11,22 @@
 #include "RigidListenerNode.h"
 
 Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
-    Ogre::Root *root, Ogre::SceneManager *sceneMgr,
-	Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
-    OIS::Keyboard *keyboard,
-	ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight)
+	Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
+	Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld,
+	OIS::Keyboard *keyboard,
+	ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer)
 	: mRoot(root)
 	, mKeyboard(keyboard)
 	, mSceneMgr(sceneMgr)
+	, mRiftNode(nullptr)
+	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
+	, additionalLatency(0.048)
+	, mRiftVideoScreens(nullptr)
 	, mRenderTarget(nullptr)
 	, mSmallRenderTarget(nullptr)
-	, enabledNPRRenderer(false)
 	, mWatercolorRenderTarget(nullptr)
 	, mSmallWatercolorRenderTarget(nullptr)
-	, mVideoPlayerLeft(videoPlayerLeft), mVideoPlayerRight(videoPlayerRight)
-	, mRiftVideoScreens(nullptr)
-	, additionalLatency(0.048)
+	, enabledNPRRenderer(false)
 {
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.1f,0.1f,0.1f));
 	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
@@ -52,7 +53,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	}
 
 	// attach video screens
-	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, videoPlayerLeft, videoPlayerRight, tracker);
+	mRiftVideoScreens = new ARLib::RiftVideoScreens(mSceneMgr, mRiftNode, leftVideoPlayer, rightVideoPlayer, tracker);
 	mVideoOffset[0] = Ogre::Vector2(0.05f, -0.008f);
 	mVideoOffset[1] = Ogre::Vector2(-0.01f, -0.008f);
 	mVideoScale[0] = Ogre::Vector2(1.03f, 1.11f);
@@ -110,13 +111,13 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 Scene::~Scene()
 {
+	delete mRiftNode;
 	delete mRiftVideoScreens;
-	delete mWatercolorRenderTarget;
-	delete mSmallWatercolorRenderTarget;
 	delete mRenderTarget;
 	delete mSmallRenderTarget;
+	delete mWatercolorRenderTarget;
+	delete mSmallWatercolorRenderTarget;
 	mRoot->destroySceneManager(mSceneMgr);
-	delete mRiftNode;
 }
 
 void Scene::toggleNPRRenderer()

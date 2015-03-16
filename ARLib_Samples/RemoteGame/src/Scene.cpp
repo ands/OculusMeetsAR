@@ -23,11 +23,17 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     : mRoot(root)
 	, mKeyboard(keyboard)
 	, mSceneMgr(sceneMgr)
-	, mDynamicsWorld(dyWorld)
+	, mRiftNode(nullptr)
 	, mVideoPlayerLeft(leftVideoPlayer), mVideoPlayerRight(rightVideoPlayer)
 	, additionalLatency(0.048)
 	, mRiftVideoScreens(nullptr)
 	, currentRenderTarget(RenderTargetIndex_Glow)
+	, mGlowMaterialListener(nullptr)
+	, mDynamicsWorld(dyWorld)
+	, mRemotePuppet(nullptr)
+	, mRemote(nullptr)
+	, mSword(nullptr)
+	, mSwordParentNode(nullptr)
 {
 	// rift node
 	mRiftNode = new ARLib::RiftSceneNode(rift, mSceneMgr, 0.001f, 50.0f, 1);
@@ -72,8 +78,8 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
     mSceneMgr->setShadowTechnique(Ogre::SHADOWDETAILTYPE_TEXTURE);
 	mSceneMgr->setShadowFarDistance(30);
 
-	GlowMaterialListener *gml = new GlowMaterialListener();
-	Ogre::MaterialManager::getSingleton().addListener(gml);
+	mGlowMaterialListener = new GlowMaterialListener();
+	Ogre::MaterialManager::getSingleton().addListener(mGlowMaterialListener);
 
     // roomLight
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -108,13 +114,19 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 Scene::~Scene()
 {
+	delete mRiftNode;
+	delete mRiftVideoScreens;
+	delete mGlowMaterialListener;
+	delete mRemotePuppet;
+	delete mRemote;
+	delete mSword;
+	delete mSwordParentNode;
 	for (int i = 0; i < RenderTargetIndex_Count; i++)
 	{
 		delete mRenderTargets[i];
 		delete mSmallRenderTargets[i];
 	}
 	mRoot->destroySceneManager(mSceneMgr);
-	delete mRiftNode;
 }
 
 void Scene::update(float dt)

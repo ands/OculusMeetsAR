@@ -15,8 +15,8 @@
     <ClCompile Include="..\RemoteGame\src\GlowRenderTarget.cpp" />
     <ClCompile Include="..\RemoteGame\src\LaserBulletManager.cpp" />
     <ClCompile Include="..\Common\src\NPRWatercolorRenderTarget.cpp" />
-    <ClCompile Include="..\RemoteGame\src\App.cpp" />
-    <ClCompile Include="..\RemoteGame\src\main.cpp" />
+    <ClCompile Include="..\Common\src\App.cpp" />
+    <ClCompile Include="..\Common\src\main.cpp" />
     <ClCompile Include="..\RemoteGame\src\Scene.cpp" />
     <ClCompile Include="..\Common\src\RigidListenerNode.cpp" />
     <ClCompile Include="..\RemoteGame\src\StarWarsLightSaber.cpp" />
@@ -30,7 +30,7 @@
     <ClInclude Include="..\RemoteGame\include\GlowRenderTarget.h" />
     <ClInclude Include="..\RemoteGame\include\LaserBulletManager.h" />
     <ClInclude Include="..\Common\include\NPRWatercolorRenderTarget.h" />
-    <ClInclude Include="..\RemoteGame\include\App.h" />
+    <ClInclude Include="..\Common\include\App.h" />
     <ClInclude Include="..\RemoteGame\include\Scene.h" />
     <ClInclude Include="..\Common\include\RigidListenerNode.h" />
     <ClInclude Include="..\RemoteGame\include\StarWarsLightSaber.h" />

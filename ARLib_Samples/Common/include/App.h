@@ -9,6 +9,16 @@ namespace Ogre
 	struct FrameEvent;
 };
 
+namespace OgreBulletCollisions
+{
+	class DebugDrawer;
+};
+
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+};
+
 namespace OIS
 {
 	class KeyEvent;
@@ -44,22 +54,26 @@ class App : public Ogre::FrameListener, public OIS::KeyListener
 	private:
 		void initOgre(bool showDebugWindow);
 		void quitOgre();
+        void initBullet(bool enableDebugDrawing);
+        void quitBullet();
 		void initOIS();
 		void quitOIS();
-		void initRift();
-		void quitRift();
+		void initARLib(bool enableDebugLog);
+		void quitARLib();
+
 		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog);
-		void initTracking(bool enableDebugLog);
-		void quitTracking();
-		void createViewports();
+
+		OIS::Keyboard* mKeyboard;
+
+		Ogre::Root* mRoot;
+        Ogre::SceneManager *mSceneMgr;
+
+		Ogre::RenderWindow* mWindow;
+		Ogre::RenderWindow* mSmallWindow;
 
 		bool mShutdown;
 
-		OIS::Keyboard* mKeyboard;
-		Ogre::Root* mRoot;
-        Ogre::SceneManager *mSceneMgr;
-		Ogre::RenderWindow* mWindow;
-		Ogre::RenderWindow* mSmallWindow;
+		Scene* mScene;
 
 		bool mRiftAvailable;
 		bool mTrackingAvailable;
@@ -68,7 +82,8 @@ class App : public Ogre::FrameListener, public OIS::KeyListener
 		ARLib::VideoPlayer* mVideoPlayerLeft;
 		ARLib::VideoPlayer* mVideoPlayerRight;
 
-		Scene* mScene;
+        OgreBulletCollisions::DebugDrawer *mDebugDrawer;
+        OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 };
 
 #endif

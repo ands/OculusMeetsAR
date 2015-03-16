@@ -31,6 +31,7 @@ namespace OIS
 	class KeyEvent;
 };
 
+class GlowMaterialListener;
 class StarWarsRemotePuppet;
 class StarWarsRemote;
 class StarWarsLightSaber;
@@ -64,8 +65,9 @@ class Scene
 		Ogre::Root* mRoot;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
-		ARLib::RiftSceneNode* mRiftNode;
+		OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
 
+		ARLib::RiftSceneNode* mRiftNode;
 		ARLib::VideoPlayer* mVideoPlayerLeft;
 		ARLib::VideoPlayer* mVideoPlayerRight;
 		Ogre::Vector2 mVideoOffset[2];
@@ -76,13 +78,11 @@ class Scene
         ARLib::RenderTarget* mRenderTargets[4];
         ARLib::RenderTarget* mSmallRenderTargets[4];
 		RenderTargetIndex currentRenderTarget;
-
-        OgreBulletDynamics::DynamicsWorld *mDynamicsWorld;
+		GlowMaterialListener *mGlowMaterialListener;
 
         StarWarsRemotePuppet *mRemotePuppet;
         StarWarsRemote* mRemote;
         StarWarsLightSaber* mSword;
-
 		RigidListenerNode *mSwordParentNode;
 };
 

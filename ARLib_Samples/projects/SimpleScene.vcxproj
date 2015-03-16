@@ -86,14 +86,14 @@
   <ItemGroup>
     <ClInclude Include="..\Common\include\NPRWatercolorRenderTarget.h" />
     <ClInclude Include="..\Common\include\RigidListenerNode.h" />
-    <ClInclude Include="..\SimpleScene\include\App.h" />
+    <ClInclude Include="..\Common\include\App.h" />
     <ClInclude Include="..\SimpleScene\include\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\Common\src\NPRWatercolorRenderTarget.cpp" />
     <ClCompile Include="..\Common\src\RigidListenerNode.cpp" />
-    <ClCompile Include="..\SimpleScene\src\App.cpp" />
-    <ClCompile Include="..\SimpleScene\src\main.cpp" />
+    <ClCompile Include="..\Common\src\App.cpp" />
+    <ClCompile Include="..\Common\src\main.cpp" />
     <ClCompile Include="..\SimpleScene\src\Scene.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

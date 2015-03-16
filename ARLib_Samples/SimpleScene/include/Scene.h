@@ -20,6 +20,11 @@ namespace Ogre
 	class SceneManager;
 };
 
+namespace OgreBulletDynamics
+{
+	class DynamicsWorld;
+};
+
 namespace OIS
 {
 	class Keyboard;
@@ -32,11 +37,9 @@ class RigidListenerNode;
 class Scene
 {
 	public:
-		Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
-			Ogre::Root *root, Ogre::SceneManager *sceneMgr,
-			Ogre::RenderWindow *window, Ogre::RenderWindow *smallWindow,
-			OIS::Keyboard *keyboard,
-			ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight);
+		Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker, Ogre::Root *root, Ogre::RenderWindow* window, Ogre::RenderWindow* smallWindow,
+            Ogre::SceneManager *sceneMgr, OgreBulletDynamics::DynamicsWorld *dyWorld, OIS::Keyboard *keyboard,
+			ARLib::VideoPlayer *leftVideoPlayer, ARLib::VideoPlayer *rightVideoPlayer);
 		~Scene();
 
 		void update(float dt);
@@ -51,19 +54,20 @@ class Scene
 		Ogre::Root* mRoot;
 		OIS::Keyboard* mKeyboard;
 		Ogre::SceneManager* mSceneMgr;
+
 		ARLib::RiftSceneNode* mRiftNode;
+		ARLib::VideoPlayer* mVideoPlayerLeft;
+		ARLib::VideoPlayer* mVideoPlayerRight;
+		Ogre::Vector2 mVideoOffset[2];
+		Ogre::Vector2 mVideoScale[2];
+		double additionalLatency;
+		ARLib::RiftVideoScreens* mRiftVideoScreens;
+
 		ARLib::RenderTarget* mRenderTarget;
 		ARLib::RenderTarget* mSmallRenderTarget;
 		NPRWatercolorRenderTarget* mWatercolorRenderTarget;
 		NPRWatercolorRenderTarget* mSmallWatercolorRenderTarget;
-		ARLib::VideoPlayer* mVideoPlayerLeft;
-		ARLib::VideoPlayer* mVideoPlayerRight;
-		ARLib::RiftVideoScreens* mRiftVideoScreens;
 		bool enabledNPRRenderer;
-		double additionalLatency;
-
-		Ogre::Vector2 mVideoOffset[2];
-		Ogre::Vector2 mVideoScale[2];
 };
 
 #endif

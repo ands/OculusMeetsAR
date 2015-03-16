@@ -10,15 +10,18 @@
 #include "NatNetTypes.h"
 
 App::App(bool showDebugWindow)
-	: mRoot(nullptr)
-	, mKeyboard(nullptr)
-	, mScene(nullptr)
-	, mShutdown(false)
+	: mKeyboard(nullptr)
+	, mRoot(nullptr)
+	, mSceneMgr(nullptr)
 	, mWindow(nullptr)
 	, mSmallWindow(nullptr)
+	, mShutdown(false)
+	, mScene(nullptr)
 	, mRiftAvailable(false)
+	, mTrackingAvailable(false)
 	, mRift(nullptr)
 	, mTracker(nullptr)
+	, mVideoPlayerLeft(nullptr), mVideoPlayerRight(nullptr)
     , mDebugDrawer(nullptr)
     , mDynamicsWorld(nullptr)
 {
@@ -27,20 +30,15 @@ App::App(bool showDebugWindow)
 	// check if Oculus Rift (ID 0) is available:
 	ARLib::Rift::init();
 	mRiftAvailable = ARLib::Rift::available(0);
-	showDebugWindow = false;
-	if (!mRiftAvailable) // at least show the debug window if it is not available
+
+	showDebugWindow = false; // overrides the command line option
+	if (!mRiftAvailable) // at least show the debug window if the rift is not available
 		showDebugWindow = true;
 
 	initOgre(showDebugWindow);
-    initBullet(showDebugWindow); //enable debug drawer
+    initBullet(showDebugWindow); // enable debug drawer if we also have a debug window
 	initOIS();
-	initRift();
-	initTracking(showDebugWindow);
-
-	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
-	
-	mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt" );
-	mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt" );
+	initARLib(showDebugWindow);
 
     mScene = new Scene(mRift, mTracker, mRoot,
 		mWindow, mSmallWindow, mSceneMgr, 
@@ -51,20 +49,16 @@ App::App(bool showDebugWindow)
 
 App::~App()
 {
-	std::cout << "Deleting Ogre application." << std::endl;
-	quitTracking();
-	quitRift();
-	std::cout << "Deleting Scene:" << std::endl;
+	std::cout << "Deleting application." << std::endl;
 	delete mScene;
+	std::cout << "Closing ARLib:" << std::endl;
+	quitARLib();
 	std::cout << "Closing OIS:" << std::endl;
 	quitOIS();
     std::cout << "Closing Bullet:" << std::endl;
     quitBullet();
 	std::cout << "Closing Ogre:" << std::endl;
 	quitOgre();
-
-	delete mVideoPlayerLeft;
-	delete mVideoPlayerRight;
 }
 
 void App::initOgre(bool showDebugWindow)
@@ -130,7 +124,6 @@ void App::initBullet(bool enableDebugDrawing)
         node->attachObject(static_cast<Ogre::SimpleRenderable *>(mDebugDrawer));
     }
 }
-
 void App::quitBullet()
 {
     delete mDebugDrawer;
@@ -154,18 +147,61 @@ void App::quitOIS()
 	delete mKeyboard;
 }
 
-void App::initRift()
+void App::initARLib(bool enableDebugLog)
 {
-	if (mRiftAvailable)
-		mRift = new ARLib::Rift(0); // try to initialize the Oculus Rift (ID 0):
+	std::cout << "Initializing Tracking System" << std::endl;
+	{
+		ARLib::TRACKING_ERROR_CODE error;
+
+		error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, enableDebugLog); // Try both first
+		if (error == ARLib::ARLIB_TRACKING_OK)
+			std::cout << "NatNet + Rift Tracking initialized." << std::endl;
+
+		if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
+		{
+			error = initTracking(ARLib::ARLIB_RIFT, enableDebugLog); // Rift Tracking only
+			if (error == ARLib::ARLIB_TRACKING_OK)
+				std::cout << "Rift Tracking initialized." << std::endl;
+		}
+		else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
+		{
+			error = initTracking(ARLib::ARLIB_NATNET, enableDebugLog); // NatNet Tracking only
+			if (error == ARLib::ARLIB_TRACKING_OK)
+				std::cout << "NatNet Tracking initialized." << std::endl;
+		}
+
+		if (error != ARLib::ARLIB_TRACKING_OK)
+			std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
+	}
+
+	std::cout << "Initializing Oculus Rift" << std::endl;
+	{
+		if (mRiftAvailable)
+			mRift = new ARLib::Rift(0); // try to initialize the Oculus Rift (ID 0):
+	}
+
+	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
+	
+	std::cout << "Initializing Video System" << std::endl;
+	{
+		mVideoPlayerLeft  = new ARLib::VideoPlayer(0, "../../media/calib_results_CAM1.txt", 3.0f, "../../media/homography_CAM1.txt");
+		mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt");
+	}
 }
-void App::quitRift()
+void App::quitARLib()
 {
-	std::cout << "Shutting down Oculus Rifts:" << std::endl;
+	std::cout << "Shutting down Tracking System" << std::endl;
+	mTracker->uninitialize();
+	delete mTracker;
+
+	std::cout << "Shutting down Oculus Rift:" << std::endl;
 	delete mRift;
 	ARLib::Rift::shutdown();
-}
 
+	std::cout << "Shutting down Video:" << std::endl;
+	delete mVideoPlayerLeft;
+	delete mVideoPlayerRight;
+}
 ARLib::TRACKING_ERROR_CODE App::initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog)
 {
 	mTracker = new ARLib::TrackingManager(method, 100, enableDebugLog);
@@ -185,38 +221,6 @@ ARLib::TRACKING_ERROR_CODE App::initTracking(ARLib::TRACKING_METHOD method, bool
 	}
 	
 	return error;
-}
-		
-void App::initTracking(bool enableDebugLog)
-{
-	ARLib::TRACKING_ERROR_CODE error;
-
-	error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, enableDebugLog); // Try both first
-	if (error == ARLib::ARLIB_TRACKING_OK)
-		std::cout << "NatNet + Rift Tracking initialized." << std::endl;
-
-	if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
-	{
-		error = initTracking(ARLib::ARLIB_RIFT, enableDebugLog); // Rift Tracking only
-		if (error == ARLib::ARLIB_TRACKING_OK)
-			std::cout << "Rift Tracking initialized." << std::endl;
-	}
-	else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
-	{
-		error = initTracking(ARLib::ARLIB_NATNET, enableDebugLog); // NatNet Tracking only
-		if (error == ARLib::ARLIB_TRACKING_OK)
-			std::cout << "NatNet Tracking initialized." << std::endl;
-	}
-
-	if (error != ARLib::ARLIB_TRACKING_OK)
-		std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
-}
-		
-void App::quitTracking()
-{
-	std::cout << "Shutting down Tracking System" << std::endl;
-	mTracker->uninitialize();
-	delete mTracker;
 }
 
 bool App::frameRenderingQueued(const Ogre::FrameEvent& evt) 
