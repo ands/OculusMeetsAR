@@ -17,8 +17,6 @@ App::App(bool showDebugWindow)
 	, mSmallWindow(nullptr)
 	, mShutdown(false)
 	, mScene(nullptr)
-	, mRiftAvailable(false)
-	, mTrackingAvailable(false)
 	, mRift(nullptr)
 	, mTracker(nullptr)
 	, mVideoPlayerLeft(nullptr), mVideoPlayerRight(nullptr)
@@ -27,18 +25,12 @@ App::App(bool showDebugWindow)
 {
 	std::cout << "Creating Ogre application:" << std::endl;
 
-	// check if Oculus Rift (ID 0) is available:
-	ARLib::Rift::init();
-	mRiftAvailable = ARLib::Rift::available(0);
-
 	showDebugWindow = false; // overrides the command line option
-	if (!mRiftAvailable) // at least show the debug window if the rift is not available
-		showDebugWindow = true;
 
+	initARLib(showDebugWindow);
 	initOgre(showDebugWindow);
     initBullet(showDebugWindow); // enable debug drawer if we also have a debug window
 	initOIS();
-	initARLib(showDebugWindow);
 
     mScene = new Scene(mRift, mTracker, mRoot,
 		mWindow, mSmallWindow, mSceneMgr, 
@@ -84,7 +76,7 @@ void App::initOgre(bool showDebugWindow)
 	mRoot->initialise(false, "ARLib Example");
 
 	// create windows:
-	if (mRiftAvailable)
+	if (mRift)
 	{
 		Ogre::NameValuePairList miscParams;
 		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1);
@@ -147,37 +139,51 @@ void App::quitOIS()
 	delete mKeyboard;
 }
 
-void App::initARLib(bool enableDebugLog)
+void App::initARLib(bool& showDebugWindow)
 {
+	std::cout << "Initializing Oculus Rift" << std::endl;
+	{
+		ARLib::Rift::init(); // initialize the ovr system
+		mRift = new ARLib::Rift();
+		ARLib::RIFT_ERROR_CODE error = mRift->initialize(0); // initialize the first connected rift
+		switch(error)
+		{
+		case ARLib::RIFT_OK: std::cout << "Oculus Rift initialized" << std::endl; break;
+		case ARLib::RIFT_CONNECTION_ERROR: std::cout << "Error: Connection to Oculus Rift failed" << std::endl; break;
+		case ARLib::RIFT_TRACKING_ERROR: std::cout << "Error: Failed to initialize the internal Oculus Rift Tracking system" << std::endl; break;
+		}
+
+		if (error != ARLib::RIFT_OK)
+		{
+			delete mRift;
+			mRift = nullptr;
+			showDebugWindow = true; // at least show the debug window if the rift is not available
+		}
+	}
+
 	std::cout << "Initializing Tracking System" << std::endl;
 	{
 		ARLib::TRACKING_ERROR_CODE error;
 
-		error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, enableDebugLog); // Try both first
+		error = initTracking(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, showDebugWindow); // Try both first
 		if (error == ARLib::ARLIB_TRACKING_OK)
 			std::cout << "NatNet + Rift Tracking initialized." << std::endl;
 
 		if (error == ARLib::ARLIB_TRACKING_NATNET_ERROR)
 		{
-			error = initTracking(ARLib::ARLIB_RIFT, enableDebugLog); // Rift Tracking only
+			error = initTracking(ARLib::ARLIB_RIFT, showDebugWindow); // Rift Tracking only
 			if (error == ARLib::ARLIB_TRACKING_OK)
 				std::cout << "Rift Tracking initialized." << std::endl;
 		}
 		else if (error == ARLib::ARLIB_TRACKING_RIFT_ERROR)
 		{
-			error = initTracking(ARLib::ARLIB_NATNET, enableDebugLog); // NatNet Tracking only
+			error = initTracking(ARLib::ARLIB_NATNET, showDebugWindow); // NatNet Tracking only
 			if (error == ARLib::ARLIB_TRACKING_OK)
 				std::cout << "NatNet Tracking initialized." << std::endl;
 		}
 
 		if (error != ARLib::ARLIB_TRACKING_OK)
 			std::cout << "Failed to Initialize Tracking Manager. ErrorCode:" << error << std::endl;
-	}
-
-	std::cout << "Initializing Oculus Rift" << std::endl;
-	{
-		if (mRiftAvailable)
-			mRift = new ARLib::Rift(0); // try to initialize the Oculus Rift (ID 0):
 	}
 
 	Sleep(2000); // needed if the rift tracking camera is connected... too many concurrent usb initializations maybe?
@@ -188,10 +194,29 @@ void App::initARLib(bool enableDebugLog)
 		mVideoPlayerRight = new ARLib::VideoPlayer(1, "../../media/calib_results_CAM2.txt", 3.0f, "../../media/homography_CAM2.txt");
 	}
 }
+ARLib::TRACKING_ERROR_CODE App::initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog)
+{
+	mTracker = new ARLib::TrackingManager(method, 100, enableDebugLog);
+	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
+	mTracker->setNatNetClientIP("128.176.181.34"); 
+	mTracker->setNatNetServerIP("128.176.181.34");
+	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
+
+	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
+	if(error != ARLib::ARLIB_TRACKING_OK)
+	{
+		mTracker->uninitialize();
+		delete mTracker;
+		mTracker = nullptr;
+	}
+	
+	return error;
+}
 void App::quitARLib()
 {
 	std::cout << "Shutting down Tracking System" << std::endl;
-	mTracker->uninitialize();
+	if (mTracker)
+		mTracker->uninitialize();
 	delete mTracker;
 
 	std::cout << "Shutting down Oculus Rift:" << std::endl;
@@ -202,26 +227,6 @@ void App::quitARLib()
 	delete mVideoPlayerLeft;
 	delete mVideoPlayerRight;
 }
-ARLib::TRACKING_ERROR_CODE App::initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog)
-{
-	mTracker = new ARLib::TrackingManager(method, 100, enableDebugLog);
-	mTracker->setNatNetConnectionType(ConnectionType_Multicast);
-	mTracker->setNatNetClientIP("128.176.181.34"); 
-	mTracker->setNatNetServerIP("128.176.181.34");
-	mTracker->setFrameEvaluationMethod(ARLib::FRAME_FLOOR);
-
-	ARLib::TRACKING_ERROR_CODE error = mTracker->initialize();
-	mTrackingAvailable = (error == ARLib::ARLIB_TRACKING_OK);
-
-	if(!mTrackingAvailable)
-	{
-		mTracker->uninitialize();
-		delete mTracker;
-		mTracker = nullptr;
-	}
-	
-	return error;
-}
 
 bool App::frameRenderingQueued(const Ogre::FrameEvent& evt) 
 {
@@ -229,7 +234,7 @@ bool App::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 	mKeyboard->capture();
 
-    if (mTrackingAvailable)
+    if (mTracker)
 		mTracker->update(); //right place?
 
     mDynamicsWorld->stepSimulation(evt.timeSinceLastFrame, 5);

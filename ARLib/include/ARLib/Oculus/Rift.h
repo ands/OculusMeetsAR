@@ -13,15 +13,23 @@ struct DistortionVertex
     float TanEyeAnglesB[2];
 };
 
+enum RIFT_ERROR_CODE
+{
+	RIFT_OK,
+	RIFT_CONNECTION_ERROR,
+	RIFT_TRACKING_ERROR
+};
+
 class Rift
 {
 	public:
-		Rift(int id);
-		~Rift();
-		
 		static void init();
 		static void shutdown();
 		static bool available(int id);
+
+		Rift();
+		~Rift();
+		RIFT_ERROR_CODE initialize(int id);
 
 		void getTextureSizes(
 			int *size2dL,

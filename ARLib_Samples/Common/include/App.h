@@ -43,13 +43,11 @@ class App : public Ogre::FrameListener, public OIS::KeyListener
 		~App();
 
 		void quit();
+		bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+		bool update();
 
 		bool keyPressed(const OIS::KeyEvent& e);
 		bool keyReleased(const OIS::KeyEvent& e);
-
-		bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-
-		bool update();
 
 	private:
 		void initOgre(bool showDebugWindow);
@@ -58,7 +56,7 @@ class App : public Ogre::FrameListener, public OIS::KeyListener
         void quitBullet();
 		void initOIS();
 		void quitOIS();
-		void initARLib(bool enableDebugLog);
+		void initARLib(bool& showDebugWindow);
 		void quitARLib();
 
 		ARLib::TRACKING_ERROR_CODE initTracking(ARLib::TRACKING_METHOD method, bool enableDebugLog);
@@ -75,8 +73,6 @@ class App : public Ogre::FrameListener, public OIS::KeyListener
 
 		Scene* mScene;
 
-		bool mRiftAvailable;
-		bool mTrackingAvailable;
 		ARLib::Rift* mRift;
 		ARLib::TrackingManager* mTracker;
 		ARLib::VideoPlayer* mVideoPlayerLeft;
