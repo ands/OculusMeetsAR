@@ -239,3 +239,13 @@ OgreMain_d.pdb
 /ARLib/lib/ARLibSound_d.lib
 /ARLib/lib/ARLibVideo.lib
 /ARLib/lib/ARLibVideo_d.lib
+/ARLib/lib/arliboculus.pdb
+/ARLib/lib/arliboculus_d.pdb
+/ARLib/lib/arlibogre.pdb
+/ARLib/lib/arlibogre_d.pdb
+/ARLib/lib/arlibsound.pdb
+/ARLib/lib/arlibsound_d.pdb
+/ARLib/lib/arlibtracking.pdb
+/ARLib/lib/arlibtracking_d.pdb
+/ARLib/lib/arlibvideo.pdb
+/ARLib/lib/arlibvideo_d.pdb
