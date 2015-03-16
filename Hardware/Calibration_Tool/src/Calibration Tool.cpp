@@ -41,7 +41,7 @@ vector<int> getSelectedNumbers(string input, int numOfImgPairs){
 		vector<string> tokens;
 		for (string each; getline(stream, each, ','); tokens.push_back(each));
 		//extract ints from tokens
-		for(int i=0;i<tokens.size();i++){
+		for(unsigned int i=0;i<tokens.size();i++){
 			istringstream substream(tokens[i]);
 			vector<string> subtokens;
 			for (string each; getline(substream, each, '-'); subtokens.push_back(each));
@@ -58,7 +58,7 @@ vector<int> getSelectedNumbers(string input, int numOfImgPairs){
 		}
 	}
 	vector<int> result;
-	for(int i=0;i<list.size();i++){
+	for(unsigned int i=0;i<list.size();i++){
 		if(list[i]<=numOfImgPairs && list[i]>0){
 			result.push_back(list[i]);
 		}
@@ -111,7 +111,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			vector<string> filenames = getFileNames(L"..\\media\\images\\*.*");
 			cout<<filenames.size()/2<<" image pairs found: \n";
 			if(filenames.size()!=0){
-				for(int i=0;i<filenames.size();i++){
+				for(unsigned int i=0;i<filenames.size();i++){
 					cout<<filenames[i]<<", ";
 				}
 				cout<<"\n\nChoose image pairs for calibration ([]=all or e.g. 1-5,7,11-17) \n";
@@ -126,7 +126,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					cout<<firstnum;
 					cin.putback(firstnum);
 					if(cin.peek() == 13){
-						for(int i=0;i<filenames.size()/2;i++){
+						for(unsigned int i=0;i<filenames.size()/2;i++){
 							selected.push_back(i+1);
 						}
 					}
@@ -143,7 +143,7 @@ int _tmain(int argc, _TCHAR* argv[])
 					else{
 
 						cout<<"\nLoading selected images...";
-						for(int i=0;i<selected.size();i++){
+						for(unsigned int i=0;i<selected.size();i++){
 							string pathleft = "../media/images/"+filenames[2*(selected[i]-1)];
 							string pathright = "../media/images/"+filenames[2*selected[i]-1];
 							hand.loadImagePair(pathleft,pathright);

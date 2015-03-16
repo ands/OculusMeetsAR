@@ -63,14 +63,14 @@ void ImageHandler::calculateMatches(int method){
 		//enforce distance constraints, to many similar matches bias the estimation of the epipolar geometry
 		if(pairMatches.size()!=0){
 			matchesFound=pairMatches[0].size();
-			for(int j=0;j<pairMatches[0].size();j++){
+			for(unsigned int j=0;j<pairMatches[0].size();j++){
 				//set min distance of matchpairs
 				if(leftMatch.size()==0){
 					leftMatch.push_back(pairMatches[0][j]);
 					rightMatch.push_back(pairMatches[1][j]);
 				}
 				bool nearby=false;
-				for(int k=0;k<leftMatch.size();k++){
+				for(unsigned int k=0;k<leftMatch.size();k++){
 					if(dist(leftMatch[k],pairMatches[0][j])<70 && dist(leftMatch[k]-pairMatches[0][j],rightMatch[k]-pairMatches[1][j])<10)
 					{//distance between left points of compared matches is <70 and distance between vectors given by (leftMatchPoint-rightMatchPoint) is <10
 						nearby=true;
@@ -136,7 +136,7 @@ void ImageHandler::saveMatches(){
 	std::ofstream leftfile;
 	std::remove("../media/leftmatch.txt");
 	leftfile.open ("../media/leftmatch.txt");
-	for(int i=0;i<leftMatch.size();i++){
+	for(unsigned int i=0;i<leftMatch.size();i++){
 		leftfile << leftMatch[i].x<<" "<<leftMatch[i].y<<"\n";
 	}
 	leftfile.close();
@@ -144,7 +144,7 @@ void ImageHandler::saveMatches(){
 	std::ofstream rightfile;
 	std::remove("../media/rightmatch.txt");
 	rightfile.open ("../media/rightmatch.txt");
-	for(int i=0;i<rightMatch.size();i++){
+	for(unsigned int i=0;i<rightMatch.size();i++){
 		rightfile << rightMatch[i].x<<" "<<rightMatch[i].y<<"\n";
 	}
 	rightfile.close();
@@ -248,7 +248,7 @@ void ImageHandler::drawEpipolarLines(const Mat F,
 		epilines1.size() == epilines2.size());
 
 	cv::RNG rng(0);
-	for(size_t i=0; i<points1.size(); i++)
+	for(unsigned int i=0; i<points1.size(); i++)
 	{
 		if(inlierDistance > 0)
 		{
@@ -265,14 +265,14 @@ void ImageHandler::drawEpipolarLines(const Mat F,
 		cv::Scalar color(rng(256),rng(256),rng(256));
 
 		cv::line(outImg(rect2),
-			cv::Point(0,-epilines1[i][2]/epilines1[i][1]),
-			cv::Point(img1.cols,-(epilines1[i][2]+epilines1[i][0]*img1.cols)/epilines1[i][1]),
+			cv::Point(0,(int)(-epilines1[i][2]/epilines1[i][1])),
+			cv::Point(img1.cols,(int)(-(epilines1[i][2]+epilines1[i][0]*img1.cols)/epilines1[i][1])),
 			color);
 		cv::circle(outImg(rect1), points1[i], 3, color, -1, CV_AA);
 
 		cv::line(outImg(rect1),
-			cv::Point(0,-epilines2[i][2]/epilines2[i][1]),
-			cv::Point(img2.cols,-(epilines2[i][2]+epilines2[i][0]*img2.cols)/epilines2[i][1]),
+			cv::Point(0,(int)(-epilines2[i][2]/epilines2[i][1])),
+			cv::Point(img2.cols,(int)(-(epilines2[i][2]+epilines2[i][0]*img2.cols)/epilines2[i][1])),
 			color);
 		cv::circle(outImg(rect2), points2[i], 3, color, -1, CV_AA);
 	}

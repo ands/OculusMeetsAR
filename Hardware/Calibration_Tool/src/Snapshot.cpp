@@ -33,7 +33,7 @@ int Snapshot::recursiveDelete(const char *path)
     char dir[MAX_PATH + 1];
     SHFILEOPSTRUCTA fos = {0};
 
-    strncpy(dir, path, MAX_PATH);
+    strncpy_s(dir, path, MAX_PATH);
     dir[strlen(dir) + 1] = 0; // double null terminate for SHFileOperation
 
     // delete the folder and everything inside
@@ -113,7 +113,7 @@ LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPAR
 				printf(".");
 
 				char filename[MAX_PATH];
-				_snprintf(filename, MAX_PATH, "%s\\capture_%003d_L.bmp", destinationDir, captureIndex);
+				_snprintf_s(filename, MAX_PATH, "%s\\capture_%003d_L.bmp", destinationDir, captureIndex);
 				if(!stbi_write_bmp(filename, width, height, 3, memL))
 				{
 					fprintf(stderr, "could not save \"%s\"\n", filename);
@@ -122,7 +122,7 @@ LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPAR
 
 				printf(".");
 
-				_snprintf(filename, MAX_PATH, "%s\\capture_%003d_R.bmp", destinationDir, captureIndex);
+				_snprintf_s(filename, MAX_PATH, "%s\\capture_%003d_R.bmp", destinationDir, captureIndex);
 				if(!stbi_write_bmp(filename, width, height, 3, memR))
 				{
 					fprintf(stderr, "could not save \"%s\"\n", filename);
@@ -135,6 +135,9 @@ LRESULT CALLBACK Snapshot::WindowProc(HWND window, UINT msg, WPARAM wparam, LPAR
 			else if (wparam == VK_ESCAPE)
 			{
 				done = true;
+				return 0;
+			}
+			else{
 				return 0;
 			}
 		} break;

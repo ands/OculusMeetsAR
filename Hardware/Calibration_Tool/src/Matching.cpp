@@ -32,7 +32,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 	cvtColor(bothImagesG,bothImages,CV_GRAY2RGB);
 	//for imshow purpose
 	Scalar color(50,50,255);
-	Point2f addPoint = Point2f(imageLeftUndistort->cols,0);
+	Point2f addPoint = Point2f((float)imageLeftUndistort->cols,0);
 
 	vector<Point2f> matchLeft, matchRight, matchCandidateLeft, matchCandidateRight, badMatchLeft, badMatchRight;
 
@@ -70,10 +70,10 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 
 	//simple symmetry and vertical disparity test
 	vector<DMatch> acceptable_matches;
-	for(int i=0;i<matches1.size();i++){
+	for(unsigned int i=0;i<matches1.size();i++){
 		int first = matches1[i].queryIdx;
 		int second = matches1[i].trainIdx;
-		for(int j=0;j<matches2.size();j++){
+		for(unsigned int j=0;j<matches2.size();j++){
 			if(matches2[j].queryIdx==second && matches2[j].trainIdx==first){
 				if(std::abs(pointsleft[first].pt.y-pointsright[second].pt.y)<30){
 					acceptable_matches.push_back(matches1[i]);
@@ -83,7 +83,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 	}
 
 	//save SIFT-matches as Point2f-vectors
-	for(int i=0;i<acceptable_matches.size();i++){
+	for(unsigned int i=0;i<acceptable_matches.size();i++){
 		DMatch current = acceptable_matches[i];
 		matchCandidateLeft.push_back(pointsleft[current.queryIdx].pt);
 		matchCandidateRight.push_back(pointsright[current.trainIdx].pt);
@@ -107,14 +107,14 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 					break;
 				}
 			}
-			for(int j=numOfChessmatches;j<matchLeft.size();j++){//compare to non-chessboardmatches
+			for(unsigned int j=numOfChessmatches;j<matchLeft.size();j++){//compare to non-chessboardmatches
 				if(pointdistance(matchLeft[j],curPointL)<50 && pointdistance(curPointL-matchLeft[j],curPointR-matchRight[j])<10){
 					nearby=true;
 					break;
 				}
 			}
 			//Test whether there are similar bad matches nearby
-			for(int j=0;j<badMatchLeft.size();j++){
+			for(unsigned int j=0;j<badMatchLeft.size();j++){
 				if(pointdistance(badMatchLeft[j],curPointL)<50 && pointdistance(curPointL-badMatchLeft[j],curPointR-badMatchRight[j])<5){
 					nearby=true;
 					break;
@@ -144,7 +144,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 		}
 	}
 	else if(method==2||method==5){//no manual selection
-		for(int i=0;i<matchCandidateLeft.size();i++){
+		for(unsigned int i=0;i<matchCandidateLeft.size();i++){
 			Point2f curPointL = matchCandidateLeft[i];
 			Point2f curPointR = matchCandidateRight[i];
 			bool nearby=false;
@@ -154,7 +154,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 					break;
 				}
 			}
-			for(int j=numOfChessmatches;j<matchLeft.size();j++){
+			for(unsigned int j=numOfChessmatches;j<matchLeft.size();j++){
 				if(pointdistance(matchLeft[j],curPointL)<50 && pointdistance(curPointL-matchLeft[j],curPointR-matchRight[j])<10){
 					nearby=true;
 					break;
@@ -171,7 +171,7 @@ vector<vector<Point2f>> Matching::siftMatcher(Mat *imageLeftUndistort, Mat *imag
 	//show all matches
 	Mat bothImagesCopy = bothImages.clone();
 	RNG rng;
-	for(int i=0;i<matchLeft.size();i++){
+	for(unsigned int i=0;i<matchLeft.size();i++){
 		Point2f curPointL = matchLeft[i];
 		Point2f curPointR = matchRight[i];
 		color=Scalar(rng(255),rng(255),rng(255));
@@ -219,7 +219,7 @@ vector<vector<Point2f>> Matching::computeChessboardMatches(Mat *imageLeftUndisto
 		vector<DMatch> chessmatches;
 		vector<KeyPoint> keypointsleft, keypointsright;
 		//save the matches
-		for(int i=0;i<cornersLeft.size();i++){
+		for(unsigned int i=0;i<cornersLeft.size();i++){
 			KeyPoint keyleft(cornersLeft[i],1);
 			keypointsleft.push_back(keyleft);
 			KeyPoint keyright(cornersRight[i],1);

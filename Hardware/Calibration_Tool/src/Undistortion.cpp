@@ -30,8 +30,8 @@ void Undistortion::calculateLUT(float sf)
 	int i, j;
 	int width = mapx.cols;
 	int height = mapx.rows;
-	float Nxc = height/2.0;
-	float Nyc = width/2.0;
+	float Nxc = height/2.0f;
+	float Nyc = width/2.0f;
 	float Nz  = -width/sf;
 	double M[3];
 	double m[2];
@@ -150,7 +150,7 @@ void Undistortion::getOcamModel(char *filename)
 	int i;
 
 	//Open file
-	if(!(f=fopen(filename,"r")))
+	if(fopen_s(&f,filename,"r")!=0)
 	{
 		printf("File %s cannot be opened\n", filename);
 		return;
@@ -158,38 +158,38 @@ void Undistortion::getOcamModel(char *filename)
 
 	//Read polynomial coefficients
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%d", length_pol);
+	fscanf_s(f,"\n");
+	fscanf_s(f,"%d", length_pol);
 	for (i = 0; i < *length_pol; i++)
 	{
-		fscanf(f," %lf",&pol[i]);
+		fscanf_s(f," %lf",&pol[i]);
 	}
 
 	//Read inverse polynomial coefficients
-	fscanf(f,"\n");
+	fscanf_s(f,"\n");
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%d", length_invpol);
+	fscanf_s(f,"\n");
+	fscanf_s(f,"%d", length_invpol);
 	for (i = 0; i < *length_invpol; i++)
 	{
-		fscanf(f," %lf",&invpol[i]);
+		fscanf_s(f," %lf",&invpol[i]);
 	}
 
 	//Read center coordinates
-	fscanf(f,"\n");
+	fscanf_s(f,"\n");
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%lf %lf\n", xc, yc);
+	fscanf_s(f,"\n");
+	fscanf_s(f,"%lf %lf\n", xc, yc);
 
 	//Read affine coefficients
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%lf %lf %lf\n", c,d,e);
+	fscanf_s(f,"\n");
+	fscanf_s(f,"%lf %lf %lf\n", c,d,e);
 
 	//Read image size
 	fgets(buf,CMV_MAX_BUF,f);
-	fscanf(f,"\n");
-	fscanf(f,"%d %d", height, width);
+	fscanf_s(f,"\n");
+	fscanf_s(f,"%d %d", height, width);
 
 	fclose(f);
 }

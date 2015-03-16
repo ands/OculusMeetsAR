@@ -72,7 +72,7 @@ void EpiGeoEstimation::fundamentalZMEK(vector<Point2f> leftmatch, vector<Point2f
 
 		//compute consensussetsize
 		int currentConsSize = 0;
-		for(int j=0;j<leftmatch.size();j++){
+		for(unsigned int j=0;j<leftmatch.size();j++){
 			if(transformDistance(tempF,leftmatch[j],rightmatch[j])<threshold){
 				currentConsSize++;
 			}
@@ -87,7 +87,7 @@ void EpiGeoEstimation::fundamentalZMEK(vector<Point2f> leftmatch, vector<Point2f
 
 	//calculate consensus set
 	vector<Point2f> leftConsensus, rightConsensus;
-	for(int i=0;i<leftmatch.size();i++){
+	for(unsigned int i=0;i<leftmatch.size();i++){
 		if(transformDistance(bestF,leftmatch[i],rightmatch[i])<threshold){
 			leftConsensus.push_back(leftmatch[i]);
 			rightConsensus.push_back(rightmatch[i]);
@@ -177,7 +177,7 @@ void EpiGeoEstimation::homographyError(vector<Point2f> leftMatches, vector<Point
 		result=0.0;
 		Mat A = leftHomography.inv();
 		Mat B = rightHomography.inv();
-		for(int i=0;i<leftMatches.size();i++){
+		for(unsigned int i=0;i<leftMatches.size();i++){
 			Mat leftV = Mat(3,1,CV_64FC1);
 			leftV.at<double>(0,0)=leftMatches[i].x;
 			leftV.at<double>(1,0)=leftMatches[i].y;
@@ -197,7 +197,7 @@ void EpiGeoEstimation::homographyError(vector<Point2f> leftMatches, vector<Point
 
 Mat EpiGeoEstimation::linearSolution(vector<Point2f> left, vector<Point2f> right){
 	Mat A = Mat(left.size(),7,CV_64FC1);
-	for(int i=0; i<left.size();i++){
+	for(unsigned int i=0; i<left.size();i++){
 		float u=left[i].x;
 		float v=left[i].y;
 		float u2=right[i].x;
@@ -212,7 +212,7 @@ Mat EpiGeoEstimation::linearSolution(vector<Point2f> left, vector<Point2f> right
 	}
 
 	Mat b = Mat(left.size(),1,CV_64FC1);
-	for(int j=0;j<left.size();j++){
+	for(unsigned int j=0;j<left.size();j++){
 		b.at<double>(j,0)=right[j].y-left[j].y;
 	}
 
@@ -252,12 +252,13 @@ bool EpiGeoEstimation::loadMatrices(const char *fundFile, const char *leftFile, 
 
 bool EpiGeoEstimation::loadMatrix(const char *fileName, Mat *A){
 	bool success=true;
-	FILE *file = fopen(fileName, "r");
+	FILE *file;
+	fopen_s(&file,fileName, "r");
 	if(file)
 	{
-		int count1 = fscanf(file, "%lf %lf %lf\n", &(A->at<double>(0,0)), &(A->at<double>(0,1)), &(A->at<double>(0,2)));
-		int count2 = fscanf(file, "%lf %lf %lf\n", &(A->at<double>(1,0)), &(A->at<double>(1,1)), &(A->at<double>(1,2)));
-		int count3 = fscanf(file, "%lf %lf %lf\n", &(A->at<double>(2,0)), &(A->at<double>(2,1)), &(A->at<double>(2,2)));
+		int count1 = fscanf_s(file, "%lf %lf %lf\n", &(A->at<double>(0,0)), &(A->at<double>(0,1)), &(A->at<double>(0,2)));
+		int count2 = fscanf_s(file, "%lf %lf %lf\n", &(A->at<double>(1,0)), &(A->at<double>(1,1)), &(A->at<double>(1,2)));
+		int count3 = fscanf_s(file, "%lf %lf %lf\n", &(A->at<double>(2,0)), &(A->at<double>(2,1)), &(A->at<double>(2,2)));
 		fclose(file);
 		if(!(count1==3 && count2==3 && count3==3)){
 			success=false;
@@ -285,13 +286,14 @@ bool EpiGeoEstimation::saveMatrices(const char *fundFile, const char *leftFile, 
 bool EpiGeoEstimation::saveMatrix(const char *fileName, Mat A){
 	bool success = true;
 	if(A.rows==3 && A.cols==3){
-		FILE *file = fopen(fileName, "w");
+		FILE *file;
+		fopen_s(&file,fileName, "w");
 		if(file)
 		{
 			double temp = A.at<double>(1,1);
-			fprintf(file, "%.30f %.30f %.30f\n", A.at<double>(0,0), A.at<double>(0,1), A.at<double>(0,2));
-			fprintf(file, "%.30f %.30f %.30f\n", A.at<double>(1,0), A.at<double>(1,1), A.at<double>(1,2));
-			fprintf(file, "%.30f %.30f %.30f\n", A.at<double>(2,0), A.at<double>(2,1), A.at<double>(2,2));
+			fprintf_s(file, "%.30f %.30f %.30f\n", A.at<double>(0,0), A.at<double>(0,1), A.at<double>(0,2));
+			fprintf_s(file, "%.30f %.30f %.30f\n", A.at<double>(1,0), A.at<double>(1,1), A.at<double>(1,2));
+			fprintf_s(file, "%.30f %.30f %.30f\n", A.at<double>(2,0), A.at<double>(2,1), A.at<double>(2,2));
 			fclose(file);
 		}
 		else{
