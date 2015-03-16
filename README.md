@@ -1,7 +1,12 @@
 OculusMeetsAR
 =============
 
-THIS IS A WORK IN PROGRESS, NOT AN USABLE LIBRARY/APPLICATION (yet)!
+OculusMeetsAR is a library to use the Oculus Rift DK2 Head Mounted Display, two Logitech C310 Webcams (with fisheye lenses) and the Natural Point OptiTrack Flex 3 tracking hardware in Augmented Reality applications.
+
+
+Here is a first test video of the RemoteGame example without any positional tracking:
+[![OculusMeetsAR - RemoteGame without positional tracking](http://img.youtube.com/vi/iCzXeNZOGMs/0.jpg)](http://www.youtube.com/watch?v=iCzXeNZOGMs)
+
 
 Resources:
 
