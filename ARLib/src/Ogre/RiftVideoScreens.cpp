@@ -71,8 +71,8 @@ namespace ARLib {
 
 	void RiftVideoScreens::setOffsets(Ogre::Vector2 leftOffset, Ogre::Vector2 rightOffset)
 	{
-		screenCalibrationNode[0]->setPosition(screenWidth * leftOffset.x, screenHeight * leftOffset.y, 0.0f);
-		screenCalibrationNode[1]->setPosition(screenWidth * rightOffset.x, screenHeight * rightOffset.y, 0.0f);
+		screenCalibrationNode[0]->setPosition(screenWidth * leftOffset.x, screenHeight * leftOffset.y -0.05f, 0.25f);
+		screenCalibrationNode[1]->setPosition(screenWidth * rightOffset.x, screenHeight * rightOffset.y -0.05f, 0.25f);
 	}
 
 	void RiftVideoScreens::setScalings(Ogre::Vector2 leftScale, Ogre::Vector2 rightScale)

@@ -101,7 +101,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	mRiftNode->getBodyNode()->attachObject(light); 
 
 	Ogre::SceneNode *swordOffsetNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	swordOffsetNode->setPosition(0,0,-0.2f);
+	swordOffsetNode->setPosition(0.08f,-0.1f,0.0f/*-0.2f*/);
     mSwordParentNode = new RigidListenerNode(swordOffsetNode, mSceneMgr, 2);
     mSword = new StarWarsLightSaber(mSwordParentNode->getSceneNode(), mSceneMgr, mDynamicsWorld);
     if(tracker)
@@ -109,7 +109,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 
 	mRemote = new StarWarsRemote(mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, mRiftNode->getHeadNode(),2.0f);
     mRemotePuppet = new StarWarsRemotePuppet(mRemote, mRiftNode->getBodyNode(), mSceneMgr->getRootSceneNode(), mSceneMgr, mDynamicsWorld, 2.0f);
-    mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
+    mRemotePuppet->init((mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1)) * 3.0f);
 }
 
 Scene::~Scene()
@@ -175,7 +175,7 @@ bool Scene::keyPressed(const OIS::KeyEvent& e)
     if(e.key == OIS::KC_C){
 		mRiftNode->calibrate();
 		mSwordParentNode->calibrate();
-		mRemotePuppet->init(mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1));
+		mRemotePuppet->init((mRiftNode->getHeadNode()->_getDerivedOrientation() * Ogre::Vector3(0,0,-1)) * 3.0f);
     }if(e.key == OIS::KC_V){
         mSword->draw();
     }if(e.key == OIS::KC_N){

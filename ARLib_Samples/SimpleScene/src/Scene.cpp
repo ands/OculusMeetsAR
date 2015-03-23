@@ -71,7 +71,7 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt3 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt3->getSubEntity(0)->setMaterialName( "CubeMaterialWhite" );
 	cubeNode3->attachObject( cubeEnt3 );
-	cubeNode3->setPosition(-0.4f, 0.2f, -0.2f);
+	cubeNode3->setPosition(-0.4f, 1.0f, 1.2f);
 	cubeNode3->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* roomLight = mSceneMgr->createLight();
@@ -90,14 +90,14 @@ Scene::Scene(ARLib::Rift *rift, ARLib::TrackingManager *tracker,
 	Ogre::Entity* cubeEnt2 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt2->getSubEntity(0)->setMaterialName( "CubeMaterialGreen" );
 	cubeNode2->attachObject( cubeEnt2 );
-	cubeNode2->setPosition(0.6f, 0.0f, 0.0f);
+	cubeNode2->setPosition(0.6f, 0.8f, 1.4f);
 	cubeNode2->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::SceneNode* cubeNode1 = mSceneMgr->getRootSceneNode()->createChildSceneNode();
 	Ogre::Entity* cubeEnt1 = mSceneMgr->createEntity( "Cube.mesh" );
 	cubeEnt1->getSubEntity(0)->setMaterialName( "CubeMaterialRed" );
 	cubeNode1->attachObject( cubeEnt1 );
-	cubeNode1->setPosition(0.4f, -0.2f, 0.6f);
+	cubeNode1->setPosition(0.4f, 0.6f, 2.0f);
 	cubeNode1->setScale(0.1f, 0.1f, 0.1f);
 
 	Ogre::Light* light = mSceneMgr->createLight();

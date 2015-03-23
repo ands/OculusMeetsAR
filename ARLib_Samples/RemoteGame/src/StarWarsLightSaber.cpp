@@ -12,11 +12,9 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     , mAccumTime(0.0f){
     mSceneNode = parentNode->createChildSceneNode("StarWarsLaserSword");
     Ogre::Entity *swordEntity = sceneMgr->createEntity("Blade.mesh");
-    swordEntity->setMaterialName("BlueGlowBig");
+    swordEntity->setMaterialName("GreenGlowBig");
     mSceneNode->attachObject(swordEntity);
     mSceneNode->setScale(1.0f, 0.0f, 1.0f);
-
-	mSwordLocalPos = Ogre::Vector3(0,0,0); //delete!!!!
 
     //create bullet collision object
     OgreBulletCollisions::StaticMeshToShapeConverter *stmc = new OgreBulletCollisions::StaticMeshToShapeConverter(swordEntity);
@@ -25,7 +23,7 @@ StarWarsLightSaber::StarWarsLightSaber(Ogre::SceneNode *parentNode, Ogre::SceneM
     mNoShape = new OgreBulletCollisions::BoxCollisionShape(Ogre::Vector3(0.0f, 0.0f, 0.0f));
 
     mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-	mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
+	mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
 
 	mSwordBody->getBulletRigidBody()->setUserPointer(nullptr);
     delete stmc;
@@ -57,7 +55,7 @@ void StarWarsLightSaber::update(float dt){
 
                 delete mSwordBody;
                 mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-				mSwordBody->setShape(mSceneNode, mSwordShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
+				mSwordBody->setShape(mSceneNode, mSwordShape, 0.6f, 0.6f, 0.0f);
                 mSceneNode->setScale(1.0f, 1.0f, 1.0f);
             }else{
                 mSceneNode->setScale(1.0f, mAccumTime/drawTime, 1.0f);
@@ -70,7 +68,7 @@ void StarWarsLightSaber::update(float dt){
 
                 delete mSwordBody;
                 mSwordBody = new OgreBulletDynamics::RigidBody("SwordBody", mDynamicsWorld, 2, 1);
-                mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f, mSwordLocalPos);
+                mSwordBody->setShape(mSceneNode, mNoShape, 0.6f, 0.6f, 0.0f);
                 mSceneNode->setScale(1.0f, 0.0f, 1.0f);
             }else{
                 mSceneNode->setScale(1.0f, (drawTime - mAccumTime)/drawTime, 1.0f);

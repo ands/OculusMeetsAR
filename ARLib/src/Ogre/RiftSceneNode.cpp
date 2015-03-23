@@ -57,8 +57,8 @@ RiftSceneNode::RiftSceneNode(Rift *_rift, Ogre::SceneManager *sceneManager, floa
 		}
 	}
 
-	cameras[0]->setPosition(-ipd/2.0f, 0.0f, 0.0f);
-	cameras[1]->setPosition( ipd/2.0f, 0.0f, 0.0f);
+	cameras[0]->setPosition(-ipd/2.0f, -0.05f, 0.25f);
+	cameras[1]->setPosition( ipd/2.0f, -0.05f, 0.25f);
 }
 
 RiftSceneNode::~RiftSceneNode()

@@ -62,7 +62,7 @@ void StarWarsRemotePuppet::init(const Ogre::Vector3& position){
 
 	mCenterOfRotation = mParentPosNode->_getDerivedPosition();
 	mSceneNode->setPosition(std::atan2f(position.z, position.x) + mCenterOfRotation.x,
-                            position.z + mCenterOfRotation.y, mRadius + mCenterOfRotation.z);
+                            /*position.z + mCenterOfRotation.y*/ -1.0f, mRadius + mCenterOfRotation.z);
 	
     mRemote->changePos(Ogre::Vector3(mRadius*std::cosf(mSceneNode->getPosition().x), mSceneNode->getPosition().y, mRadius*std::sinf(mSceneNode->getPosition().x))+mCenterOfRotation);
 }

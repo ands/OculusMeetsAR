@@ -81,7 +81,7 @@ void App::initOgre(bool showDebugWindow)
 		Ogre::NameValuePairList miscParams;
 		miscParams["monitorIndex"] = Ogre::StringConverter::toString(1);
 		miscParams["border"] = "none";
-		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, false, &miscParams);
+		mWindow = mRoot->createRenderWindow("ARLib Example", 1920, 1080, true, &miscParams);
 	}
 	if (showDebugWindow)
 	{
