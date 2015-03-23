@@ -5,7 +5,7 @@ OculusMeetsAR is a library to use the Oculus Rift DK2 Head Mounted Display, two 
 
 
 Here is a first test video of the RemoteGame example without any positional tracking:
-[![OculusMeetsAR - RemoteGame without positional tracking](http://img.youtube.com/vi/iCzXeNZOGMs/0.jpg)](http://www.youtube.com/watch?v=iCzXeNZOGMs)
+[![OculusMeetsAR - RemoteGame without positional tracking](http://img.youtube.com/vi/00ViRXw4kz8/0.jpg)](https://www.youtube.com/watch?v=00ViRXw4kz8&index=1&list=PLhHrY3VnlsyW8hXCeFxSEMeTvPfaKLa_S)
 
 
 Resources:
