@@ -5,8 +5,13 @@ OculusMeetsAR is a library to use the Oculus Rift DK2 Head Mounted Display, two 
 
 
 A few example videos:
-[![OculusMeetsAR - Example video playlist](http://img.youtube.com/vi/00ViRXw4kz8/0.jpg)](https://www.youtube.com/watch?v=00ViRXw4kz8&index=1&list=PLhHrY3VnlsyW8hXCeFxSEMeTvPfaKLa_S)
 
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=00ViRXw4kz8&index=1&list=PLhHrY3VnlsyW8hXCeFxSEMeTvPfaKLa_S">
+    <img src="https://raw.githubusercontent.com/wiki/ands/OculusMeetsAR/images/RemoteGameThumb.png" alt="OculusMeetsAR - Example video playlist"/>
+  </a>
+</p>
 
 Resources:
 
