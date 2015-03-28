@@ -6,58 +6,37 @@ OculusMeetsAR is a library to use the Oculus Rift DK2 Head Mounted Display, two 
 
 A few example videos:
 
-
 <p align="center">
   <a href="https://www.youtube.com/watch?v=00ViRXw4kz8&index=1&list=PLhHrY3VnlsyW8hXCeFxSEMeTvPfaKLa_S">
     <img src="https://raw.githubusercontent.com/wiki/ands/OculusMeetsAR/images/RemoteGameThumb.png" alt="OculusMeetsAR - Example video playlist"/>
   </a>
 </p>
 
-Resources:
-
-- Wiki: https://github.com/ands/OculusMeetsAR/wiki
+Please visit our wiki for documentation: https://github.com/ands/OculusMeetsAR/wiki
 
 
+Project Files
+=============
+- **ARLib:** The OculusMeetsAR libraries. They can be used to create augmented reality applications with an Oculus Rift DK2, attached cameras and a tracking system. Also features OGRE integration.
+- **ARLib_Samples:** Two simple example applications that use ARLib with OGRE.
+- **Hardware:** Contains our camera calibration tool and 3D-Printable camera and lens mounts.
+- **TrackingTestServer:** A simple tracking system server that rotates a rigid body (to test ARLibTracking without a real setup).
 
-Including:
-
-- NatNetSDK v2.7
-
-- OGRE v1.9
-
+Included Third Party Libraries
+==============================
+- OGRE v1.9 with Bullet
 - LibOVR v0.4.3
-
-- OpenAL Soft 1.1
-
+- NatNetSDK v2.7
 - TinyThread++ 1.1
-
-
-For Visual Studio 2010 (with service pack 1!) ONLY
-
-Contents
-========
-
-- ARLib: The main library. Can be used to create augmented reality applications with an Oculus Rift DK2 and attached cameras. Also features direct Ogre integration.
-
-- ARLib_Samples: Various sample applications that use ARLib with Ogre.
-
-- LibOVR: Static libraries from the original Oculus SDK.
-
-- NatNetSDK: Dynamically linked libraries from the original NatNetSDK for tracking purposes.
-
-- OgreBulletPack: The Object-Oriented Graphics Rendering Engine with Bullet Physics bindings (and the viargo input aggregation library).
+- OpenCV 2.4.10 (only for the calibration tool)
 
 Building
 ========
+For Visual Studio 2010 with service pack 1 ONLY (if you want to use OGRE v1.9)!
 
-- Execute SET_ENV.bat to set environment variables for all the libraries prior to building.
-
+- Execute SET_ENV.bat to set environment variables for all libraries prior to building.
 - Open the ARLib solution file and batch build everything.
-
 - Open up the ARLib_Samples solution file and set the working directory for the example projects to "$(TargetDir)" (those are not saved in the Visual Studio project files - don't ask...).
-
 - Build and run the ARLib_Samples.
-
 - Enjoy.
-
 - $Profit.
