@@ -95,12 +95,12 @@ VideoPlayer::~VideoPlayer()
 	free(ocamModel);
 }
 
-void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
+void * VideoPlayer::beginUpdate(LARGE_INTEGER *captureTimeStamp)
 {
 	HRESULT check = E_FAIL;
 	if(capture)
 	{
-		BYTE* sample = capture->getLastImagesample(&check, captureTimeStamp);
+		BYTE* sample = capture->BeginGetLastImagesample(&check, captureTimeStamp);
 		if(SUCCEEDED(check))
 		{
 			if(captureTimeStamp){
@@ -110,6 +110,11 @@ void * VideoPlayer::update(LARGE_INTEGER *captureTimeStamp)
 		}
 	}
 	return NULL;
+}
+void VideoPlayer::endUpdate()
+{
+	if(capture)
+		capture->EndGetLastImagesample();
 }
 
 int VideoPlayer::getVideoWidth()

@@ -25,7 +25,8 @@ public:
 	// Returns a pointer to the current video frame memory in the BGR format
 	// or NULL if there is no new frame
 	// captureTimeStamp is set to the value of QueryPerformanceCounter() during arrival
-	void * update(LARGE_INTEGER *captureTimeStamp = NULL);
+	void * beginUpdate(LARGE_INTEGER *captureTimeStamp = NULL);
+	void endUpdate();
 	// Precalculates a coordinate mapping for undistortion
 	void calculateUndistortionMap(float *xyMap);
 

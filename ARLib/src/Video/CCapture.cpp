@@ -495,7 +495,7 @@ done:
 	}
 
 	//get last image sample
-	BYTE* CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp)
+	BYTE* CCapture::BeginGetLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp)
 	{
 		BYTE *returndata = NULL;
 		*res = E_FAIL;
@@ -504,16 +504,23 @@ done:
 		int curbuf = currentbuffer == 0 ? numBuffers - 1 : currentbuffer - 1;
 		if (buffersWithNewFramesBitfield & (1 << curbuf)) // does the last received buffer contain a new frame?
 		{
-			buffersWithNewFramesBitfield &= ~(1 << curbuf); // consume the buffer
-			bufferlist[curbuf]->Unlock(); // ??
 			DWORD len = 0;
 			*res = bufferlist[curbuf]->Lock(&returndata, NULL, &len);
+			assert(len == (1280 * 960 * 3));
 			if (captureTimeStamp)
 				*captureTimeStamp = bufferCaptureTimeStamp[curbuf];
-			bufferlist[curbuf]->Unlock(); // TODO: must be unlocked after use, not here!
+		}
+		return returndata;
+	}
+	void CCapture::EndGetLastImagesample()
+	{
+		int curbuf = currentbuffer == 0 ? numBuffers - 1 : currentbuffer - 1;
+		if (buffersWithNewFramesBitfield & (1 << curbuf)) // did the last received buffer contain a new frame?
+		{
+			buffersWithNewFramesBitfield &= ~(1 << curbuf); // consume the buffer
+			bufferlist[curbuf]->Unlock();
 		}
 		LeaveCriticalSection(&m_critsec);
-		return returndata;
 	}
 
 

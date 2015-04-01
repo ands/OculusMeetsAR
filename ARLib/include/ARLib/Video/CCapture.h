@@ -103,7 +103,8 @@ public:
     HRESULT     StartCapture(IMFActivate *pActivate);
     HRESULT     EndCaptureSession();
     HRESULT     CheckDeviceLost(DEV_BROADCAST_HDR *pHdr, BOOL *pbDeviceLost);
-	BYTE*       CCapture::getLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp = NULL);
+	BYTE*       BeginGetLastImagesample(HRESULT *res, LARGE_INTEGER *captureTimeStamp = NULL);
+	void		EndGetLastImagesample();
 
 protected:
 

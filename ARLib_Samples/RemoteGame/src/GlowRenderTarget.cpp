@@ -14,7 +14,7 @@ void GlowRenderTarget::setCameras(Ogre::Camera *left, Ogre::Camera *right)
 	camera[1] = right;
 	destination->setCameras(camera[0], camera[1]);
 
-	// attach both cameras
+	// attach compositor to both viewports
 	for (int eyeNum = 0; eyeNum < 2; eyeNum++)
 	{
 		Ogre::Viewport *vp = camera[eyeNum]->getViewport();
