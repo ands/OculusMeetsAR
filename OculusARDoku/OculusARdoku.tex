@@ -1,0 +1,816 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+    \usepackage{xltxtra,xunicode}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage{longtable,booktabs}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\ifxetex
+  \usepackage[setpagesize=false, % page size defined by xetex
+              unicode=false, % unicode breaks when used with xetex
+              xetex]{hyperref}
+\else
+  \usepackage[unicode=true]{hyperref}
+\fi
+\hypersetup{breaklinks=true,
+            bookmarks=true,
+            pdfauthor={},
+            pdftitle={},
+            colorlinks=true,
+            citecolor=blue,
+            urlcolor=blue,
+            linkcolor=magenta,
+            pdfborder={0 0 0}}
+\urlstyle{same}  % don't use monospace font for urls
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{0}
+
+\date{}
+
+\begin{document}
+
+Welcome to the OculusMeetsAR wiki!
+
+\section{Hardware Requirements}\label{hardware-requirements}
+
+Please note that every single part of the following hardware
+configuration is optional in the example applications. You do not need
+any of the hardware present to develop with ARLib! The hardware we were
+developing for: - 2x
+\href{http://www.logitech.com/de-de/product/hd-webcam-c310}{Logitech
+C310 Webcams} -
+\href{https://github.com/ands/OculusMeetsAR/tree/master/Hardware/Printmodels}{3D-Printed
+camera mounts and lens mounts} - 2x
+\href{http://www.camera2000.com/en/cctv-board-security-video-camera-1-8mm-lens-f2-0.html}{Fisheye
+1.8mm lens F2.0} - \href{https://www.oculus.com/dk2/}{Oculus Rift DK2
+Head-Mounted Display} -
+\href{http://www.optitrack.com/products/flex-3/}{OptiTrack Flex 3
+Tracking System}
+
+Here is an exploded-view drawing of our modified HMD:\\
+\includegraphics*{explosion.jpg}
+The components from left to right: Oculus Rift DK2, 3D-printed camera
+mount, Logitech C310s, 3D-printed lens mounts, lenses.
+
+\subsection{Lens selection and camera
+calibration}\label{lens-selection-and-camera-calibration}
+
+Regarding our hardware choices we recommend William Steptoe's
+\href{http://willsteptoe.com/post/67399683294/ar-rift-camera-selection-part-2}{documentation
+on his project AR-Rift}. According to different user-reports, the actual
+horizontal FOV of the DK2, which should be matched by the lenses, is
+only about 80°-90°. With our lenses, we got a vertical* FOV of
+approximately 75°, so for a more accurate matching one might want to buy
+lenses with a smaller focal length. To prevent easy mistakes on your
+search for other lenses, we recommend
+\href{http://pomeroyprinting.blogspot.de/2014/04/modifying-logitech-c310-hd-webcam.html}{this
+post by Brandon Pomeroy}.
+
+*Remark: This is the relevant FOV since the cameras are mounted with a
+90° rotation!
+
+For calibration we used Davide Scaramuzzas
+\href{https://sites.google.com/site/scarabotix/ocamcalib-toolbox}{OCamCalib
+toolbox} along with a small
+\href{https://github.com/ands/OculusMeetsAR/tree/master/Hardware}{stereo
+calibration tool}, we implemented using OpenCV. Click
+\href{https://github.com/ands/OculusMeetsAR/wiki/Calibration}{here} for
+a step-by-step guide and technical details.
+
+\section{ARLib}\label{arlib}
+
+This is the main library we are developing here. It is comprised of the
+following modules:
+
+\begin{itemize}
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Video-Module}{ARLibVideo}:
+  The stereo video input library. It grabs real-time video streams from
+  the two cameras attached to the Oculus Rift DK2 and provides
+  coordinate lookup tables to undistort them according to their lens
+  parameters and align them to one another according to their
+  precalculated homographies.
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Oculus-Module}{ARLibOculus}:
+  A small wrapper for LibOVR. Only the needed parts. It initializes the
+  HMD, provides the LibOVR configuration parameters and the latest
+  LibOVR tracking data.
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Tracking-Module}{ARLibTracking}:
+  The rigid body tracking library. It uses the NatNetSDK and/or
+  ARLibOculus to provide the latest positions and orientations of rigid
+  bodies as well as a fraction of their tracking history for retroactive
+  queries.
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Ogre-Module}{ARLibOgre}:
+  The OGRE 1.9 interface library. The only part of ARLib that depends on
+  OGRE! Provides all the shaders, materials, render targets and
+  abstracted components that can be directly inserted into a scene.
+\end{itemize}
+
+\section{ARLib\_Samples}\label{arlibux5fsamples}
+
+We provide two simple example projects that demonstrate the usage of
+ARLib within OGRE:
+
+\begin{itemize}
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/SimpleScene}{SimpleScene}:
+  A simple example scene with some static objects placed around the
+  origin.
+\item
+  \href{https://github.com/ands/OculusMeetsAR/wiki/RemoteGame}{RemoteGame}:
+  A simple game where one has to defend against laser bullets of a Star
+  Wars Remote.
+\end{itemize}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\item
+  Before starting the stereo calibration, download the
+  \href{https://sites.google.com/site/scarabotix/ocamcalib-toolbox}{OCamCalib
+  Toolbox} for Matlab provided by Davide Scaramuzza. Use this tool to
+  calculate the intrinsic camera parameters for both cameras. We
+  recommend our calibration tool to take snapshots for both cameras (see
+  3). Rename the two resulting calib\_results.txt to
+  calib\_results\_CAM1.txt (left camera) and calib\_results\_CAM2.txt
+  (right camera) and place these files at
+  /Hardware/Calibration\_Tool/media/
+\item
+  Connect your webcams to the system and start our
+  \href{https://github.com/ands/OculusMeetsAR/tree/master/Hardware/Calibration_Tool}{calibration
+  tool}. You will see the main menu.\\
+  \includegraphics*{0.jpg}
+  Note: We built our system for two Logitech C310 webcams with Logitech
+  drivers installed. If you don't want to use Logitech Cxxx cameras or
+  the Logitech drivers, you will have to modify the
+  \href{https://github.com/ands/OculusMeetsAR/tree/master/ARLib/src/Video}{VideoPlayer.cpp}.
+\item
+  Take snapshots, which you can use for the stereo calibration (main
+  menu option 1). After selecting this option, press SPACE to take
+  snapshot or ESC to exit.
+\item
+  Load the images from the media folder (main menu option 2). The tool
+  will list the snapshots.\\
+  \includegraphics*{2.jpg}
+  Now select the snapshots, you want to use for calibration (simply
+  press ENTER to select all). Here we decided to choose the snapshot
+  pairs 1,2,3,4 and 7. Then our tool loads and undistorts (according to
+  the previously determined ocam models) the images.\\
+  \includegraphics*{3.jpg}
+\item
+  Extract and match keypoints (main menu option 3).\\
+  \includegraphics*{4.jpg}
+  Select the second option and choose the method for keypoint extraction
+  and matching -
+  \href{http://en.wikipedia.org/wiki/Scale-invariant_feature_transform}{SIFT},
+  chessboard detection (using OpenCV's chessboard corner detector), or a
+  combination of both.\\
+  \includegraphics*{5.jpg}
+  If you choose the first or last method, you will have the option to
+  check the matches manually.\\
+  \includegraphics*{6.jpg}
+  If you want to examine the matches manually, for every match you will
+  get an image like this.\\
+  \includegraphics*{7.jpg}
+  Now press the RIGHT ARROW KEY to accept the currently displayed match
+  or any other key to reject it. After matching the keypoints of an
+  image pair, the console will tell you, how many matches you accepted
+  and how many of those were added to the final collection of matches.
+  Some correct matches might be discarded because of previously added
+  very similar matches.\\
+  \includegraphics*{8.jpg}
+  For chessboard matching you need to enter the number of inner
+  chessboard corners (e.g.~for a standard 8x8 chessboard enter 7 as
+  x-size as well as y-size).\\
+  \includegraphics*{9_0.jpg}
+\item
+  Approximate the
+  \href{http://en.wikipedia.org/wiki/Epipolar_geometry}{epipolar
+  geometry} (main menu option 4). With the calculated or selected
+  matches we now want to estimate the fundamental matrix as well as the
+  homographies, which we can use to rectify our camera streams.\\
+  \includegraphics*{9_1.jpg}
+  Here we used two methods: 1. The implementation of Hartley's
+  \href{http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html\#findfundamentalmat}{8-point-algorithm}
+  from OpenCV, which uses RANSAC for more than 8 points. 2. We
+  implemented
+  \href{http://publica.fraunhofer.de/documents/N-246139.html}{this
+  paper} by Zilly, Müller, Eisert and Kauff.\\
+  \includegraphics*{10.jpg}
+  If you choose the latter, you can calculate the rectifying
+  homographies either according to the mentioned paper or using
+  \href{http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html\#stereorectifyuncalibrated}{OpenCV's
+  implementation of Hartley's algorithm}.\\
+  \includegraphics*{11.jpg}
+\item
+  Visualize the approximated fundamental matrix and homogrphies (main
+  menu option 5). This will draw some epipolar lines on the first image
+  pair loaded. Furthermore it will rectify theses images. The results
+  are saved to the media folder.\\
+  \includegraphics*{12.jpg}
+  \includegraphics*{13.jpg}
+	\includegraphics*{14.jpg}
+\item
+  If you are satisfied with the results, you will have to copy the files
+  homography\_CAM1.txt and homography\_CAM2.txt from the media folder to
+  ARLibSamples/media/.
+\end{enumerate}
+
+ARLibOculus is just a lightweight single-class wrapper for the needed
+parts of LibOVR (the Oculus SDK). Including
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Oculus/Rift.h}{ARLib/Oculus/Rift.h}
+won't pull any LibOVR header files into your compilation unit. In fact,
+it doesn't depend on anything at all!
+
+\section{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Oculus/Rift.h}{ARLib::Rift}}{ARLib::Rift}}\label{arlibrift}
+
+\subsection{Static Methods}\label{static-methods}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+static void init();
+\end{verbatim}
+
+Initializes LibOVR. Must be called once before using anything else from
+ARLibOculus.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+static void shutdown();
+\end{verbatim}
+
+Shuts down LibOVR. Should be called once after deleting all ARLib::Rift
+instances.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+static bool available(int id);
+\end{verbatim}
+
+Test if an Oculus Rift device with the specified id is connected (0 is
+the first connected Rift).
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsection{Methods}\label{methods}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+enum RIFT_ERROR_CODE
+{
+    RIFT_OK,
+    RIFT_CONNECTION_ERROR,
+    RIFT_TRACKING_ERROR
+};
+
+RIFT_ERROR_CODE initialize(int id);
+\end{verbatim}
+
+Initializes this instance. Tries to connect to the Oculus Rift device
+with the specified id. Returns RIFT\_OK on success.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+void getTextureSizes(
+    int *size2dL,
+    int *size2dR);
+\end{verbatim}
+
+Writes the recommended render target texture/framebuffer resolutions for
+each eye into the specified int{[}2{]} arrays.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+void getUVScalesAndOffsets(
+    float *scale2dL, float *offset2dL,
+    float *scale2dR, float *offset2dR);
+\end{verbatim}
+
+Writes texture coordinate shader parameters for each eye to the
+specified float{[}2{]} arrays. These have to be passed as uniforms to
+the
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/ogre_media/ARLibOculusDistortionVertex.glsl}{ARLibOculusDistortionVertex.glsl}
+shader.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+struct DistortionVertex
+{
+    float ScreenPosNDC[2]; // [-1,+1],[-1,+1] over the entire framebuffer.
+    float TimeWarpFactor;  // Lerp factor between time-warp matrices. Can be encoded in Pos.z.
+    float VignetteFactor;  // Vignette fade factor. Can be encoded in Pos.w.
+    float TanEyeAnglesR[2];
+    float TanEyeAnglesG[2];
+    float TanEyeAnglesB[2];
+};
+
+void getDistortionGeometries(
+    DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
+    DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR);
+\end{verbatim}
+
+Writes pointers to triangle mesh data and data quantities for the
+distortion meshes of each eye to the specified locations.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+void getProjections(
+    float znear, float zfar, bool rightHanded,
+    float *aspectRatioL, float *projection4x4L,
+    float *aspectRatioR, float *projection4x4R);
+\end{verbatim}
+
+For specified near and far distances, writes device aspect ratios and
+projection matrices for each eye into the specified locations.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+void getPose(float *position3d, float *orientationQuaternionXYZW);
+\end{verbatim}
+
+Writes the latest LibOVR tracking position and orientation to the
+specified float{[}3{]} and float{[}4{]} arrays.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+void recenterPose();
+\end{verbatim}
+
+Will recenter the tracking position and orientation (yaw component) to
+the current pose.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+float getInterpupillaryDistance();
+\end{verbatim}
+
+Returns the configured IPD (interpupillary distance) for the current
+LibOVR user.
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\begin{verbatim}
+bool isPositionCurrentlyTracked();
+bool isOrientationCurrentlyTracked();
+bool isCameraPoseCurrentlyTracked();
+bool isPositionTrackingConnected();
+\end{verbatim}
+
+Various LibOVR tracking state flags.
+
+\section{Example}\label{example}
+
+Usage in an OGRE scene (have a look at the
+\href{https://github.com/ands/OculusMeetsAR/tree/master/ARLib_Samples}{ARLib\_Samples}
+for more details):
+
+\begin{verbatim}
+// create a rift node and add it to the tracking system
+riftNode = new ARLib::RiftSceneNode(rift, sceneManager, 0.001f, 50.0f, 1);
+tracker->addRigidBodyEventListener(riftNode);
+
+// add a render target that renders to the rift screen (window)
+renderTarget = new ARLib::RiftRenderTarget(rift, root, window);
+riftNode->addRenderTarget(renderTarget);
+
+// add a render target that renders to an additional debug output screen (smallWindow)
+smallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
+riftNode->addRenderTarget(smallRenderTarget);
+
+// attach video screens (riftVideoScreens->update() needs to be called each frame!)
+riftVideoScreens = new ARLib::RiftVideoScreens(sceneManager, riftNode, leftVideoPlayer, rightVideoPlayer, tracker);
+\end{verbatim}
+
+\begin{center}\rule{0.5\linewidth}{\linethickness}\end{center}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftSceneNode.h}{ARLib::RiftSceneNode}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Tracking/RigidBodyEventListener.h\#L33}{ARLib::RiftRigidBodyEventListener}}{ARLib::RiftSceneNode : public ARLib::RiftRigidBodyEventListener}}\label{arlibriftscenenode-public-arlibriftrigidbodyeventlistener}
+
+The RiftSceneNode represents the virtual Oculus Rift device in the OGRE
+scene. Especially, it contains the two cameras which represent the eyes.
+RenderTargets can be connected to the RiftSceneNode.
+
+\begin{verbatim}
+// constructor
+RiftSceneNode(ARLib::Rift *rift, Ogre::SceneManager *sceneManager, float zNear, float zFar, unsigned int rigidBodyID);
+
+// the various parts the RiftSceneNode is comprised of
+ARLib::Rift *getRift();
+Ogre::SceneNode *getBodyNode();
+Ogre::SceneNode *getHeadNode();
+Ogre::SceneNode *getHeadCalibrationNode();
+Ogre::Camera *getLeftCamera();
+Ogre::Camera *getRightCamera();
+
+// manually adjustable orientation (useful for mouselook if no actual Oculus Rift device is connected)
+void setPitch(Ogre::Radian angle);
+void setYaw(Ogre::Radian angle);
+
+// maintain the render targets
+void addRenderTarget(ARLib::RenderTarget *renderTarget);
+void removeRenderTarget(ARLib::RenderTarget *renderTarget);
+void removeAllRenderTargets();
+\end{verbatim}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftRenderTarget.h}{ARLib::RiftRenderTarget}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RenderTarget.h}{ARLib::RenderTarget}}{ARLib::RiftRenderTarget : public ARLib::RenderTarget}}\label{arlibriftrendertarget-public-arlibrendertarget}
+
+The RiftRenderTarget is the RenderTarget that renders to the Oculus Rift
+screen (in extended desktop mode), using the provided distortion meshes,
+vignetting and chromatic aberration correction.
+
+\begin{verbatim}
+// constructor
+RiftRenderTarget(ARLib::Rift *rift, Ogre::Root *root, Ogre::RenderWindow *renderWindow);
+\end{verbatim}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/DebugRenderTarget.h}{ARLib::DebugRenderTarget}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RenderTarget.h}{ARLib::RenderTarget}}{ARLib::DebugRenderTarget : public ARLib::RenderTarget}}\label{arlibdebugrendertarget-public-arlibrendertarget}
+
+The DebugRenderTarget is a RenderTarget that renders both camera images
+next to each other directly to a debug output window. Use this, if you
+don't have an actual Oculus Rift connected.
+
+\begin{verbatim}
+// constructor
+DebugRenderTarget(Ogre::RenderWindow *renderWindow);
+\end{verbatim}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftVideoScreens.h}{ARLib::RiftVideoScreens}}{ARLib::RiftVideoScreens}}\label{arlibriftvideoscreens}
+
+RiftVideoScreens manages the streaming and placement of camera images.
+The camera images are placed at the location in the scene where they
+have been captured (according to their capture timestamp and the Rifts'
+tracking data history).
+
+\begin{verbatim}
+// constructor
+RiftVideoScreens(
+    Ogre::SceneManager *sceneManager, ARLib::RiftSceneNode *riftNode,
+    ARLib::VideoPlayer *videoPlayerLeft, ARLib::VideoPlayer *videoPlayerRight,
+    ARLib::TrackingManager *trackingManager = NULL);
+
+// use these to fine-tune the video image positions and sizes
+void setOffsets(Ogre::Vector2 leftOffset, Ogre::Vector2 rightOffset);
+void setScalings(Ogre::Vector2 leftScale, Ogre::Vector2 rightScale);
+
+// call this every frame to upload the latest camera images
+void update();
+\end{verbatim}
+
+This page explains the integration of postprocessing effects into the
+stereo output pipeline of ARLibOgre.
+
+\section{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/RemoteGame/src/GlowRenderTarget.cpp}{GlowRenderTarget}}{GlowRenderTarget}}\label{glowrendertarget}
+
+As you can see in
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/RemoteGame/src/GlowRenderTarget.cpp}{GlowRenderTarget.cpp},
+attaching
+\href{https://github.com/ands/OculusMeetsAR/wiki/Ogre-Module}{RenderTargets}
+to the
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftSceneNode.h}{RiftSceneNode}
+can be intercepted (or decorated/wrapped as in the ``decorator
+pattern'') by inserting a custom RenderTarget in between the
+RiftSceneNode and the actual RenderTarget. In
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/RemoteGame/src/GlowRenderTarget.cpp}{GlowRenderTarget.cpp},
+the latest viewports for both eye cameras are accessed after they were
+attached to add a glow effect compositor.
+
+\section{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/Common/src/NPRWatercolorRenderTarget.cpp}{NPRWatercolorRenderTarget}}{NPRWatercolorRenderTarget}}\label{nprwatercolorrendertarget}
+
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/Common/src/NPRWatercolorRenderTarget.cpp}{NPRWatercolorRenderTarget.cpp}
+demonstrates a more advanced example for postprocessing. Instead of just
+directly rendering and compositing into the destination RenderTarget,
+the eye camera images are passed both blurred and unchanged to an OGRE
+MultiRenderTarget. The blurred images are used to make voronoi-like
+tilings of the input image (the brushstrokes), while edges detected in
+the original images are subtracted from the voronoi tilings (sharp
+outlines). The results are presented in separate scenes, which are seen
+by another set of cameras. Those cameras are finally passed to the
+destination RenderTarget.
+
+The whole process is a simplified version of a
+\href{http://csnotes.upm.edu.my/kelasmaya/web.nsf/0/d82e709c4661ce464825766400365c4d/\$FILE/p231-chen.pdf}{technique
+by Chen, Turk and MacIntyre from 2008}. The idea was that if both, real
+images and rendered objects are postprocessed to look like stylized
+watercolor paintings, it might be more difficult to tell them apart.
+
+You should read the notes for the
+\href{https://github.com/ands/OculusMeetsAR/wiki/SimpleScene}{SimpleScene}
+first. This is the more advanced example. In addition to the
+\href{https://github.com/ands/OculusMeetsAR/wiki/SimpleScene}{SimpleScene},
+this example includes some physics and gameplay code.
+
+\section{Keybindings}\label{keybindings}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  \textbf{`V'}: Pull out the lightsaber.
+\item
+  \textbf{`C'}: Set the origin of the scene to the current position and
+  orientation of the Oculus Rift.
+\item
+  \textbf{`N'}: Switch between the Glow Compositor,
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Postprocessing}{Watercolor
+  postprocessing effect}, both and none of them.
+\item
+  \textbf{`9'}: Increase the amount of constant video latency (for the
+  retroactive positioning of video frames in the scene).
+\item
+  \textbf{`0'}: Decrease the amount of constant video latency (for the
+  retroactive positioning of video frames in the scene).
+\item
+  \textbf{`Q'}: Increase the interpupillary distance in the video
+  background.
+\item
+  \textbf{`E'}: Decrease the interpupillary distance in the video
+  background.
+\item
+  \textbf{`CTRL'}: Eye selection. The left eye is selected by default.
+  While the key is pressed, the right eye is selected.
+\item
+  \textbf{`D'}: Move the video placement for the selected eye to the
+  right.
+\item
+  \textbf{`A'}: Move the video placement for the selected eye to the
+  left.
+\item
+  \textbf{`W'}: Move the video placement for the selected eye up.
+\item
+  \textbf{`S'}: Move the video placement for the selected eye down.
+\item
+  \textbf{RIGHT}: Increase the size of the selected eye horizontally.
+\item
+  \textbf{LEFT}: Decrease the size of the selected eye horizontally.
+\item
+  \textbf{UP}: Increase the size of the selected eye vertically.
+\item
+  \textbf{DOWN}: Decrease the size of the selected eye vertically.
+
+   
+\end{itemize}
+
+This is the basic example. It shows the initialization and usage of
+ARLib for a simple Augmented Reality task in OGRE. This example can also
+be used to test the hardware setup. Please note that none of the
+hardware components have to be connected to start this example. It will
+tell you in the console/logfile if there were any detected problems. To
+keep the example simple, only three static cubes are added to the Scene.
+Using the tracking system, you should be able to look and walk around
+them and see how stable their appearance is. Using the keybindings
+below, you may want to finetune the video positions and sizes as well as
+their constant hardware latency for a smooth experience.
+
+\section{Keybindings}\label{keybindings-1}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  \textbf{`C'}: Set the origin of the scene to the current position and
+  orientation of the Oculus Rift.
+\item
+  \textbf{`N'}: Toggle the
+  \href{https://github.com/ands/OculusMeetsAR/wiki/Postprocessing}{Non-Photorealistic
+  Rendering watercolor postprocessing effect} on/off.
+\item
+  \textbf{`9'}: Increase the amount of constant video latency (for the
+  retroactive positioning of video frames in the scene).
+\item
+  \textbf{`0'}: Decrease the amount of constant video latency (for the
+  retroactive positioning of video frames in the scene).
+\item
+  \textbf{`Q'}: Increase the interpupillary distance in the video
+  background.
+\item
+  \textbf{`E'}: Decrease the interpupillary distance in the video
+  background.
+\item
+  \textbf{`CTRL'}: Eye selection. The left eye is selected by default.
+  While the key is pressed, the right eye is selected.
+\item
+  \textbf{`D'}: Move the video placement for the selected eye to the
+  right.
+\item
+  \textbf{`A'}: Move the video placement for the selected eye to the
+  left.
+\item
+  \textbf{`W'}: Move the video placement for the selected eye up.
+\item
+  \textbf{`S'}: Move the video placement for the selected eye down.
+\item
+  \textbf{RIGHT}: Increase the size of the selected eye horizontally.
+\item
+  \textbf{LEFT}: Decrease the size of the selected eye horizontally.
+\item
+  \textbf{UP}: Increase the size of the selected eye vertically.
+\item
+  \textbf{DOWN}: Decrease the size of the selected eye vertically. The
+  Tracking Library supports several methods for real-time pose
+  determination and estimation. Along with the tracking devices included
+  in the Oculus Rift (both DK1 and DK2), any device using the NatNetSDK
+  is supported. The core of this Module is the \texttt{TrackingManager}
+  class. It is practically the only necessary interface to fire-up an
+  application with tracking support.
+\end{itemize}
+
+\section{Initialization of the
+TrackingManager}\label{initialization-of-the-trackingmanager}
+
+Initialization of the tracking manager requires the user to hand over
+the necessary parameters to the TrackingManager beforehand. First of all
+we create an instance of the class while also defining its purpose.
+
+\begin{verbatim}
+TrackingManager tManager = TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, frameBufferSize, debugOutput);
+\end{verbatim}
+
+where frameBufferSize determines the buffer size for retroactive queries
+(more on that later) and debugOutput is a boolean value enabling debug
+console output. In this example the tracking manager is set up to
+connect to a NatNet Server (i.e Motive etc.) as well as reading tracking
+data from the rifts inertial sensors, providing more stability in the
+tracking data (there is also support for multiple rifts).
+
+Furthermore the following parameters can (and some have to) be set.
+
+\begin{longtable}[c]{@{}lllll@{}}
+\toprule
+Function Name & Parameters & Default Values & Description & Necessary
+for (NatNet,Rift)\tabularnewline
+\midrule
+\endhead
+setNatNetConnectionType & & none & & (true, false)\tabularnewline
+setNatNetClientIP & string serverIP & localhost & The IP address on
+which your application runs & (true, false)\tabularnewline
+setNatNetServerIP & string clientIP & localhost & The IP address of the
+NatNet Server & (true, false)\tabularnewline
+setNatNetHostCommandPort & int port & 1510 & Network port for commands &
+(false, false)\tabularnewline
+setNatNetHostDataPort & int port & 1511 & Network port for streaming
+data & (false, false)\tabularnewline
+setFrameEvaluationMethod & enum FRAME\_EVALUATION\_METHOD & FRAME\_ROUND
+& Inter-Frame evaluation method for retroactive queries & (false,
+false)\tabularnewline
+\bottomrule
+\end{longtable}
+
+Atfer the setting of the required values, the initialize function of the
+tracking manager can be called for example in the following way:
+
+\begin{verbatim}
+if(ARLib::ARLIB_TRACKING_OK != tManager->initialize()){
+    printf("Failed to Initialize Tracking Manager.");
+    return -1;
+}
+\end{verbatim}
+
+Depending on wether the tracking is critical for your application or not
+you should exit your program.
+
+\section{Using the Tracking Manager}\label{using-the-tracking-manager}
+
+The tracking manager needs to be updated on a regular basis (i.e.~your
+event-loop), if your are using the Oculus Rift. For smooth
+transformations, this should happen at least 75 times per second, that
+is the frame rate supported by the Oculus DK2, or 60 times per second
+for the DK1.
+
+To make objects behave according to the tracking data (i.e.~ridig body
+transformations) they have to inherit from the abstract base class
+\texttt{RigidBodyEventListener}. On each event cycle the manager will
+notify its listeners of any change in their transformations. A
+\texttt{RigidBodyEventListener} has a, not necessarily unique, ID, which
+is used to create a correspondence between the rigid bodies on the
+server (Motive etc.) and the rigid bodies in your application.
+
+For the Oculus there is a specialized \texttt{RigidBodyEventListener}
+the \texttt{RiftRigidBodyEventListener}. The \texttt{RiftSceneNode} from
+the
+\href{https://github.com/ands/OculusMeetsAR/wiki/Ogre-Module}{OgreModule}
+is such a specialized listener. On Registration with the Tracking
+Manager, a handle to the rift is saved and queried for positional data
+each frame.
+
+\section{Retroactive Queries}\label{retroactive-queries}
+
+The camera images need to be placed in front of the virtual camera,
+which is of course a representative of the Oculus. But to reduce the
+effect of latency, which is naturally imposed by the webcams, the images
+need to be placed where they were at capture time. This solution works
+rather nicely in situations where the camera motion is not particularly
+fast. When the camera is moving faster the user will experience black
+borders at the edge of the screen, because the images could not cover
+the whole rendering area. To query the position of the
+\texttt{RiftRigidBodyEventListener} one must call the function.
+
+\begin{verbatim}
+RigidBody* TrackingManager::evaluateRigidBody(unsigned int ID, const long long& retroActiveQuery);
+\end{verbatim}
+
+ID is of course the RigidBody identifier, and retroActiveQuery is the
+desired Timestamp formated equavalently to the QueryPerformanceCounter
+function.
+
+\section{Cleaning Up}\label{cleaning-up}
+
+If the Tracking Manager is no longer used simply delete the handle to
+it. The cleanup will be taken care of by the destructor. In order to
+grab the video from the two Logitech C310 webcams we used the capture
+class from Microsofts Media Foundation example
+\href{https://msdn.microsoft.com/en-us/library/windows/desktop/ee663604\%28v=vs.85\%29.aspx}{MFCaptureToFileSample}
+and modified
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/src/Video/CCapture.cpp}{it}.
+If you want to use different cameras, video resolution or drivers,
+you'll have to modify this class (especially the ConfigureSourceReader
+function, where we set the video format). Furthermore you'll need to
+modify the camera selection in the constructor of
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/src/Video/videoplayer.cpp}{VideoPlayer.cpp}.
+
+However if you just want to use the video module with two C310 and the
+drivers provided by Logitech, you'll just have to create a VideoPlayer
+instance via
+
+\texttt{VideoPlayer(int\ cameraNumber\ =\ 0,\ const\ char\ *ocamModelParametersFilename\ =\ NULL,\ float\ videoDistance\ =\ 4.0f,\ const\ char\ *homographyMatrixFilename\ =\ NULL);}
+
+In order to undistort the video (using the ocam parameters mentioned in
+the
+\href{https://github.com/ands/OculusMeetsAR/wiki/Calibration}{calibration
+section}) and rectify it according to a previously approximated
+homography, you need to hand over the filenames. Furthermore we used
+cameraNumber 0 for the left and 1 for the right camera. The
+videoDistance is similar to a zoom factor applied to the video (look at
+\texttt{void\ calculateUndistortionMap(float\ *xyMap)} to see its
+effect).
+
+After initialization the videoPlayer will immediately start capturing.
+To get a pointer to the current video frame memory in the BGR format,
+you then just have to call videoPlayer's function
+\texttt{void\ *\ update(LARGE\_INTEGER\ *captureTimeStamp\ =\ NULL);}.
+
+\section{Tips \& Problem solving}\label{tips-problem-solving}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  One camera can be attached to the built-in USB port of the Oculus Rift
+  DK2, if the DK2s additional power supply is used.
+\item
+  We couldn't get more than one video stream over that built-in USB
+  port. The second camera needs a separate USB cord.
+\item
+  Sometimes, the Logitech driver enables a digital zoom (Probably to
+  lower the amount of data transferred over a USB root hub). Use a
+  different USB port for one of the cameras.
+\item
+  Camera enumeration seems to happen in exactly the same order each
+  time.
+\end{itemize}
+
+\end{document}
+
