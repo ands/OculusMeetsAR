@@ -1,0 +1,195 @@
+%\documentclass[fontsize=12pt, paper=a4]{report}
+\documentclass[fontsize=12pt, paper=a4]{scrreprt}
+%\documentclass[fontsize=12pt, paper=a4, headinclude, twoside=false, parskip=half+, pagesize=auto, numbers=noenddot, plainheadsepline, open=right]{scrreprt}
+%\documentclass[11pt,a4paper]{article}
+%\usepackage[latin1]{inputenc}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+%\usepackage[ngerman]{babel}
+\usepackage[ngerman,english]{babel}
+\usepackage[square,numbers]{natbib}
+\usepackage{textcomp}
+\usepackage{lmodern}
+
+\usepackage[intlimits]{amsmath}
+\usepackage{amssymb}
+\usepackage{moreverb}
+
+% PDF-Kompression
+\pdfminorversion=5
+\pdfobjcompresslevel=1
+
+%\usepackage[automark]{scrpage2} % Kopf- und Fu�zeilen
+%\usepackage{amsmath,marvosym} % Mathesachen
+%\usepackage{mathpazo} % Palatino f�r Mathemodus
+%\usepackage{mathpazo,tgpagella} % auch sehr sch�ne Schriften
+
+\usepackage{setspace} % Zeilenabstand
+\onehalfspacing % 1,5 Zeilen
+
+% Schriften-Gr��en
+\setkomafont{chapter}{\Large\rmfamily}
+\setkomafont{section}{\large\rmfamily}
+\setkomafont{subsection}{\normalsize\rmfamily}
+\setkomafont{subsubsection}{\normalsize\rmfamily}
+\setkomafont{paragraph}{\rmfamily}
+\setkomafont{subparagraph}{\rmfamily}
+%\setkomafont{chapterentry}{\large\rmfamily}
+%\setkomafont{descriptionlabel}{\bfseries\rmfamily}
+\setkomafont{captionlabel}{\upshape\bfseries}
+\setkomafont{caption}{\itshape}
+
+\usepackage[ngerman,english,pdfauthor={Andreas Mantler}, pdftitle={Design of a Semi-Actuated Tangible Device for Tabletop Interface Interactions}, breaklinks=true]{hyperref}
+\usepackage[final]{microtype}
+\usepackage{url}
+\usepackage{multirow}
+\usepackage{multicol}
+\usepackage{tabularx}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage{color}
+
+\graphicspath{{images/}}
+\DeclareGraphicsExtensions{.pdf,.png,.jpg}
+\renewcommand{\thefigure}{\arabic{figure}}
+\renewcommand{\thetable}{\arabic{table}}
+\usepackage{subcaption}
+\usepackage{rotating}
+%\newcommand{\subfigureautorefname}{\figurename}
+\usepackage[all]{hypcap}
+%\setcapindent{0em}
+%\setcapwidth[c]{0.9\textwidth}
+%\setlength{\abovecaptionskip}{0.2cm}
+\usepackage{chngcntr}
+\counterwithout{figure}{chapter}
+
+\usepackage{listings}
+\lstset{language=C,basicstyle=\ttfamily}
+%\lstset{
+%	extendedchars=true,
+%	basicstyle=\tiny\ttfamily,
+%	tabsize=2,
+%	keywordstyle=\textbf,
+%	commentstyle=\color{gray},
+%	stringstyle=\textit,
+%	numbers=left,
+%	numberstyle=\tiny,
+%	breakautoindent  = true,
+%	breakindent      = 2em,
+%	breaklines       = true,
+%	postbreak        = ,
+%	prebreak         = \raisebox{-.8ex}[0ex][0ex]{\Righttorque},
+%}
+
+% linksb�ndige Fu�boten
+\deffootnote{1.5em}{1em}{\makebox[1.5em][l]{\thefootnotemark}}
+
+\typearea{14}
+
+\makeatletter
+\newcommand{\saved@equation}{}
+\let\saved@equation\equation
+\def\equation{\@hyper@itemfalse\saved@equation}
+\makeatother
+
+% einr�cken nach �berschriften
+\makeatletter
+\let\@afterindentfalse\@afterindenttrue % Absatzeinzug auch nach �berschriften
+\@afterindenttrue
+\makeatother
+
+
+% bild mit defnierter Breite einf�gen
+\newcommand{\bild}[4]{
+  \begin{figure}[!hbt]
+    \centering
+      \vspace{1ex}
+      \includegraphics[width=#2]{images/#1}
+      \caption[#4]{\label{img.#1} #3}
+    \vspace{1ex}
+  \end{figure}
+}
+% bild mit eigener Breite
+\newcommand{\bilda}[3]{
+  \begin{figure}[!hbt]
+    \centering
+      \vspace{1ex}
+      \includegraphics{images/#1}
+      \caption[#3]{\label{img.#1} #2}
+      \vspace{1ex}
+  \end{figure}
+}
+
+\font\texttrm = cmr17
+\font\textttrm = cmr17 at 13pt
+
+\addtolength{\textwidth}{-15mm}
+\addtolength{\oddsidemargin}{13mm}
+
+\addtolength{\headheight}{6.5mm}
+\addtolength{\headsep}{0mm}%-24.5mm}
+\addtolength{\textheight}{5mm}%28.5mm}
+\addtolength{\footskip}{-7.5mm}
+
+\usepackage[headsepline, footsepline, plainheadsepline]{scrpage2}
+\pagestyle{scrheadings}
+\clearscrheadfoot
+\renewcommand*{\chaptermarkformat}{}
+%\renewcommand*{\sectionmarkformat}{}
+\automark[section]{chapter}
+\renewcommand*{\chapterheadstartvskip}{\vspace{-11mm}}
+\renewcommand*{\chapterheadendvskip}{\vspace{4mm}}
+
+\setlength{\parindent}{7mm}
+
+% punkte im Inhaltsverzeichnis
+\makeatletter
+\renewcommand*\l@chapter[2]{
+  \ifnum \c@tocdepth >\m@ne
+    \addpenalty{-\@highpenalty}
+    \vskip 1.0em \@plus\p@
+    \setlength\@tempdima{1.5em}
+    \begingroup
+      \parindent \z@ \rightskip \@pnumwidth
+      \parfillskip -\@pnumwidth
+      \leavevmode \bfseries
+      \advance\leftskip\@tempdima
+      \hskip -\leftskip
+      #1\nobreak\normalfont\leaders\hbox{$\m@th
+        \mkern \@dotsep mu\hbox{.}\mkern \@dotsep
+        mu$}\hfill\nobreak\hb@xt@\@pnumwidth{\hss\bf #2}\par
+      \penalty\@highpenalty
+    \endgroup
+  \fi}
+
+%\renewcommand\l@section[2]{
+%  \ifnum \c@tocdepth >\z@
+%    \addpenalty\@secpenalty
+%    \addvspace{1.0em \@plus\p@}
+%    \setlength\@tempdima{1.5em}
+%    \begingroup
+%      \parindent \z@ \rightskip \@pnumwidth
+%      \parfillskip -\@pnumwidth
+%      \leavevmode \bfseries
+%      \advance\leftskip\@tempdima
+%      \hskip -\leftskip
+%      #1\nobreak\ 
+%      \leaders\hbox{$\m@th\mkern \@dotsep mu\hbox{.}\mkern \@dotsep mu$}
+%     \hfil \nobreak\hb@xt@\@pnumwidth{\hss #2}\par
+%    \endgroup
+%  \fi}
+%\makeatother
+
+% newline after \paragraph
+\makeatletter
+\renewcommand\paragraph{%
+   \@startsection{paragraph}{4}{0mm}%
+      {-\baselineskip}%
+      {.01\baselineskip}%
+      {\normalfont\normalsize\bfseries}}
+\makeatother
+
+\AtBeginDocument{\addtocontents{toc}{\protect\thispagestyle{empty}}}
+

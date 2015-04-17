@@ -1,0 +1,77 @@
+\include{config}
+
+\begin{document}
+
+	% Titelseite
+	\begin{center}
+		\vspace*{54mm}
+		{
+			\renewcommand{\baselinestretch}{0.9}\normalsize
+			\Large
+			\textbf{Oculus Meets AR - Documentation}\\
+		}
+		\vspace*{15.5mm}
+		{
+			\large
+			\textbf{Project Seminar}\\
+		}
+		\vspace*{10mm}
+		{
+			at\\
+			\textbf{Westfälischen Wilhelms-Universität Münster}\\
+		}
+		\vspace*{100mm}
+		\begin{tabular*}{137mm}{ll}
+			Authors: 		& \textbf{Tim }, Matr.Nr. \\
+						& \textbf{Florian Kleene}, Matr.Nr. \\
+						& \textbf{Christian Thiele}, Matr.Nr. \\
+						& \textbf{Andreas Mantler}, Matr.Nr. 363220\\
+			Submission date: 	& April 20th 2015
+		\end{tabular*}
+	\end{center}
+	\newpage
+	
+	% Leere Seite
+	\thispagestyle{empty}\quad\newpage
+	
+	% Inhaltsverzeichnis
+	\thispagestyle{empty}
+	\tableofcontents
+	\addtocontents{toc}{\vspace{-5mm}}
+	\vfill
+	\newpage
+
+	% Leere Seite
+	\thispagestyle{empty}\quad\newpage
+	
+	% Inhalt
+	\setcounter{page}{1}
+	\pagestyle{scrheadings}
+	\setfootsepline{0pt} 
+	\ihead[\chaptername\ \thechapter: \leftmark]{\chaptername\ \thechapter: \leftmark}
+	\cfoot[\vspace*{9mm}\pagemark]{\vspace*{9mm}\pagemark}
+	\renewcommand{\baselinestretch}{1.3}\normalsize
+
+	\chapter{Introduction}
+	\label{sec:introduction}
+	\input{introduction}	
+
+	\chapter{Hardware Requirements}
+	\label{sec:hardware_requirements}
+	\input{hardware_requirements}	
+	
+	% other content
+	
+%	\newpage
+
+	% Quellenverzeichnis
+%	\nocite{*}
+%	\addcontentsline{toc}{chapter}{Bibliography}
+%	\ihead[\leftmark]{\leftmark}
+%	\begin{thebibliography}{99}
+
+%	\end{thebibliography}
+	
+%	\newpage
+
+\end{document}
