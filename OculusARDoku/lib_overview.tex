@@ -1,0 +1,46 @@
+\section{ARLib}\label{arlib}
+
+This is the main library we are developing here. It is comprised of the
+following modules:
+
+\begin{itemize}
+\item
+  \hyperref[sec:video_library]{ARLibVideo}:
+  The stereo video input library. It grabs real-time video streams from
+  the two cameras attached to the Oculus Rift DK2 and provides
+  coordinate lookup tables to undistort them according to their lens
+  parameters and align them to one another according to their
+  precalculated homographies.
+\item
+  \hyperref[sec:oculus_library]{ARLibOculus}:
+  A small wrapper for LibOVR. Only the needed parts. It initializes the
+  HMD, provides the LibOVR configuration parameters and the latest
+  LibOVR tracking data.
+\item
+  \hyperref[sec:tracking_library]{ARLibTracking}:
+  The rigid body tracking library. It uses the NatNetSDK and/or
+  ARLibOculus to provide the latest positions and orientations of rigid
+  bodies as well as a fraction of their tracking history for retroactive
+  queries.
+\item
+  \hyperref[sec:ogre_library]{ARLibOgre}:
+  The OGRE 1.9 interface library. The only part of ARLib that depends on
+  OGRE! Provides all the shaders, materials, render targets and
+  abstracted components that can be directly inserted into a scene.
+\end{itemize}
+
+\section{ARLib\_Samples}\label{arlibux5fsamples}
+
+We provide two simple example projects that demonstrate the usage of
+ARLib within OGRE:
+
+\begin{itemize}
+\item
+  \hyperref[sec:simple_scene]{SimpleScene}:
+  A simple example scene with some static objects placed around the
+  origin.
+\item
+  \hyperref[sec:remote_game]{RemoteGame}:
+  A simple game where one has to defend against laser bullets of a Star
+  Wars Remote.
+\end{itemize}

@@ -1,5 +1,5 @@
 The Tracking Library supports several methods for real-time pose determination and estimation. Along with the tracking devices included in the Oculus Rift (both DK1 and DK2), any device using the NatNetSDK is supported. The core of this Module is the \texttt{TrackingManager} class. It is practically the only necessary interface to fire-up an application with tracking support. The proper use of the tracking library will be discussed in the following sections.
-\subsection{Initialization of the Tracking Manager}\label{tracking-manager-initialization}
+\section{Initialization of the Tracking Manager}\label{tracking-manager-initialization}
 
 Initialization of the tracking manager requires the user to hand over the necessary parameters to the TrackingManager beforehand. First of all we create an instance of the class while also defining its purpose.
 
@@ -17,7 +17,7 @@ if(ARLib::ARLIB_TRACKING_OK != tManager->initialize()){
 \end{lstlisting}
 Depending on wether the tracking is critical for your application or not you should exit your program.
 
-\subsection{Using the Tracking Manager}\label{using-the-tracking-manager}
+\section{Using the Tracking Manager}\label{using-the-tracking-manager}
 
 The tracking manager needs to be updated on a regular basis (i.e. your event-loop), if your are using the Oculus Rift. For smooth transformations, this should happen at least 75 times per second, that is the frame rate supported by the Oculus DK2, or 60 times per second for the DK1.
 
@@ -26,7 +26,7 @@ To make objects behave according to the tracking data (i.e. ridig body transform
 For the Oculus there is a specialized \texttt{RigidBodyEventListener} the \texttt{\justify RiftRigidBodyEventListener}. The \texttt{RiftSceneNode} from the OgreModule is such a specialized listener. On Registration with the Tracking Manager, a handle to the rift is saved and queried for positional data each frame.
 
 
-\subsection{Retroactive Queries}\label{retroactive-queries}
+\section{Retroactive Queries}\label{retroactive-queries}
 
 The camera images need to be placed in front of the virtual camera, which is of course a representative of the Oculus. But to reduce the effect of latency, which is naturally imposed by the webcams, the images need to be placed where they were at capture time. This solution works rather nicely in situations where the camera motion is not particularly fast. When the camera is moving faster the user will experience black borders at the edge of the screen, because the images could not cover the whole rendering area. To query the position of the RiftRigidBodyEventListener one must call the function.
 
@@ -36,6 +36,6 @@ RigidBody* TrackingManager::evaluateRigidBody(unsigned int ID, const long long& 
 
 ID is of course the RigidBody identifier, and retroActiveQuery is the desired Timestamp formated equavalently to the QueryPerformanceCounter function.
 
-\subsection{Cleaning Up}\label{cleaning-up}
+\section{Cleaning Up}\label{cleaning-up}
 
 If the Tracking Manager is no longer used simply delete the handle to it. The cleanup will be taken care of by the destructor.
