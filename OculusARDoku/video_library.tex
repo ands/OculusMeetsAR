@@ -1,6 +1,6 @@
 In order to grab the video from the two Logitech C310 webcams we used the capture
 class from Microsofts Media Foundation example
-\href{https://msdn.microsoft.com/en-us/library/windows/desktop/ee663604\%28v=vs.85\%29.aspx}{MFCaptureToFileSample}
+\href{https://msdn.microsoft.com/en-us/library/windows/desktop/ee663604\%28v=vs.85\%29.aspx}{MFCaptureToFile Sample}\cite{mfcapturetofile}
 and modified
 \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/src/Video/CCapture.cpp}{it}.
 If you want to use different cameras, video resolution or drivers,
@@ -9,24 +9,31 @@ function, where we set the video format). Furthermore you'll need to
 modify the camera selection in the constructor of
 \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/src/Video/videoplayer.cpp}{VideoPlayer.cpp}.
 
-However if you just want to use the video module with two C310 and the
+However if you just want to use the video module with two C310\cite{c310} and the
 drivers provided by Logitech, you'll just have to create a VideoPlayer
-instance via
+instance via the following constructor:
 \begin{lstlisting}
 VideoPlayer(int cameraNumber = 0, const char *ocamModelParametersFilename = NULL, float videoDistance = 4.0f, const char *homographyMatrixFilename = NULL);
 \end{lstlisting}
 In order to undistort the video (using the ocam parameters mentioned in
-the \hyperref[sec:stereo_calibration]{calibration section}) and rectify it according to a previously approximated homography, you need to hand over the filenames. Furthermore we used cameraNumber 0 for the left and 1 for the right camera. The videoDistance is similar to a zoom factor applied to the video (look at
+the \hyperref[sec:stereo_calibration]{calibration section}) and rectify it according to a previously approximated homography, you need to hand over the filenames. Furthermore we used cameraNumber 0 for the left and 1 for the right camera. The videoDistance is similar to a zoom factor applied to the video. To see its effect, look at:
 \begin{lstlisting}
-void calculateUndistortionMap(float *xyMap)
-\end{lstlisting}
-to see its effect).
-
-After initialization the videoPlayer will immediately start capturing. To get a pointer to the current video frame memory in the BGR format, you then just have to call videoPlayer's function
-\begin{lstlisting}
-void * update(LARGE_INTEGER *captureTimeStamp = NULL);
+void calculateUndistortionMap(float *xyMap);
+// map size: getVideoWidth() * getVideoHeight() * sizeof(float) * 2
 \end{lstlisting}
 
+After initialization the videoPlayer will immediately start capturing.
+To get a pointer to the current video frame memory in the BGR format, you then just have to call videoPlayer's following methods:
+\begin{lstlisting}
+LARGE_INTEGER captureTimeStamp;
+void *frameData = videoPlayer->beginUpdate(&captureTimeStamp);
+// use the frameData here if it is not NULL.
+// frame size: getVideoWidth() * getVideoHeight() * 3
+videoPlayer->endUpdate();
+\end{lstlisting}
+The captureTimeStamp is optional. If you provide a captureTimeStamp to beginUpdate and frameData is not NULL, it will be filled with the timestamp at which the frame arrived.
+
+\newpage
 \section{Tips \& Problem solving}\label{tips-problem-solving}
 
 \begin{itemize}
@@ -36,7 +43,7 @@ void * update(LARGE_INTEGER *captureTimeStamp = NULL);
 \item
   We couldn't get more than one video stream over that built-in USB port. The second camera needs a separate USB cord.
 \item
-  Sometimes, the Logitech driver enables a digital zoom (Probably to lower the amount of data transferred over a USB root hub). Use a different USB port for one of the cameras.
+  Sometimes, the Logitech driver enables a digital zoom (Probably to lower the amount of data transferred over a USB root hub). Try a different USB port for one of the cameras.
 \item
   Camera enumeration seems to happen in exactly the same order each time.
 \end{itemize}

@@ -1,0 +1,112 @@
+ARLibOgre provides an engine-dependent integration of ARLib into the \emph{Object oriented Graphics Rendering Engine (OGRE)}\cite{ogre}.
+
+\section{Example}\label{example}
+
+Usage in an OGRE scene (have a look at the
+\href{https://github.com/ands/OculusMeetsAR/tree/master/ARLib_Samples}{ARLib\_Samples}
+for more details):
+
+\begin{lstlisting}
+// create a rift node and add it to the tracking system
+riftNode = new ARLib::RiftSceneNode(
+    rift, sceneManager, 0.001f, 50.0f, 1);
+tracker->addRigidBodyEventListener(riftNode);
+
+// add a render target that renders to the rift screen (window)
+renderTarget = new ARLib::RiftRenderTarget(rift, root, window);
+riftNode->addRenderTarget(renderTarget);
+
+// add a render target that renders to an additional debug output
+smallRenderTarget = new ARLib::DebugRenderTarget(smallWindow);
+riftNode->addRenderTarget(smallRenderTarget);
+
+// attach video screens (call riftVideoScreens->update() each frame!)
+riftVideoScreens = new ARLib::RiftVideoScreens(sceneManager,
+    riftNode, leftVideoPlayer, rightVideoPlayer, tracker);
+\end{lstlisting}
+
+\section{Class Listing}
+ARLibOgre is comprised of the following classes:
+
+\newpage
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftSceneNode.h}{ARLib::RiftSceneNode}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Tracking/RigidBodyEventListener.h\#L33}{ARLib::RiftRigidBodyEventListener}}{ARLib::RiftSceneNode : public ARLib::RiftRigidBodyEventListener}}\label{arlibriftscenenode-public-arlibriftrigidbodyeventlistener}
+
+The \texttt{RiftSceneNode} represents the virtual Oculus Rift device in the OGRE
+scene. Especially, it contains the two cameras which represent the eyes.
+\texttt{RenderTargets} can be connected to the \texttt{RiftSceneNode}.
+
+\begin{lstlisting}
+// constructor
+RiftSceneNode(ARLib::Rift *rift, Ogre::SceneManager *sceneManager,
+    float zNear, float zFar, unsigned int rigidBodyID);
+
+// the various parts the RiftSceneNode is comprised of
+ARLib::Rift *getRift();
+Ogre::SceneNode *getBodyNode();
+Ogre::SceneNode *getHeadNode();
+Ogre::SceneNode *getHeadCalibrationNode();
+Ogre::Camera *getLeftCamera();
+Ogre::Camera *getRightCamera();
+
+// manually adjustable orientation
+// useful for mouselook if no actual Oculus Rift device is connected
+void setPitch(Ogre::Radian angle);
+void setYaw(Ogre::Radian angle);
+
+// maintain the render targets
+void addRenderTarget(ARLib::RenderTarget *renderTarget);
+void removeRenderTarget(ARLib::RenderTarget *renderTarget);
+void removeAllRenderTargets();
+\end{lstlisting}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftRenderTarget.h}{ARLib::RiftRenderTarget}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RenderTarget.h}{ARLib::RenderTarget}}{ARLib::RiftRenderTarget : public ARLib::RenderTarget}}\label{arlibriftrendertarget-public-arlibrendertarget}
+
+The \texttt{RiftRenderTarget} is the \texttt{RenderTarget} that renders to the Oculus Rift
+screen (in extended desktop mode), using the provided distortion meshes,
+vignetting and chromatic aberration correction.
+
+\begin{lstlisting}
+// constructor
+RiftRenderTarget(ARLib::Rift *rift, Ogre::Root *root,
+    Ogre::RenderWindow *renderWindow);
+\end{lstlisting}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/DebugRenderTarget.h}{ARLib::DebugRenderTarget}
+: public
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RenderTarget.h}{ARLib::RenderTarget}}{ARLib::DebugRenderTarget : public ARLib::RenderTarget}}\label{arlibdebugrendertarget-public-arlibrendertarget}
+
+The \texttt{DebugRenderTarget} is a \texttt{RenderTarget} that renders both camera images
+next to each other directly to a debug output window. Use this, if you
+don't have an actual Oculus Rift connected.
+
+\begin{lstlisting}
+// constructor
+DebugRenderTarget(Ogre::RenderWindow *renderWindow);
+\end{lstlisting}
+
+\subsubsection{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftVideoScreens.h}{ARLib::RiftVideoScreens}}{ARLib::RiftVideoScreens}}\label{arlibriftvideoscreens}
+
+\texttt{RiftVideoScreens} manages the streaming and placement of camera images.
+The camera images are placed at the location in the scene where they
+have been captured (according to their capture timestamp and the Rifts'
+tracking data history).
+
+\begin{lstlisting}
+// constructor
+RiftVideoScreens(
+    Ogre::SceneManager *sceneManager, ARLib::RiftSceneNode *riftNode,
+    ARLib::VideoPlayer *videoPlayerLeft,
+    ARLib::VideoPlayer *videoPlayerRight,
+    ARLib::TrackingManager *trackingManager = NULL);
+
+// use these to fine-tune the video image positions and sizes
+void setOffsets(Ogre::Vector2 leftOffset, Ogre::Vector2 rightOffset);
+void setScalings(Ogre::Vector2 leftScale, Ogre::Vector2 rightScale);
+
+// call this every frame to upload the latest camera images
+void update();
+\end{lstlisting}

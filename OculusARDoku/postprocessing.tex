@@ -5,12 +5,12 @@ This page explains the integration of postprocessing effects into the stereo out
 As you can see in
 \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/RemoteGame/src/GlowRenderTarget.cpp}{GlowRenderTarget.cpp},
 attaching
-\hyperref[sec:ogre_library]{RenderTargets}
+\hyperref[sec:ogre_library]{\texttt{RenderTargets}}
 to the
-\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftSceneNode.h}{RiftSceneNode}
+\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Ogre/RiftSceneNode.h}{\texttt{RiftSceneNode}}
 can be intercepted (or decorated/wrapped as in the ``decorator
-pattern'') by inserting a custom RenderTarget in between the
-RiftSceneNode and the actual RenderTarget. In
+pattern'') by inserting a custom \texttt{RenderTarget} in between the
+\texttt{RiftSceneNode} and the actual \texttt{RenderTarget}. In
 \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/RemoteGame/src/GlowRenderTarget.cpp}{GlowRenderTarget.cpp},
 the latest viewports for both eye cameras are accessed after they were
 attached to add a glow effect compositor.
@@ -19,19 +19,19 @@ attached to add a glow effect compositor.
 
 \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib_Samples/Common/src/NPRWatercolorRenderTarget.cpp}{NPRWatercolorRenderTarget.cpp}
 demonstrates a more advanced example for postprocessing. Instead of just
-directly rendering and compositing into the destination RenderTarget,
+directly rendering and compositing into the destination \texttt{RenderTarget},
 the eye camera images are passed both blurred and unchanged to an OGRE
-MultiRenderTarget. The blurred images are used to make voronoi-like
+\texttt{MultiRenderTarget}. The blurred images are used to make voronoi-like
 tilings of the input image (the brushstrokes), while edges detected in
 the original images are subtracted from the voronoi tilings (sharp
 outlines). The results are presented in separate scenes, which are seen
 by another set of cameras. Those cameras are finally passed to the
-destination RenderTarget.
+destination \texttt{RenderTarget}.
 
 \includegraphics*[width=.92\textwidth]{NPRWatercolorRenderTarget.png}
 
 The whole process is a simplified version of a
-\href{http://csnotes.upm.edu.my/kelasmaya/web.nsf/0/d82e709c4661ce464825766400365c4d/\$FILE/p231-chen.pdf}{technique
-by Chen, Turk and MacIntyre from 2008}. The idea was that if both, real
+\href{http://csnotes.upm.edu.my/kelasmaya/web.nsf/0/d82e709c4661ce464825766400365c4d/$FILE/p231-chen.pdf}{technique
+by Chen, Turk and MacIntyre from 2008}\cite{watercolor}. The idea was that if both, real
 images and rendered objects are postprocessed to look like stylized
 watercolor paintings, it might be more difficult to tell them apart.

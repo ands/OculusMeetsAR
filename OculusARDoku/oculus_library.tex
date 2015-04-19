@@ -1,0 +1,109 @@
+ARLibOculus is just a lightweight single-class wrapper for the needed parts of LibOVR (the Oculus SDK)\cite{dk2}.
+Including \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Oculus/Rift.h}{ARLib/Oculus/Rift.h} won't pull any LibOVR header files into the compilation unit.
+In fact, it doesn't depend on anything at all!
+
+\section{\texorpdfstring{\href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/include/ARLib/Oculus/Rift.h}{ARLib::Rift}}{ARLib::Rift}}\label{arlibrift}
+\texttt{ARLib::Rift} has some static methods as well as non-static ones.
+The static methods are needed to initialize and shutdown the LibOVR system as a whole,
+while the non-static methods operate on single instances of Oculus Rift devices.
+
+\subsubsection{Static Methods}\label{static-methods}
+
+\begin{lstlisting}
+static void init();
+\end{lstlisting}
+Initializes LibOVR. Must be called once before using anything else from ARLibOculus.
+
+\begin{lstlisting}
+static void shutdown();
+\end{lstlisting}
+Shuts down LibOVR. Should be called once after deleting all \texttt{ARLib::Rift} instances.
+
+\begin{lstlisting}
+static bool available(int id);
+\end{lstlisting}
+Test if an Oculus Rift device with the specified id is connected (0 is the first connected Rift).
+
+\subsubsection{Methods}\label{methods}
+
+\begin{lstlisting}
+enum RIFT_ERROR_CODE
+{
+    RIFT_OK,
+    RIFT_CONNECTION_ERROR,
+    RIFT_TRACKING_ERROR
+};
+
+RIFT_ERROR_CODE initialize(int id);
+\end{lstlisting}
+Initializes the instance. Tries to connect to the Oculus Rift device with the specified id. Returns \texttt{RIFT\_OK} on success.
+
+\begin{lstlisting}
+void getTextureSizes(
+    int *size2dL,
+    int *size2dR);
+\end{lstlisting}
+Writes the recommended render target texture/framebuffer resolutions for each eye into the specified \texttt{int{[}2{]}} arrays.
+
+\begin{lstlisting}
+void getUVScalesAndOffsets(
+    float *scale2dL, float *offset2dL,
+    float *scale2dR, float *offset2dR);
+\end{lstlisting}
+Writes texture coordinate shader parameters for each eye to the specified \texttt{float{[}2{]}} arrays.
+These have to be passed as uniforms to the \href{https://github.com/ands/OculusMeetsAR/blob/master/ARLib/ogre_media/ARLibOculusDistortionVertex.glsl}{ARLibOculusDistortionVertex.glsl} shader.
+
+\begin{lstlisting}
+struct DistortionVertex
+{
+    // [-1,+1],[-1,+1] over the entire framebuffer:
+    float ScreenPosNDC[2];
+
+    // Lerp factor between time-warp matrices. Can be encoded in Pos.z:
+    float TimeWarpFactor; 
+
+    // Vignette fade factor. Can be encoded in Pos.w:
+    float VignetteFactor;
+
+    // Chromatic aberration correction parameters:
+    float TanEyeAnglesR[2];
+    float TanEyeAnglesG[2];
+    float TanEyeAnglesB[2];
+};
+
+void getDistortionGeometries(
+    DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
+    DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR);
+\end{lstlisting}
+Writes pointers to triangle mesh data and data quantities for the distortion meshes of each eye to the specified locations.
+
+\begin{lstlisting}
+void getProjections(
+    float znear, float zfar, bool rightHanded,
+    float *aspectRatioL, float *projection4x4L,
+    float *aspectRatioR, float *projection4x4R);
+\end{lstlisting}
+For specified near and far distances, writes device aspect ratios and projection matrices for each eye into the specified locations.
+
+\begin{lstlisting}
+void getPose(float *position3d, float *orientationQuaternionXYZW);
+\end{lstlisting}
+Writes the latest LibOVR tracking position and orientation to the specified \texttt{float{[}3{]}} and \texttt{float{[}4{]}} arrays.
+
+\begin{lstlisting}
+void recenterPose();
+\end{lstlisting}
+Will recenter the tracking position and orientation (yaw component) to the current pose.
+
+\begin{lstlisting}
+float getInterpupillaryDistance();
+\end{lstlisting}
+Returns the configured IPD (interpupillary distance) for the current LibOVR user.
+
+\begin{lstlisting}
+bool isPositionCurrentlyTracked();
+bool isOrientationCurrentlyTracked();
+bool isCameraPoseCurrentlyTracked();
+bool isPositionTrackingConnected();
+\end{lstlisting}
+Various LibOVR tracking state flags.

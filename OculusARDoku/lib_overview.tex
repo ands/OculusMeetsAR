@@ -7,25 +7,25 @@ following modules:
 \item
   \hyperref[sec:video_library]{ARLibVideo}:
   The stereo video input library. It grabs real-time video streams from
-  the two cameras attached to the Oculus Rift DK2 and provides
+  the two cameras\cite{c310} attached to the Oculus Rift DK2\cite{dk2} and provides
   coordinate lookup tables to undistort them according to their lens
   parameters and align them to one another according to their
   precalculated homographies.
 \item
   \hyperref[sec:oculus_library]{ARLibOculus}:
-  A small wrapper for LibOVR. Only the needed parts. It initializes the
+  A small wrapper for LibOVR\cite{dk2}. Only the needed parts. It initializes the
   HMD, provides the LibOVR configuration parameters and the latest
   LibOVR tracking data.
 \item
   \hyperref[sec:tracking_library]{ARLibTracking}:
-  The rigid body tracking library. It uses the NatNetSDK and/or
+  The rigid body tracking library. It uses the NatNetSDK\cite{optitrack} and/or
   ARLibOculus to provide the latest positions and orientations of rigid
   bodies as well as a fraction of their tracking history for retroactive
   queries.
 \item
   \hyperref[sec:ogre_library]{ARLibOgre}:
-  The OGRE 1.9 interface library. The only part of ARLib that depends on
-  OGRE! Provides all the shaders, materials, render targets and
+  The OGRE 1.9\cite{ogre} interface library. This is the only part of ARLib that depends on
+  OGRE. It provides all the shaders, materials, render targets and
   abstracted components that can be directly inserted into a scene.
 \end{itemize}
 
@@ -41,6 +41,6 @@ ARLib within OGRE:
   origin.
 \item
   \hyperref[sec:remote_game]{RemoteGame}:
-  A simple game where one has to defend against laser bullets of a Star
-  Wars Remote.
+  A simple game where one has to defend against laser bullets of a \emph{Star
+  Wars Remote}.
 \end{itemize}

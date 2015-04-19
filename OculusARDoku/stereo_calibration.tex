@@ -1,6 +1,6 @@
 \begin{enumerate}
 \item 
-Before starting the stereo calibration, download the \href{https://sites.google.com/site/scarabotix/ocamcalib-toolbox}{OCamCalib Toolbox} for Matlab provided by Davide Scaramuzza. Use this tool to calculate the intrinsic camera parameters for both cameras. We recommend our calibration tool to take snapshots for both cameras (see 3). Rename the two resulting calib\_results.txt to calib\_results\_CAM1.txt (left camera) and calib\_results\_CAM2.txt (right camera) and place these files at /Hardware/Calibration\_Tool/media/
+Before starting the stereo calibration, download the \href{https://sites.google.com/site/scarabotix/ocamcalib-toolbox}{OCamCalib Toolbox} for Matlab provided by Davide Scaramuzza\cite{ocamcalib}. Use this tool to calculate the intrinsic camera parameters for both cameras. We recommend our calibration tool to take snapshots for both cameras (see 3). Rename the two resulting calib\_results.txt to calib\_results\_CAM1.txt (left camera) and calib\_results\_CAM2.txt (right camera) and place these files at /Hardware/Calibration\_Tool/media/
 \item
   Connect your webcams to the system and start our
   \href{https://github.com/ands/OculusMeetsAR/tree/master/Hardware/Calibration_Tool}{calibration
@@ -36,7 +36,7 @@ Before starting the stereo calibration, download the \href{https://sites.google.
 	
   Select the second option and choose the method for keypoint extraction
   and matching -
-  \href{http://en.wikipedia.org/wiki/Scale-invariant_feature_transform}{SIFT},
+  \href{http://en.wikipedia.org/wiki/Scale-invariant_feature_transform}{SIFT}\cite{sift},
   chessboard detection (using OpenCV's chessboard corner detector), or a
   combination of both.
 	
@@ -70,30 +70,29 @@ Before starting the stereo calibration, download the \href{https://sites.google.
 \item
   Approximate the
   \href{http://en.wikipedia.org/wiki/Epipolar_geometry}{epipolar
-  geometry} (main menu option 4). With the calculated or selected
+  geometry}\cite{epipolar} (main menu option 4). With the calculated or selected
   matches we now want to estimate the fundamental matrix as well as the
   homographies, which we can use to rectify our camera streams.
 	
   \includegraphics*[width=.92\textwidth]{9_1.jpg}
 	
   Here we used two methods: 1. The implementation of Hartley's
-  \href{http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html\#findfundamentalmat}{8-point-algorithm}
+  \href{http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html\#findfundamentalmat}{8-point-algorithm}\cite{hartley8point}
   from OpenCV, which uses RANSAC for more than 8 points. 2. We
   implemented
-  \href{http://publica.fraunhofer.de/documents/N-246139.html}{this
-  paper} by Zilly, Mueller, Eisert and Kauff.
+  \href{http://publica.fraunhofer.de/documents/N-246139.html}{\emph{Joint estimation of epipolar geometry and rectification parameters using point correspondences for stereoscopic TV sequences}} by Zilly, Mueller, Eisert and Kauff\cite{joint_estimation}.
 	
   \includegraphics*[width=.92\textwidth]{10.jpg}
 	
   If you choose the latter, you can calculate the rectifying
   homographies either according to the mentioned paper or using
   \href{http://docs.opencv.org/modules/calib3d/doc/camera_calibration_and_3d_reconstruction.html\#stereorectifyuncalibrated}{OpenCV's
-  implementation of Hartley's algorithm}.
+  implementation of Hartley's algorithm}\cite{hartley}.
 	
   \includegraphics*[width=.92\textwidth]{11.jpg}
 	
 \item
-  Visualize the approximated fundamental matrix and homogrphies (main
+  Visualize the approximated fundamental matrix and homographies (main
   menu option 5). This will draw some epipolar lines on the first image
   pair loaded. Furthermore it will rectify theses images. The results
   are saved to the media folder.
