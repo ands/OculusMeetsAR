@@ -7,7 +7,9 @@ The Tracking Library supports several methods for real-time pose determination a
 Initialization of the tracking manager requires the user to hand over the necessary parameters to the TrackingManager beforehand. First of all we create an instance of the class while also defining its purpose.
 
 \begin{lstlisting}
-TrackingManager tManager = TrackingManager(ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT, frameBufferSize, debugOutput);
+TrackingManager tManager = TrackingManager(
+    ARLib::ARLIB_NATNET | ARLib::ARLIB_RIFT,
+    frameBufferSize, debugOutput);
 \end{lstlisting}
 where frameBufferSize determines the buffer size for retroactive queries (more on that later) and debugOutput is a boolean value enabling debug console output. In this example the tracking manager is set up to connect to a NatNet Server (i.e Motive etc.) as well as reading tracking data from the rifts inertial sensors, providing more stability in the tracking data (there is also support for multiple rifts).
 The \texttt{initialize} function returns the status of the tracking manager. This is very helpfull for debugging. Furthermore the tracking manager should not be used unless no error is returned by the \texttt{initialize} function.
@@ -34,7 +36,8 @@ For the Oculus there is a specialized \texttt{RigidBodyEventListener} the \textt
 The camera images need to be placed in front of the virtual camera, which is of course a representative of the Oculus. But to reduce the effect of latency, which is naturally imposed by the webcams, the images need to be placed where they were at capture time. This solution works rather nicely in situations where the camera motion is not particularly fast. When the camera is moving faster the user will experience black borders at the edge of the screen, because the images could not cover the whole rendering area. To query the position of the RiftRigidBodyEventListener one must call the function.
 
 \begin{lstlisting}
-RigidBody* TrackingManager::evaluateRigidBody(unsigned int ID, const long long& retroActiveQuery);
+RigidBody* TrackingManager::evaluateRigidBody(
+    unsigned int ID, const long long& retroActiveQuery);
 \end{lstlisting}
 
 ID is of course the RigidBody identifier, and retroActiveQuery is the desired Timestamp formated equavalently to the QueryPerformanceCounter function.

@@ -75,8 +75,10 @@ struct DistortionVertex
 };
 
 void getDistortionGeometries(
-    DistortionVertex **verticesL, int *vertexNumL, unsigned short **indicesL, int *indexNumL,
-    DistortionVertex **verticesR, int *vertexNumR, unsigned short **indicesR, int *indexNumR);
+    DistortionVertex **verticesL, int *vertexNumL,
+    unsigned short **indicesL, int *indexNumL,
+    DistortionVertex **verticesR, int *vertexNumR,
+    unsigned short **indicesR, int *indexNumR);
 \end{lstlisting}
 Writes pointers to triangle mesh data and data quantities for the distortion meshes of each eye to the specified locations.
 
