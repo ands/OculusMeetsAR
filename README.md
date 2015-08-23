@@ -1,5 +1,8 @@
 OculusMeetsAR
 =============
+<p align="center">
+  <img src="https://raw.githubusercontent.com/wiki/ands/OculusMeetsAR/images/explosion.jpg" alt="OculusMeetsAR - Hardware Explosion"/>
+</p>
 
 OculusMeetsAR is a library to use the Oculus Rift DK2 Head Mounted Display, two Logitech C310 Webcams (with fisheye lenses) and the Natural Point OptiTrack Flex 3 tracking hardware in Augmented Reality applications.
 
